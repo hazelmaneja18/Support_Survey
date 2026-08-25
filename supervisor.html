@@ -3,111 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supervisor Access - Service Rating Analytics</title>
+    <title>Verifone | Analytics & Reporting Dashboard</title>
     <style>
         :root {
-            --bg-color: #03182b;
-            --card-bg: #06233f;
-            --accent-cyan: #00bcd4;
-            --text-color: #ffffff;
-            --input-bg: #02111e;
-            --border-color: #0d47a1;
+            --bg-base: #f0f4f8;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(203, 213, 225, 0.6);
+            --primary-dark: #0f172a;
+            --accent-teal: #0d9488;
+            --accent-teal-light: #ccfbf1;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e0f2fe 100%);
+            color: var(--text-main);
             margin: 0;
-            padding: 30px;
+            padding: 40px 20px;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         .container {
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-            padding: 25px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 30px;
             width: 100%;
             max-width: 1000px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
             margin-bottom: 25px;
+            box-sizing: border-box;
         }
 
-        h2, h3 { color: var(--accent-cyan); margin-top: 0; }
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
 
-        /* Auth Screen */
+        .verifone-logo svg {
+            height: 32px;
+            fill: var(--primary-dark);
+        }
+
+        h2, h3 { color: var(--primary-dark); margin-top: 0; }
+
+        .quote-box {
+            background: var(--accent-teal-light);
+            border-left: 4px solid var(--accent-teal);
+            padding: 10px 15px;
+            font-style: italic;
+            font-size: 13px;
+            color: #0f766e;
+            margin-bottom: 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
         #auth-screen {
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
-            margin-top: 80px;
+            margin-top: 60px;
         }
 
         input[type="password"], input[type="text"], select {
-            background-color: var(--input-bg);
-            color: #fff;
-            border: 1px solid var(--accent-cyan);
-            padding: 8px 12px;
-            border-radius: 3px;
+            background: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--input-border);
+            padding: 10px 14px;
+            border-radius: 6px;
             font-size: 14px;
             box-sizing: border-box;
         }
 
+        input[type="password"]:focus, input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+        }
+
         .btn {
-            background-color: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--accent-cyan);
-            padding: 8px 16px;
-            font-weight: bold;
+            background: var(--accent-teal);
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-weight: 700;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
         }
 
         .btn:hover {
-            background-color: var(--accent-cyan);
-            color: #000;
+            background: #0f766e;
         }
 
         .filter-bar {
             display: flex;
-            gap: 15px;
-            background: var(--input-bg);
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            gap: 20px;
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
             align-items: center;
+            border: 1px solid var(--card-border);
         }
 
-        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            background-color: #e0e0e0;
-            color: #000;
+            background-color: #ffffff;
+            color: var(--text-main);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         th, td {
-            border: 1px solid #9e9e9e;
-            padding: 8px 12px;
+            padding: 12px 14px;
             text-align: left;
             font-size: 13px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         th {
-            background-color: #06233f;
-            color: #fff;
+            background-color: #0f172a;
+            color: #ffffff;
+            font-weight: 600;
         }
 
-        tr:nth-child(even) { background-color: #eeeeee; }
+        tr:nth-child(even) { background-color: #f8fafc; }
 
         .hidden { display: none !important; }
 
         .form-inline {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
         }
     </style>
@@ -116,69 +158,93 @@
 
     <!-- Authentication Screen -->
     <div id="auth-screen" class="container">
-        <h2>SUPERVISOR ACCESS</h2>
-        <p>Please enter the password to view reporting.</p>
-        <input type="password" id="passwordInput" placeholder="Enter Password" style="width: 100%; margin-bottom: 15px;">
-        <button class="btn" style="width: 100%;" onclick="authenticate()">LOGIN</button>
-        <p id="authError" style="color: #ff5252; margin-top: 10px;" class="hidden">Incorrect password.</p>
+        <div class="verifone-logo" style="margin-bottom: 20px; justify-content: center; display: flex;">
+            <svg viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="8" cy="8" r="3.5"/><circle cx="8" cy="22" r="3.5"/><circle cx="16" cy="27" r="3.5"/>
+                <circle cx="24" cy="8" r="3.5"/><circle cx="24" cy="17" r="3.5"/><circle cx="24" cy="26" r="3.5"/>
+                <path d="M 10,21 C 12,14 18,18 22,12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <text x="36" y="23" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700">verifone</text>
+            </svg>
+        </div>
+        <h2>SUPERVISOR PORTAL</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Enter security credentials to unlock metrics.</p>
+        <input type="password" id="passwordInput" placeholder="Password" style="width: 100%; margin-bottom: 15px;">
+        <button class="btn" style="width: 100%;" onclick="authenticate()">LOG IN</button>
+        <p id="authError" style="color: #e11d48; margin-top: 12px;" class="hidden">Access Denied: Invalid password.</p>
     </div>
 
-    <!-- Protected Supervisor Content -->
+    <!-- Protected Content -->
     <div id="dashboard-content" class="hidden" style="width: 100%; max-width: 1000px;">
         
-        <!-- Roster Management -->
         <div class="container">
+            <div class="brand-header">
+                <div class="verifone-logo">
+                    <svg viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="8" cy="8" r="3.5"/><circle cx="8" cy="22" r="3.5"/><circle cx="16" cy="27" r="3.5"/>
+                        <circle cx="24" cy="8" r="3.5"/><circle cx="24" cy="17" r="3.5"/><circle cx="24" cy="26" r="3.5"/>
+                        <path d="M 10,21 C 12,14 18,18 22,12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <text x="36" y="23" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700">verifone</text>
+                    </svg>
+                </div>
+                <span style="font-weight: 600; color: var(--accent-teal);">Supervisor Analytics Hub</span>
+            </div>
+
+            <div class="quote-box">
+                "Data-driven decisions empower operational efficiency and elevate team success."
+            </div>
+
             <h3>Manage Support Roster</h3>
             <div class="form-inline">
-                <input type="text" id="newName" placeholder="Support Name" style="flex: 2;">
+                <input type="text" id="newName" placeholder="Support Member Name" style="flex: 2;">
                 <select id="newTeam" style="flex: 1;">
-                    <option value="Tucson">Tucson</option>
-                    <option value="Manila">Manila</option>
-                </select>
-                <button class="btn" onclick="addSupportMember()">Add Support Member</button>
-            </div>
-        </div>
-
-        <!-- Analytics & Filter Dashboard -->
-        <div class="container">
-            <h3>Supervisor Dashboard & Filters</h3>
-            
-            <div class="filter-bar">
-                <label>Filter Team:</label>
-                <select id="teamFilter" onchange="renderDashboard()">
-                    <option value="ALL">All Teams</option>
                     <option value="Tucson">Tucson Support</option>
                     <option value="Manila">Manila Support</option>
                 </select>
+                <button class="btn" onclick="addSupportMember()">Add to Roster</button>
+            </div>
+        </div>
 
-                <label>Filter Month:</label>
-                <select id="monthFilter" onchange="renderDashboard()"></select>
+        <div class="container">
+            <h3>Performance Reporting</h3>
+            
+            <div class="filter-bar">
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Region Filter:</label>
+                    <select id="teamFilter" onchange="renderDashboard()">
+                        <option value="ALL">All Regions (Tucson & Manila)</option>
+                        <option value="Tucson">Tucson Support</option>
+                        <option value="Manila">Manila Support</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Month Filter:</label>
+                    <select id="monthFilter" onchange="renderDashboard()"></select>
+                </div>
             </div>
 
-            <!-- Average Summary Table -->
-            <h4 style="color: var(--accent-cyan); margin-bottom: 5px;">Support Average Survey Feedback</h4>
-            <table style="background: #fff; margin-bottom: 25px;">
+            <h4 style="color: var(--accent-teal); margin-bottom: 8px;">Average Feedback Score Per Support</h4>
+            <table style="margin-bottom: 30px;">
                 <thead>
                     <tr>
                         <th>Support Name</th>
-                        <th>Team</th>
-                        <th>Total Feedback Submissions</th>
-                        <th>Average Rating</th>
+                        <th>Region</th>
+                        <th>Submissions</th>
+                        <th>Average Score</th>
                     </tr>
                 </thead>
                 <tbody id="summaryBody"></tbody>
             </table>
 
-            <!-- Detailed Feedback Submissions Log -->
-            <h4 style="color: var(--accent-cyan); margin-bottom: 5px;">All Submitted Feedback Log</h4>
+            <h4 style="color: var(--accent-teal); margin-bottom: 8px;">Detailed Audit Log</h4>
             <table>
                 <thead>
                     <tr>
-                        <th>Date & Time Submitted</th>
+                        <th>Date & Time</th>
                         <th>Agent Name</th>
-                        <th>Case Number</th>
+                        <th>Case #</th>
                         <th>Support Name</th>
-                        <th>Team</th>
+                        <th>Region</th>
                         <th>Rating</th>
                         <th>Comments</th>
                     </tr>
@@ -217,13 +283,13 @@
 
             const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
             if (roster.some(m => m.name.toLowerCase() === name.toLowerCase())) {
-                return alert('This support person already exists.');
+                return alert('This member already exists in the roster.');
             }
 
             roster.push({ name, team });
             localStorage.setItem('supportRoster', JSON.stringify(roster));
             nameInput.value = '';
-            alert(`${name} added to ${team} support roster!`);
+            alert(`${name} added to ${team} team roster!`);
             renderDashboard();
         }
 
@@ -232,7 +298,7 @@
             const months = [...new Set(submissions.map(s => s.monthKey))].sort().reverse();
             
             const monthSelect = document.getElementById('monthFilter');
-            monthSelect.innerHTML = '<option value="ALL">All Months</option>';
+            monthSelect.innerHTML = '<option value="ALL">All Time</option>';
             
             months.forEach(m => {
                 const opt = document.createElement('option');
@@ -247,20 +313,16 @@
             const monthVal = document.getElementById('monthFilter').value;
             
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
 
-            // Filter submissions
             const filteredData = submissions.filter(s => {
                 const matchTeam = (teamVal === 'ALL') || (s.team === teamVal);
                 const matchMonth = (monthVal === 'ALL') || (s.monthKey === monthVal);
                 return matchTeam && matchMonth;
             });
 
-            // 1. Render Summary Table
             const summaryBody = document.getElementById('summaryBody');
             summaryBody.innerHTML = '';
 
-            // Group data
             const stats = {};
             filteredData.forEach(item => {
                 if (!stats[item.supportName]) {
@@ -282,7 +344,6 @@
                 `;
             }
 
-            // 2. Render Detail Logs
             const detailsBody = document.getElementById('detailsBody');
             detailsBody.innerHTML = '';
 
