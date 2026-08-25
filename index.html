@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifone | Analytics & Supervisor Portal</title>
+    <title>Verifone | Support Service Rating</title>
     <style>
         :root {
             --bg-base: #f0f4f8;
@@ -16,7 +16,6 @@
             --text-muted: #64748b;
             --input-bg: #ffffff;
             --input-border: #cbd5e1;
-            --danger-red: #ef4444;
         }
 
         body {
@@ -24,550 +23,315 @@
             background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e0f2fe 100%);
             color: var(--text-main);
             margin: 0;
-            padding: 30px;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 15px;
             box-sizing: border-box;
         }
 
-        /* Auth Screen */
-        #auth-screen {
-            max-width: 420px;
-            margin: 80px auto;
+        .container {
             background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--card-border);
             border-radius: 12px;
-            padding: 35px;
-            text-align: center;
+            padding: 40px 35px;
+            width: 100%;
+            max-width: 520px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
-        /* App Layout: Left Roster Sidebar + Right Dashboard Focus */
-        .app-layout {
+        .header-top {
             display: flex;
-            gap: 25px;
-            max-width: 1400px;
-            margin: 0 auto;
-            align-items: flex-start;
-        }
-
-        .sidebar-left {
-            width: 280px;
-            flex-shrink: 0;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-        }
-
-        .main-dashboard {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .container-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-        }
-
-        .brand-header {
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--card-border);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            align-items: center;
+            margin-bottom: 25px;
         }
 
         .verifone-logo-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .verifone-mark {
-            height: 28px;
-            width: 28px;
+            height: 32px;
+            width: 32px;
         }
 
         .verifone-text {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
             color: var(--primary-dark);
             letter-spacing: -0.8px;
         }
 
-        h2, h3, h4 { color: var(--primary-dark); margin-top: 0; }
+        .btn-supervisor {
+            background: #ffffff;
+            color: var(--accent-teal);
+            border: 1px solid var(--accent-teal);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-        .quote-box {
+        .btn-supervisor:hover {
+            background: var(--accent-teal);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+        }
+
+        .title-block {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: var(--primary-dark);
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .quote-banner {
             background: var(--accent-teal-light);
             border-left: 4px solid var(--accent-teal);
-            padding: 10px 15px;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 25px;
             font-style: italic;
             font-size: 13px;
             color: #0f766e;
-            margin-bottom: 20px;
-            border-radius: 0 6px 6px 0;
         }
 
-        input[type="password"], input[type="text"], input[type="date"], select {
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        input[type="text"], select, textarea {
             background: var(--input-bg);
             color: var(--text-main);
             border: 1px solid var(--input-border);
-            padding: 9px 12px;
+            padding: 11px 14px;
             border-radius: 6px;
-            font-size: 13px;
-            box-sizing: border-box;
+            font-size: 14px;
             width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        input:focus, select:focus {
+        input[type="text"]:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--accent-teal);
             box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
         }
 
-        .btn {
+        textarea {
+            height: 85px;
+            resize: vertical;
+        }
+
+        .btn-submit {
             background: var(--accent-teal);
             color: #ffffff;
             border: none;
-            padding: 10px 16px;
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: background-color 0.2s ease;
-        }
-
-        .btn:hover { background: #0f766e; }
-
-        .btn-delete {
-            background: #fef2f2;
-            color: var(--danger-red);
-            border: 1px solid #fca5a5;
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .btn-delete:hover {
-            background: var(--danger-red);
-            color: #ffffff;
-        }
-
-        .btn-clear-all {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            float: right;
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px;
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid var(--card-border);
-        }
-
-        .filter-item label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        table {
+            padding: 13px;
             width: 100%;
-            border-collapse: collapse;
+            font-weight: 700;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
             margin-top: 10px;
-            background-color: #ffffff;
-            color: var(--text-main);
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: background-color 0.2s ease, transform 0.1s ease;
         }
 
-        th, td {
-            padding: 11px 13px;
-            text-align: left;
-            font-size: 13px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        th {
-            background-color: #0f172a;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        tr:nth-child(even) { background-color: #f8fafc; }
-
-        .hidden { display: none !important; }
-
-        .roster-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
-            max-height: 520px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        .roster-item {
-            background: #ffffff;
-            border: 1px solid var(--card-border);
-            padding: 8px 10px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-        }
-
-        .text-center {
-            text-align: center;
+        .btn-submit:hover {
+            background: #0f766e;
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body>
 
-    <!-- Login Screen -->
-    <div id="auth-screen">
-        <div class="verifone-logo-wrapper" style="justify-content: center; margin-bottom: 20px;">
-            <svg class="verifone-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="20" cy="22" r="10" fill="#0f172a"/>
-                <circle cx="20" cy="52" r="10" fill="#0f172a"/>
-                <circle cx="56" cy="22" r="10" fill="#0f172a"/>
-                <circle cx="56" cy="52" r="10" fill="#0f172a"/>
-                <rect x="46" y="22" width="20" height="30" fill="#0f172a"/>
-                <circle cx="38" cy="82" r="10" fill="#0f172a"/>
-            </svg>
-            <span class="verifone-text">verifone</span>
+    <div class="container">
+        <div class="header-top">
+            <div class="verifone-logo-wrapper">
+                <svg class="verifone-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="22" r="10" fill="#0f172a"/>
+                    <circle cx="20" cy="52" r="10" fill="#0f172a"/>
+                    <circle cx="56" cy="22" r="10" fill="#0f172a"/>
+                    <circle cx="56" cy="52" r="10" fill="#0f172a"/>
+                    <rect x="46" y="22" width="20" height="30" fill="#0f172a"/>
+                    <circle cx="38" cy="82" r="10" fill="#0f172a"/>
+                </svg>
+                <span class="verifone-text">verifone</span>
+            </div>
+            <a href="supervisor.html" target="_blank" class="btn-supervisor">
+                🔒 Supervisor Access
+            </a>
         </div>
-        <h2>SUPERVISOR PORTAL</h2>
-        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Enter password to access performance analytics.</p>
-        <input type="password" id="passwordInput" placeholder="Enter Password" style="margin-bottom: 15px;">
-        <button class="btn" style="width: 100%;" onclick="authenticate()">LOGIN</button>
-        <p id="authError" style="color: var(--danger-red); font-size: 13px; margin-top: 12px;" class="hidden">Access Denied: Invalid password.</p>
-    </div>
 
-    <!-- Main Workspace -->
-    <div id="dashboard-content" class="app-layout hidden">
-        
-        <!-- LEFT SIDEBAR -->
-        <aside class="sidebar-left">
-            <h3 style="font-size: 16px; margin-bottom: 12px;">Manage Roster</h3>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Add or delete active support personnel.</p>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-                <input type="text" id="newName" placeholder="Support Full Name">
-                <select id="newTeam">
-                    <option value="Tucson">Tucson</option>
-                    <option value="Manila">Manila</option>
+        <div class="title-block">
+            <h2>SUPPORT SERVICE RATING</h2>
+            <div class="subtitle">Technical Support Assistance Feedback</div>
+        </div>
+
+        <div class="quote-banner">
+            "Excellence is not an act, but a habit. Your feedback drives our continuous improvement."
+        </div>
+
+        <form id="ratingForm">
+            <div class="form-group">
+                <label for="agentUser">Agent Name / ID:</label>
+                <input type="text" id="agentUser" placeholder="e.g. Jane Doe / hmaneja" required>
+            </div>
+
+            <div class="form-group">
+                <label for="caseNumber">Case Number:</label>
+                <input type="text" id="caseNumber" placeholder="Enter support case number" required>
+            </div>
+
+            <div class="form-group">
+                <label for="supportPerson">Support Person Assisting You:</label>
+                <select id="supportPerson" required>
+                    <option value="">-- Select Support Person --</option>
                 </select>
-                <button class="btn" style="width: 100%;" onclick="addSupportMember()">+ Add Member</button>
             </div>
 
-            <hr style="border: none; border-top: 1px solid var(--card-border); margin: 15px 0;">
-
-            <h4 style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Active Roster (<span id="rosterCount">0</span>)</h4>
-            <div class="roster-list" id="rosterList"></div>
-        </aside>
-
-        <!-- RIGHT MAIN AREA -->
-        <main class="main-dashboard">
-            
-            <div class="container-card">
-                <div class="brand-header">
-                    <div class="verifone-logo-wrapper">
-                        <svg class="verifone-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="20" cy="22" r="10" fill="#0f172a"/>
-                            <circle cx="20" cy="52" r="10" fill="#0f172a"/>
-                            <circle cx="56" cy="22" r="10" fill="#0f172a"/>
-                            <circle cx="56" cy="52" r="10" fill="#0f172a"/>
-                            <rect x="46" y="22" width="20" height="30" fill="#0f172a"/>
-                            <circle cx="38" cy="82" r="10" fill="#0f172a"/>
-                        </svg>
-                        <span class="verifone-text">verifone</span>
-                    </div>
-                    <span style="font-weight: 600; color: var(--accent-teal);">Supervisor Performance Reporting</span>
-                </div>
-
-                <div class="quote-box">
-                    "Data-driven decisions empower operational efficiency and elevate team performance."
-                </div>
-
-                <div class="filter-grid">
-                    <div class="filter-item">
-                        <label>Team</label>
-                        <select id="teamFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Teams</option>
-                            <option value="Tucson">Tucson Support</option>
-                            <option value="Manila">Manila Support</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Year</label>
-                        <select id="yearFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Years</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Start Date</label>
-                        <input type="date" id="startDate" onchange="renderDashboard()">
-                    </div>
-
-                    <div class="filter-item">
-                        <label>End Date</label>
-                        <input type="date" id="endDate" onchange="renderDashboard()">
-                    </div>
-                </div>
-
-                <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Support Performance Summary</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Support Name</th>
-                            <th>Team</th>
-                            <th class="text-center">Total Submissions</th>
-                            <th>Average Rating</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summaryBody"></tbody>
-                </table>
+            <div class="form-group">
+                <label for="rating">Rating (1 - 5 Stars):</label>
+                <select id="rating" required>
+                    <option value="">-- Select Rating --</option>
+                    <option value="5">5 ★★★★★ - Excellent Assistance</option>
+                    <option value="4">4 ★★★★☆ - Good Support</option>
+                    <option value="3">3 ★★★☆☆ - Average</option>
+                    <option value="2">2 ★★☆☆☆ - Needs Improvement</option>
+                    <option value="1">1 ★☆☆☆☆ - Poor</option>
+                </select>
             </div>
 
-            <div class="container-card">
-                <div>
-                    <button class="btn-clear-all" onclick="clearAllTestFeedback()">Clear All Test Submissions</button>
-                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Detailed Audit Log</h3>
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date & Time</th>
-                            <th>Agent Name</th>
-                            <th>Case #</th>
-                            <th>Support Name</th>
-                            <th>Team</th>
-                            <th>Rating</th>
-                            <th>Comments</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detailsBody"></tbody>
-                </table>
+            <div class="form-group">
+                <label for="notes">Notes & Constructive Feedback:</label>
+                <textarea id="notes" placeholder="Provide additional details regarding the assistance received..."></textarea>
             </div>
 
-        </main>
+            <button type="submit" class="btn-submit">SUBMIT FEEDBACK</button>
+        </form>
     </div>
 
     <script>
-        const AUTH_PASS = "Verifone123";
+        const defaultRoster = [
+            { name: "Donald Sayers", team: "Tucson" },
+            { name: "Gerardo Morales", team: "Tucson" },
+            { name: "James Warder", team: "Tucson" },
+            { name: "Jesse McQueary", team: "Tucson" },
+            { name: "Justine Santa Cruz", team: "Tucson" },
+            { name: "Kimber Dawson", team: "Tucson" },
+            { name: "Robert Hasson", team: "Tucson" },
+            { name: "Wendy Franco", team: "Tucson" },
+            { name: "Judy Tolentino", team: "Manila" },
+            { name: "Aj Dela Cruz", team: "Manila" },
+            { name: "Melvin Lagrosa", team: "Manila" },
+            { name: "Kristian Ong", team: "Manila" },
+            { name: "Zachary Jeremy Payabyab", team: "Manila" },
+            { name: "Christian Mark Patdu", team: "Manila" },
+            { name: "Glory Barbacena", team: "Manila" },
+            { name: "Gemmalyn Silvestre", team: "Manila" }
+        ];
 
-        function authenticate() {
-            const input = document.getElementById('passwordInput').value;
-            if (input === AUTH_PASS) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('dashboard-content').classList.remove('hidden');
-                initDashboard();
-            } else {
-                document.getElementById('authError').classList.remove('hidden');
-            }
+        if (!localStorage.getItem('supportRoster')) {
+            localStorage.setItem('supportRoster', JSON.stringify(defaultRoster));
         }
 
-        function initDashboard() {
-            populateFilterOptions();
-            renderRosterManagement();
-            renderDashboard();
-        }
+        function loadSupportDropdown() {
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
+            const select = document.getElementById('supportPerson');
+            select.innerHTML = '<option value="">-- Select Support Person --</option>';
 
-        function addSupportMember() {
-            const nameInput = document.getElementById('newName');
-            const name = nameInput.value.trim();
-            const team = document.getElementById('newTeam').value;
-
-            if (!name) return alert('Please enter a full name.');
-
-            const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
-            if (roster.some(m => m.name.toLowerCase() === name.toLowerCase())) {
-                return alert('This member is already on the roster.');
-            }
-
-            roster.push({ name, team });
-            localStorage.setItem('supportRoster', JSON.stringify(roster));
-            nameInput.value = '';
-            renderRosterManagement();
-            renderDashboard();
-        }
-
-        function deleteSupportMember(nameToDelete) {
-            if (!confirm(`Remove ${nameToDelete} from the support roster?`)) return;
-            let roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
-            roster = roster.filter(m => m.name !== nameToDelete);
-            localStorage.setItem('supportRoster', JSON.stringify(roster));
-            renderRosterManagement();
-            renderDashboard();
-        }
-
-        function deleteFeedback(indexToDelete) {
-            if (!confirm("Delete this feedback log entry?")) return;
-            let submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            submissions.splice(indexToDelete, 1);
-            localStorage.setItem('supportRatings', JSON.stringify(submissions));
-            populateFilterOptions();
-            renderDashboard();
-        }
-
-        function clearAllTestFeedback() {
-            if (!confirm("Are you sure you want to clear ALL feedback submissions for testing? This cannot be undone.")) return;
-            localStorage.setItem('supportRatings', JSON.stringify([]));
-            populateFilterOptions();
-            renderDashboard();
-        }
-
-        function renderRosterManagement() {
-            const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
-            const container = document.getElementById('rosterList');
-            document.getElementById('rosterCount').textContent = roster.length;
-            container.innerHTML = '';
-
-            roster.forEach(member => {
-                const item = document.createElement('div');
-                item.className = 'roster-item';
-                item.innerHTML = `
-                    <div>
-                        <strong style="color: var(--primary-dark);">${member.name}</strong>
-                        <div style="font-size: 10px; color: var(--text-muted);">${member.team}</div>
-                    </div>
-                    <button class="btn-delete" onclick="deleteSupportMember('${member.name}')">Remove</button>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function populateFilterOptions() {
-            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            
-            const years = [...new Set(submissions.map(s => s.year).filter(Boolean))].sort().reverse();
-            const yearSelect = document.getElementById('yearFilter');
-            yearSelect.innerHTML = '<option value="ALL">All Years</option>';
-            years.forEach(y => yearSelect.innerHTML += `<option value="${y}">${y}</option>`);
-        }
-
-        function renderDashboard() {
-            const teamVal = document.getElementById('teamFilter').value;
-            const yearVal = document.getElementById('yearFilter').value;
-            const startVal = document.getElementById('startDate').value;
-            const endVal = document.getElementById('endDate').value;
-            
-            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-
-            const filteredData = submissions.filter(s => {
-                const matchTeam = (teamVal === 'ALL') || (s.team === teamVal);
-                const matchYear = (yearVal === 'ALL') || (s.year === yearVal);
-                
-                let matchDateRange = true;
-                if (s.dateISO) {
-                    if (startVal && s.dateISO < startVal) matchDateRange = false;
-                    if (endVal && s.dateISO > endVal) matchDateRange = false;
-                }
-
-                return matchTeam && matchYear && matchDateRange;
-            });
-
-            const summaryBody = document.getElementById('summaryBody');
-            summaryBody.innerHTML = '';
-
-            const stats = {};
-            filteredData.forEach(item => {
-                if (!stats[item.supportName]) {
-                    stats[item.supportName] = { team: item.team, count: 0, sum: 0 };
-                }
-                stats[item.supportName].count += 1;
-                stats[item.supportName].sum += item.rating;
-            });
-
-            if (Object.keys(stats).length === 0) {
-                summaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No feedback records found for selected filters.</td></tr>`;
-            } else {
-                for (const [name, data] of Object.entries(stats)) {
-                    const avg = (data.sum / data.count).toFixed(2);
-                    summaryBody.innerHTML += `
-                        <tr>
-                            <td><strong>${name}</strong></td>
-                            <td>${data.team}</td>
-                            <td class="text-center">${data.count}</td>
-                            <td><strong>${avg} / 5.00</strong></td>
-                        </tr>
-                    `;
-                }
-            }
-
-            const detailsBody = document.getElementById('detailsBody');
-            detailsBody.innerHTML = '';
-
-            if (submissions.length === 0) {
-                detailsBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No entries in the log.</td></tr>`;
-            } else {
-                submissions.forEach((item, index) => {
-                    const matchTeam = (teamVal === 'ALL') || (item.team === teamVal);
-                    const matchYear = (yearVal === 'ALL') || (item.year === yearVal);
-                    
-                    let matchDateRange = true;
-                    if (item.dateISO) {
-                        if (startVal && item.dateISO < startVal) matchDateRange = false;
-                        if (endVal && item.dateISO > endVal) matchDateRange = false;
-                    }
-
-                    if (matchTeam && matchYear && matchDateRange) {
-                        const agentName = item.agentUser || item.agentName || 'N/A';
-                        const commentsText = item.comments || '';
-
-                        const isTestEntry = agentName.toLowerCase().includes('test') || commentsText.toLowerCase().includes('test');
-                        const actionCellContent = isTestEntry 
-                            ? `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>` 
-                            : '';
-
-                        detailsBody.innerHTML += `
-                            <tr>
-                                <td>${item.timestamp}</td>
-                                <td>${agentName}</td>
-                                <td>${item.caseNumber}</td>
-                                <td>${item.supportName}</td>
-                                <td>${item.team}</td>
-                                <td>${item.rating}</td>
-                                <td>${commentsText}</td>
-                                <td>${actionCellContent}</td>
-                            </tr>
-                        `;
-                    }
+            const teams = ['Tucson', 'Manila'];
+            teams.forEach(team => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = `${team} Support Team`;
+                roster.filter(member => member.team === team).forEach(member => {
+                    const opt = document.createElement('option');
+                    opt.value = member.name;
+                    opt.textContent = member.name;
+                    optgroup.appendChild(opt);
                 });
-            }
+                select.appendChild(optgroup);
+            });
         }
+
+        loadSupportDropdown();
+
+        document.getElementById('ratingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
+            const selectedName = document.getElementById('supportPerson').value;
+            const personObj = roster.find(m => m.name === selectedName);
+
+            const now = new Date();
+            const dateISO = now.toISOString().split('T')[0];
+            const yearStr = String(now.getFullYear());
+            
+            // Calculate ISO week number
+            const tempDate = new Date(now.valueOf());
+            const dayNum = (now.getDay() + 6) % 7;
+            tempDate.setDate(tempDate.getDate() - dayNum + 3);
+            const firstThursday = tempDate.valueOf();
+            tempDate.setMonth(0, 1);
+            if (tempDate.getDay() !== 4) {
+                tempDate.setMonth(0, 1 + ((4 - tempDate.getDay() + 7) % 7));
+            }
+            const weekNum = 1 + Math.round((firstThursday - tempDate.valueOf()) / 604800000);
+
+            const formattedDate = `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            const newEntry = {
+                id: Date.now(),
+                timestamp: formattedDate,
+                dateISO: dateISO,
+                year: yearStr,
+                week: String(weekNum),
+                agentUser: document.getElementById('agentUser').value.trim(),
+                caseNumber: document.getElementById('caseNumber').value.trim(),
+                supportName: selectedName,
+                team: personObj ? personObj.team : 'Unknown',
+                rating: parseInt(document.getElementById('rating').value),
+                comments: document.getElementById('notes').value.trim()
+            };
+
+            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
+            submissions.unshift(newEntry);
+            localStorage.setItem('supportRatings', JSON.stringify(submissions));
+
+            alert('Thank you! Your feedback has been recorded.');
+            this.reset();
+        });
     </script>
 </body>
 </html>
