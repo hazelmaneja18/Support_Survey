@@ -244,6 +244,10 @@
             align-items: center;
             font-size: 12px;
         }
+
+        .text-center {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -310,7 +314,7 @@
                     "Data-driven decisions empower operational efficiency and elevate team performance."
                 </div>
 
-                <!-- Custom Filters Bar: Year, Week, Date Range, Team -->
+                <!-- Custom Filters Bar: Team, Year, Start Date, End Date -->
                 <div class="filter-grid">
                     <div class="filter-item">
                         <label>Team</label>
@@ -325,13 +329,6 @@
                         <label>Year</label>
                         <select id="yearFilter" onchange="renderDashboard()">
                             <option value="ALL">All Years</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Week</label>
-                        <select id="weekFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Weeks</option>
                         </select>
                     </div>
 
@@ -353,7 +350,7 @@
                         <tr>
                             <th>Support Name</th>
                             <th>Team</th>
-                            <th>Total Submissions</th>
+                            <th class="text-center">Total Submissions</th>
                             <th>Average Rating</th>
                         </tr>
                     </thead>
@@ -372,7 +369,7 @@
                     <thead>
                         <tr>
                             <th>Date & Time</th>
-                            <th>Agent ID</th>
+                            <th>Agent Name</th>
                             <th>Case #</th>
                             <th>Support Name</th>
                             <th>Team</th>
@@ -480,19 +477,11 @@
             const yearSelect = document.getElementById('yearFilter');
             yearSelect.innerHTML = '<option value="ALL">All Years</option>';
             years.forEach(y => yearSelect.innerHTML += `<option value="${y}">${y}</option>`);
-
-            // Week options (1 to 52)
-            const weekSelect = document.getElementById('weekFilter');
-            weekSelect.innerHTML = '<option value="ALL">All Weeks</option>';
-            for (let i = 1; i <= 52; i++) {
-                weekSelect.innerHTML += `<option value="${i}">Week ${i}</option>`;
-            }
         }
 
         function renderDashboard() {
             const teamVal = document.getElementById('teamFilter').value;
             const yearVal = document.getElementById('yearFilter').value;
-            const weekVal = document.getElementById('weekFilter').value;
             const startVal = document.getElementById('startDate').value;
             const endVal = document.getElementById('endDate').value;
             
@@ -501,7 +490,6 @@
             const filteredData = submissions.filter(s => {
                 const matchTeam = (teamVal === 'ALL') || (s.team === teamVal);
                 const matchYear = (yearVal === 'ALL') || (s.year === yearVal);
-                const matchWeek = (weekVal === 'ALL') || (s.week === weekVal);
                 
                 let matchDateRange = true;
                 if (s.dateISO) {
@@ -509,7 +497,7 @@
                     if (endVal && s.dateISO > endVal) matchDateRange = false;
                 }
 
-                return matchTeam && matchYear && matchWeek && matchDateRange;
+                return matchTeam && matchYear && matchDateRange;
             });
 
             // Summary Stats
@@ -534,7 +522,7 @@
                         <tr>
                             <td><strong>${name}</strong></td>
                             <td>${data.team}</td>
-                            <td>${data.count}</td>
+                            <td class="text-center">${data.count}</td>
                             <td><strong>${avg} / 5.00</strong></td>
                         </tr>
                     `;
@@ -551,7 +539,6 @@
                 submissions.forEach((item, index) => {
                     const matchTeam = (teamVal === 'ALL') || (item.team === teamVal);
                     const matchYear = (yearVal === 'ALL') || (item.year === yearVal);
-                    const matchWeek = (weekVal === 'ALL') || (item.week === weekVal);
                     
                     let matchDateRange = true;
                     if (item.dateISO) {
@@ -559,19 +546,26 @@
                         if (endVal && item.dateISO > endVal) matchDateRange = false;
                     }
 
-                    if (matchTeam && matchYear && matchWeek && matchDateRange) {
+                    if (matchTeam && matchYear && matchDateRange) {
+                        const agentName = item.agentUser || item.agentName || 'N/A';
+                        const commentsText = item.comments || '';
+
+                        // Only display the Delete button if Agent Name or Comments contain "test"
+                        const isTestEntry = agentName.toLowerCase().includes('test') || commentsText.toLowerCase().includes('test');
+                        const actionCellContent = isTestEntry 
+                            ? `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>` 
+                            : '';
+
                         detailsBody.innerHTML += `
                             <tr>
                                 <td>${item.timestamp}</td>
-                                <td>${item.agentUser}</td>
+                                <td>${agentName}</td>
                                 <td>${item.caseNumber}</td>
                                 <td>${item.supportName}</td>
                                 <td>${item.team}</td>
                                 <td>${item.rating}</td>
-                                <td>${item.comments}</td>
-                                <td>
-                                    <button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>
-                                </td>
+                                <td>${commentsText}</td>
+                                <td>${actionCellContent}</td>
                             </tr>
                         `;
                     }
