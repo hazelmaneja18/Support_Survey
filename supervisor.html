@@ -178,7 +178,7 @@
         /* Responsive Multi-Filter Grid */
         .filter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 12px;
             background: #f8fafc;
             padding: 15px;
@@ -221,6 +221,10 @@
         }
 
         tr:nth-child(even) { background-color: #f8fafc; }
+
+        .nowrap {
+            white-space: nowrap;
+        }
 
         .hidden { display: none !important; }
 
@@ -314,7 +318,7 @@
                     "Data-driven decisions empower operational efficiency and elevate team performance."
                 </div>
 
-                <!-- Custom Filters Bar: Team, Year, Start Date, End Date -->
+                <!-- Custom Filters Bar: Team, Year, Month, Start Date, End Date -->
                 <div class="filter-grid">
                     <div class="filter-item">
                         <label>Team</label>
@@ -329,6 +333,25 @@
                         <label>Year</label>
                         <select id="yearFilter" onchange="renderDashboard()">
                             <option value="ALL">All Years</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <label>Month</label>
+                        <select id="monthFilter" onchange="renderDashboard()">
+                            <option value="ALL">All Months</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
                         </select>
                     </div>
 
@@ -348,7 +371,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Support Name</th>
+                            <th class="nowrap">Support Name</th>
                             <th>Team</th>
                             <th class="text-center">Total Submissions</th>
                             <th>Average Rating</th>
@@ -368,10 +391,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Date & Time</th>
-                            <th>Agent Name</th>
+                            <th class="nowrap">Date & Time</th>
+                            <th class="nowrap">Agent Name</th>
                             <th>Case #</th>
-                            <th>Support Name</th>
+                            <th class="nowrap">Support Name</th>
                             <th>Team</th>
                             <th>Rating</th>
                             <th>Comments</th>
@@ -482,6 +505,7 @@
         function renderDashboard() {
             const teamVal = document.getElementById('teamFilter').value;
             const yearVal = document.getElementById('yearFilter').value;
+            const monthVal = document.getElementById('monthFilter').value;
             const startVal = document.getElementById('startDate').value;
             const endVal = document.getElementById('endDate').value;
             
@@ -491,13 +515,25 @@
                 const matchTeam = (teamVal === 'ALL') || (s.team === teamVal);
                 const matchYear = (yearVal === 'ALL') || (s.year === yearVal);
                 
+                let matchMonth = true;
+                if (monthVal !== 'ALL') {
+                    if (s.dateISO) {
+                        const sMonth = s.dateISO.split('-')[1];
+                        matchMonth = (sMonth === monthVal);
+                    } else if (s.timestamp) {
+                        const dateObj = new Date(s.timestamp);
+                        const sMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
+                        matchMonth = (sMonth === monthVal);
+                    }
+                }
+
                 let matchDateRange = true;
                 if (s.dateISO) {
                     if (startVal && s.dateISO < startVal) matchDateRange = false;
                     if (endVal && s.dateISO > endVal) matchDateRange = false;
                 }
 
-                return matchTeam && matchYear && matchDateRange;
+                return matchTeam && matchYear && matchMonth && matchDateRange;
             });
 
             // Summary Stats
@@ -520,7 +556,7 @@
                     const avg = (data.sum / data.count).toFixed(2);
                     summaryBody.innerHTML += `
                         <tr>
-                            <td><strong>${name}</strong></td>
+                            <td class="nowrap"><strong>${name}</strong></td>
                             <td>${data.team}</td>
                             <td class="text-center">${data.count}</td>
                             <td><strong>${avg} / 5.00</strong></td>
@@ -540,13 +576,25 @@
                     const matchTeam = (teamVal === 'ALL') || (item.team === teamVal);
                     const matchYear = (yearVal === 'ALL') || (item.year === yearVal);
                     
+                    let matchMonth = true;
+                    if (monthVal !== 'ALL') {
+                        if (item.dateISO) {
+                            const sMonth = item.dateISO.split('-')[1];
+                            matchMonth = (sMonth === monthVal);
+                        } else if (item.timestamp) {
+                            const dateObj = new Date(item.timestamp);
+                            const sMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
+                            matchMonth = (sMonth === monthVal);
+                        }
+                    }
+
                     let matchDateRange = true;
                     if (item.dateISO) {
                         if (startVal && item.dateISO < startVal) matchDateRange = false;
                         if (endVal && item.dateISO > endVal) matchDateRange = false;
                     }
 
-                    if (matchTeam && matchYear && matchDateRange) {
+                    if (matchTeam && matchYear && matchMonth && matchDateRange) {
                         const agentName = item.agentUser || item.agentName || 'N/A';
                         const commentsText = item.comments || '';
 
@@ -558,10 +606,10 @@
 
                         detailsBody.innerHTML += `
                             <tr>
-                                <td>${item.timestamp}</td>
-                                <td>${agentName}</td>
+                                <td class="nowrap">${item.timestamp}</td>
+                                <td class="nowrap">${agentName}</td>
                                 <td>${item.caseNumber}</td>
-                                <td>${item.supportName}</td>
+                                <td class="nowrap">${item.supportName}</td>
                                 <td>${item.team}</td>
                                 <td>${item.rating}</td>
                                 <td>${commentsText}</td>
