@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifone | Analytics & Supervisor Portal</title>
+    <title>Verifone | Analytics & Reporting Dashboard</title>
     <style>
         :root {
             --bg-base: #f0f4f8;
-            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-bg: rgba(255, 255, 255, 0.90);
             --card-border: rgba(203, 213, 225, 0.6);
             --primary-dark: #0f172a;
             --accent-teal: #0d9488;
@@ -24,55 +24,25 @@
             background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e0f2fe 100%);
             color: var(--text-main);
             margin: 0;
-            padding: 30px;
+            padding: 40px 20px;
             min-height: 100vh;
-            box-sizing: border-box;
-        }
-
-        /* Auth Screen */
-        #auth-screen {
-            max-width: 420px;
-            margin: 80px auto;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 35px;
-            text-align: center;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-        }
-
-        /* App Layout: Left Roster Sidebar + Right Dashboard Focus */
-        .app-layout {
-            display: flex;
-            gap: 25px;
-            max-width: 1400px;
-            margin: 0 auto;
-            align-items: flex-start;
-        }
-
-        .sidebar-left {
-            width: 280px;
-            flex-shrink: 0;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-        }
-
-        .main-dashboard {
-            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            align-items: center;
         }
 
-        .container-card {
+        .container {
             background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--card-border);
             border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            padding: 30px;
+            width: 100%;
+            max-width: 1020px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            box-sizing: border-box;
         }
 
         .brand-header {
@@ -102,7 +72,7 @@
             letter-spacing: -0.8px;
         }
 
-        h2, h3, h4 { color: var(--primary-dark); margin-top: 0; }
+        h2, h3 { color: var(--primary-dark); margin-top: 0; }
 
         .quote-box {
             background: var(--accent-teal-light);
@@ -115,18 +85,23 @@
             border-radius: 0 6px 6px 0;
         }
 
-        input[type="password"], input[type="text"], input[type="date"], select {
+        #auth-screen {
+            max-width: 420px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        input[type="password"], input[type="text"], select {
             background: var(--input-bg);
             color: var(--text-main);
             border: 1px solid var(--input-border);
-            padding: 9px 12px;
+            padding: 10px 14px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             box-sizing: border-box;
-            width: 100%;
         }
 
-        input:focus, select:focus {
+        input[type="password"]:focus, input[type="text"]:focus, select:focus {
             outline: none;
             border-color: var(--accent-teal);
             box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
@@ -136,7 +111,7 @@
             background: var(--accent-teal);
             color: #ffffff;
             border: none;
-            padding: 10px 16px;
+            padding: 10px 18px;
             font-weight: 700;
             cursor: pointer;
             border-radius: 6px;
@@ -149,13 +124,12 @@
             background: #fef2f2;
             color: var(--danger-red);
             border: 1px solid #fca5a5;
-            padding: 4px 8px;
-            font-size: 11px;
+            padding: 5px 10px;
+            font-size: 12px;
             font-weight: 600;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
         }
 
         .btn-delete:hover {
@@ -163,37 +137,15 @@
             color: #ffffff;
         }
 
-        .btn-clear-all {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            float: right;
-        }
-
-        /* Responsive Multi-Filter Grid */
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px;
+        .filter-bar {
+            display: flex;
+            gap: 20px;
             background: #f8fafc;
-            padding: 15px;
+            padding: 15px 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            align-items: center;
             border: 1px solid var(--card-border);
-        }
-
-        .filter-item label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 4px;
         }
 
         table {
@@ -208,7 +160,7 @@
         }
 
         th, td {
-            padding: 11px 13px;
+            padding: 12px 14px;
             text-align: left;
             font-size: 13px;
             border-bottom: 1px solid #e2e8f0;
@@ -224,32 +176,36 @@
 
         .hidden { display: none !important; }
 
-        .roster-list {
+        .form-inline {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
-            max-height: 520px;
-            overflow-y: auto;
-            padding-right: 4px;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        .roster-item {
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .roster-chip {
             background: #ffffff;
             border: 1px solid var(--card-border);
-            padding: 8px 10px;
+            padding: 8px 12px;
             border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 12px;
+            font-size: 13px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Login Screen -->
-    <div id="auth-screen">
+    <!-- Security Login Screen -->
+    <div id="auth-screen" class="container">
         <div class="verifone-logo-wrapper" style="justify-content: center; margin-bottom: 20px;">
             <svg class="verifone-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="25" cy="20" r="12" fill="#0f172a"/>
@@ -260,132 +216,97 @@
             <span class="verifone-text">verifone</span>
         </div>
         <h2>SUPERVISOR PORTAL</h2>
-        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Enter password to access performance analytics.</p>
-        <input type="password" id="passwordInput" placeholder="Enter Password" style="margin-bottom: 15px;">
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Please enter the password to view reporting.</p>
+        <input type="password" id="passwordInput" placeholder="Enter Password" style="width: 100%; margin-bottom: 15px;">
         <button class="btn" style="width: 100%;" onclick="authenticate()">LOGIN</button>
-        <p id="authError" style="color: var(--danger-red); font-size: 13px; margin-top: 12px;" class="hidden">Access Denied: Invalid password.</p>
+        <p id="authError" style="color: var(--danger-red); margin-top: 12px;" class="hidden">Access Denied: Invalid password.</p>
     </div>
 
-    <!-- Main Workspace (Hidden until auth) -->
-    <div id="dashboard-content" class="app-layout hidden">
+    <!-- Authenticated Portal View -->
+    <div id="dashboard-content" class="hidden" style="width: 100%; max-width: 1020px;">
         
-        <!-- LEFT SIDEBAR: Manage Support Roster -->
-        <aside class="sidebar-left">
-            <h3 style="font-size: 16px; margin-bottom: 12px;">Manage Roster</h3>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Add or delete active support personnel.</p>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-                <input type="text" id="newName" placeholder="Support Full Name">
-                <select id="newTeam">
+        <div class="container">
+            <div class="brand-header">
+                <div class="verifone-logo-wrapper">
+                    <svg class="verifone-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="20" r="12" fill="#0f172a"/>
+                        <circle cx="25" cy="55" r="12" fill="#0f172a"/>
+                        <circle cx="50" cy="80" r="12" fill="#0f172a"/>
+                        <path d="M75 20C75 20 87 35 75 55C63 75 75 90 75 90" stroke="#0f172a" stroke-width="24" stroke-linecap="round"/>
+                    </svg>
+                    <span class="verifone-text">verifone</span>
+                </div>
+                <span style="font-weight: 600; color: var(--accent-teal);">Supervisor Dashboard & Reporting</span>
+            </div>
+
+            <div class="quote-box">
+                "Data-driven decisions empower operational efficiency and elevate team success."
+            </div>
+
+            <h3>Manage Support Roster</h3>
+            <div class="form-inline">
+                <input type="text" id="newName" placeholder="Support Name" style="flex: 2;">
+                <select id="newTeam" style="flex: 1;">
                     <option value="Tucson">Tucson</option>
                     <option value="Manila">Manila</option>
                 </select>
-                <button class="btn" style="width: 100%;" onclick="addSupportMember()">+ Add Member</button>
+                <button class="btn" onclick="addSupportMember()">Add Support Member</button>
             </div>
 
-            <hr style="border: none; border-top: 1px solid var(--card-border); margin: 15px 0;">
+            <h4 style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Active Roster (Click Remove to delete for testing):</h4>
+            <div class="roster-grid" id="rosterList"></div>
+        </div>
 
-            <h4 style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Active Roster (<span id="rosterCount">0</span>)</h4>
-            <div class="roster-list" id="rosterList"></div>
-        </aside>
-
-        <!-- RIGHT MAIN AREA: Focus on Performance Reporting & Detailed Audit Log -->
-        <main class="main-dashboard">
+        <div class="container">
+            <h3>Supervisor Dashboard & Filters</h3>
             
-            <div class="container-card">
-                <div class="brand-header">
-                    <div class="verifone-logo-wrapper">
-                        <svg class="verifone-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="25" cy="20" r="12" fill="#0f172a"/>
-                            <circle cx="25" cy="55" r="12" fill="#0f172a"/>
-                            <circle cx="50" cy="80" r="12" fill="#0f172a"/>
-                            <path d="M75 20C75 20 87 35 75 55C63 75 75 90 75 90" stroke="#0f172a" stroke-width="24" stroke-linecap="round"/>
-                        </svg>
-                        <span class="verifone-text">verifone</span>
-                    </div>
-                    <span style="font-weight: 600; color: var(--accent-teal);">Supervisor Performance Reporting</span>
-                </div>
-
-                <div class="quote-box">
-                    "Data-driven decisions empower operational efficiency and elevate team performance."
-                </div>
-
-                <!-- Custom Filters Bar: Year, Week, Date Range, Team -->
-                <div class="filter-grid">
-                    <div class="filter-item">
-                        <label>Team</label>
-                        <select id="teamFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Teams</option>
-                            <option value="Tucson">Tucson Support</option>
-                            <option value="Manila">Manila Support</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Year</label>
-                        <select id="yearFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Years</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Week</label>
-                        <select id="weekFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Weeks</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Start Date</label>
-                        <input type="date" id="startDate" onchange="renderDashboard()">
-                    </div>
-
-                    <div class="filter-item">
-                        <label>End Date</label>
-                        <input type="date" id="endDate" onchange="renderDashboard()">
-                    </div>
-                </div>
-
-                <!-- Performance Reporting Table -->
-                <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Support Performance Summary</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Support Name</th>
-                            <th>Team</th>
-                            <th>Total Submissions</th>
-                            <th>Average Rating</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summaryBody"></tbody>
-                </table>
-            </div>
-
-            <!-- Detailed Audit Log Card -->
-            <div class="container-card">
+            <div class="filter-bar">
                 <div>
-                    <button class="btn-clear-all" onclick="clearAllTestFeedback()">Clear All Test Submissions</button>
-                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Detailed Audit Log</h3>
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Filter Team:</label>
+                    <select id="teamFilter" onchange="renderDashboard()">
+                        <option value="ALL">All Teams</option>
+                        <option value="Tucson">Tucson Support</option>
+                        <option value="Manila">Manila Support</option>
+                    </select>
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date & Time</th>
-                            <th>Agent ID</th>
-                            <th>Case #</th>
-                            <th>Support Name</th>
-                            <th>Team</th>
-                            <th>Rating</th>
-                            <th>Comments</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detailsBody"></tbody>
-                </table>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Filter Month:</label>
+                    <select id="monthFilter" onchange="renderDashboard()"></select>
+                </div>
             </div>
 
-        </main>
+            <h4 style="color: var(--accent-teal); margin-bottom: 8px;">Support Average Survey Feedback</h4>
+            <table style="margin-bottom: 30px;">
+                <thead>
+                    <tr>
+                        <th>Support Name</th>
+                        <th>Team</th>
+                        <th>Total Feedback Submissions</th>
+                        <th>Average Rating</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody"></tbody>
+            </table>
+
+            <h4 style="color: var(--accent-teal); margin-bottom: 8px;">All Submitted Feedback Log</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date & Time Submitted</th>
+                        <th>Agent Name</th>
+                        <th>Case Number</th>
+                        <th>Support Name</th>
+                        <th>Team</th>
+                        <th>Rating</th>
+                        <th>Comments</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="detailsBody"></tbody>
+            </table>
+        </div>
+
     </div>
 
     <script>
@@ -403,7 +324,7 @@
         }
 
         function initDashboard() {
-            populateFilterOptions();
+            populateMonthFilter();
             renderRosterManagement();
             renderDashboard();
         }
@@ -413,11 +334,11 @@
             const name = nameInput.value.trim();
             const team = document.getElementById('newTeam').value;
 
-            if (!name) return alert('Please enter a full name.');
+            if (!name) return alert('Please enter a name.');
 
             const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
             if (roster.some(m => m.name.toLowerCase() === name.toLowerCase())) {
-                return alert('This member is already on the roster.');
+                return alert('This member already exists in the roster.');
             }
 
             roster.push({ name, team });
@@ -428,91 +349,66 @@
         }
 
         function deleteSupportMember(nameToDelete) {
-            if (!confirm(`Remove ${nameToDelete} from the support roster?`)) return;
+            if (!confirm(`Are you sure you want to remove ${nameToDelete} from the roster?`)) return;
             let roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
-            roster = roster.filter(m => m.name !== nameToDelete);
+            roster = roster.filter(member => member.name !== nameToDelete);
             localStorage.setItem('supportRoster', JSON.stringify(roster));
             renderRosterManagement();
             renderDashboard();
         }
 
         function deleteFeedback(indexToDelete) {
-            if (!confirm("Delete this feedback log entry?")) return;
+            if (!confirm("Are you sure you want to delete this test submission?")) return;
             let submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             submissions.splice(indexToDelete, 1);
             localStorage.setItem('supportRatings', JSON.stringify(submissions));
-            populateFilterOptions();
-            renderDashboard();
-        }
-
-        function clearAllTestFeedback() {
-            if (!confirm("Are you sure you want to clear ALL feedback submissions for testing? This cannot be undone.")) return;
-            localStorage.setItem('supportRatings', JSON.stringify([]));
-            populateFilterOptions();
+            populateMonthFilter();
             renderDashboard();
         }
 
         function renderRosterManagement() {
             const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
             const container = document.getElementById('rosterList');
-            document.getElementById('rosterCount').textContent = roster.length;
             container.innerHTML = '';
 
             roster.forEach(member => {
-                const item = document.createElement('div');
-                item.className = 'roster-item';
-                item.innerHTML = `
-                    <div>
-                        <strong style="color: var(--primary-dark);">${member.name}</strong>
-                        <div style="font-size: 10px; color: var(--text-muted);">${member.team}</div>
-                    </div>
+                const chip = document.createElement('div');
+                chip.className = 'roster-chip';
+                chip.innerHTML = `
+                    <span><strong>${member.name}</strong> (${member.team})</span>
                     <button class="btn-delete" onclick="deleteSupportMember('${member.name}')">Remove</button>
                 `;
-                container.appendChild(item);
+                container.appendChild(chip);
             });
         }
 
-        function populateFilterOptions() {
+        function populateMonthFilter() {
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
+            const months = [...new Set(submissions.map(s => s.monthKey))].sort().reverse();
             
-            // Year options
-            const years = [...new Set(submissions.map(s => s.year).filter(Boolean))].sort().reverse();
-            const yearSelect = document.getElementById('yearFilter');
-            yearSelect.innerHTML = '<option value="ALL">All Years</option>';
-            years.forEach(y => yearSelect.innerHTML += `<option value="${y}">${y}</option>`);
-
-            // Week options (1 to 52)
-            const weekSelect = document.getElementById('weekFilter');
-            weekSelect.innerHTML = '<option value="ALL">All Weeks</option>';
-            for (let i = 1; i <= 52; i++) {
-                weekSelect.innerHTML += `<option value="${i}">Week ${i}</option>`;
-            }
+            const monthSelect = document.getElementById('monthFilter');
+            monthSelect.innerHTML = '<option value="ALL">All Months</option>';
+            
+            months.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m;
+                monthSelect.appendChild(opt);
+            });
         }
 
         function renderDashboard() {
             const teamVal = document.getElementById('teamFilter').value;
-            const yearVal = document.getElementById('yearFilter').value;
-            const weekVal = document.getElementById('weekFilter').value;
-            const startVal = document.getElementById('startDate').value;
-            const endVal = document.getElementById('endDate').value;
+            const monthVal = document.getElementById('monthFilter').value;
             
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
 
             const filteredData = submissions.filter(s => {
                 const matchTeam = (teamVal === 'ALL') || (s.team === teamVal);
-                const matchYear = (yearVal === 'ALL') || (s.year === yearVal);
-                const matchWeek = (weekVal === 'ALL') || (s.week === weekVal);
-                
-                let matchDateRange = true;
-                if (s.dateISO) {
-                    if (startVal && s.dateISO < startVal) matchDateRange = false;
-                    if (endVal && s.dateISO > endVal) matchDateRange = false;
-                }
-
-                return matchTeam && matchYear && matchWeek && matchDateRange;
+                const matchMonth = (monthVal === 'ALL') || (s.monthKey === monthVal);
+                return matchTeam && matchMonth;
             });
 
-            // Summary Stats
             const summaryBody = document.getElementById('summaryBody');
             summaryBody.innerHTML = '';
 
@@ -525,58 +421,42 @@
                 stats[item.supportName].sum += item.rating;
             });
 
-            if (Object.keys(stats).length === 0) {
-                summaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No feedback records found for selected filters.</td></tr>`;
-            } else {
-                for (const [name, data] of Object.entries(stats)) {
-                    const avg = (data.sum / data.count).toFixed(2);
-                    summaryBody.innerHTML += `
-                        <tr>
-                            <td><strong>${name}</strong></td>
-                            <td>${data.team}</td>
-                            <td>${data.count}</td>
-                            <td><strong>${avg} / 5.00</strong></td>
-                        </tr>
-                    `;
-                }
+            for (const [name, data] of Object.entries(stats)) {
+                const avg = (data.sum / data.count).toFixed(2);
+                summaryBody.innerHTML += `
+                    <tr>
+                        <td><strong>${name}</strong></td>
+                        <td>${data.team}</td>
+                        <td>${data.count}</td>
+                        <td><strong>${avg} / 5.00</strong></td>
+                    </tr>
+                `;
             }
 
-            // Audit Log
             const detailsBody = document.getElementById('detailsBody');
             detailsBody.innerHTML = '';
 
-            if (submissions.length === 0) {
-                detailsBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No entries in the log.</td></tr>`;
-            } else {
-                submissions.forEach((item, index) => {
-                    const matchTeam = (teamVal === 'ALL') || (item.team === teamVal);
-                    const matchYear = (yearVal === 'ALL') || (item.year === yearVal);
-                    const matchWeek = (weekVal === 'ALL') || (item.week === weekVal);
-                    
-                    let matchDateRange = true;
-                    if (item.dateISO) {
-                        if (startVal && item.dateISO < startVal) matchDateRange = false;
-                        if (endVal && item.dateISO > endVal) matchDateRange = false;
-                    }
-
-                    if (matchTeam && matchYear && matchWeek && matchDateRange) {
-                        detailsBody.innerHTML += `
-                            <tr>
-                                <td>${item.timestamp}</td>
-                                <td>${item.agentUser}</td>
-                                <td>${item.caseNumber}</td>
-                                <td>${item.supportName}</td>
-                                <td>${item.team}</td>
-                                <td>${item.rating}</td>
-                                <td>${item.comments}</td>
-                                <td>
-                                    <button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                });
-            }
+            submissions.forEach((item, index) => {
+                const matchTeam = (teamVal === 'ALL') || (item.team === teamVal);
+                const matchMonth = (monthVal === 'ALL') || (item.monthKey === monthVal);
+                
+                if (matchTeam && matchMonth) {
+                    detailsBody.innerHTML += `
+                        <tr>
+                            <td>${item.timestamp}</td>
+                            <td>${item.agentUser}</td>
+                            <td>${item.caseNumber}</td>
+                            <td>${item.supportName}</td>
+                            <td>${item.team}</td>
+                            <td>${item.rating}</td>
+                            <td>${item.comments}</td>
+                            <td>
+                                <button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
         }
     </script>
 </body>
