@@ -32,6 +32,34 @@
             width: 100%;
             max-width: 550px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .btn-supervisor {
+            background-color: transparent;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-supervisor:hover {
+            background-color: var(--accent-cyan);
+            color: #000;
         }
 
         h2 {
@@ -97,18 +125,24 @@
 <body>
 
     <div class="container">
+        <div class="header-actions">
+            <a href="supervisor.html" target="_blank" class="btn-supervisor">
+                🔒 Supervisor Access
+            </a>
+        </div>
+
         <h2>SUPPORT SERVICE RATING</h2>
         <div class="subtitle">Submit feedback for technical support assistance</div>
 
         <form id="ratingForm">
             <div class="form-group">
-                <label for="agentUser">Agent User:</label>
-                <input type="text" id="agentUser" placeholder="e.g. hmaneja" required>
+                <label for="agentUser">Agent Name:</label>
+                <input type="text" id="agentUser" placeholder="Enter your full name / ID" required>
             </div>
 
             <div class="form-group">
                 <label for="caseNumber">Case Number:</label>
-                <input type="text" id="caseNumber" required>
+                <input type="text" id="caseNumber" placeholder="Enter case number" required>
             </div>
 
             <div class="form-group">
@@ -132,7 +166,7 @@
 
             <div class="form-group">
                 <label for="notes">Notes / Feedback:</label>
-                <textarea id="notes"></textarea>
+                <textarea id="notes" placeholder="Additional details or comments..."></textarea>
             </div>
 
             <button type="submit" class="btn-submit">SUBMIT RATING</button>
@@ -140,7 +174,7 @@
     </div>
 
     <script>
-        // Initial Roster Setup
+        // Preset Roster for Support Teams
         const defaultRoster = [
             // Tucson Support
             { name: "Donald Sayers", team: "Tucson" },
@@ -162,18 +196,17 @@
             { name: "Gemmalyn Silvestre", team: "Manila" }
         ];
 
-        // Ensure roster exists in localStorage
+        // Store roster in localStorage if not already initialized
         if (!localStorage.getItem('supportRoster')) {
             localStorage.setItem('supportRoster', JSON.stringify(defaultRoster));
         }
 
-        // Load dropdown options dynamically
+        // Load dropdown options dynamically grouped by team
         function loadSupportDropdown() {
             const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
             const select = document.getElementById('supportPerson');
             select.innerHTML = '<option value="">-- Select Support Person --</option>';
 
-            // Group by team in dropdown
             const teams = ['Tucson', 'Manila'];
             teams.forEach(team => {
                 const optgroup = document.createElement('optgroup');
@@ -181,7 +214,7 @@
                 roster.filter(member => member.team === team).forEach(member => {
                     const opt = document.createElement('option');
                     opt.value = member.name;
-                    opt.textContent = `${member.name} (${member.team})`;
+                    opt.textContent = member.name;
                     optgroup.appendChild(opt);
                 });
                 select.appendChild(optgroup);
@@ -190,7 +223,7 @@
 
         loadSupportDropdown();
 
-        // Form Submit
+        // Handle Form Submission
         document.getElementById('ratingForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -199,18 +232,18 @@
             const personObj = roster.find(m => m.name === selectedName);
 
             const now = new Date();
-            const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`; // Format: YYYY-MM
+            const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             const formattedDate = `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
             const newEntry = {
                 timestamp: formattedDate,
                 monthKey: monthKey,
-                agentUser: document.getElementById('agentUser').value,
-                caseNumber: document.getElementById('caseNumber').value,
+                agentUser: document.getElementById('agentUser').value.trim(),
+                caseNumber: document.getElementById('caseNumber').value.trim(),
                 supportName: selectedName,
                 team: personObj ? personObj.team : 'Unknown',
                 rating: parseInt(document.getElementById('rating').value),
-                comments: document.getElementById('notes').value
+                comments: document.getElementById('notes').value.trim()
             };
 
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
