@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervisor Access - Service Rating Analytics</title>
+    <style>
+        :root {
+            --bg-color: #03182b;
+            --card-bg: #06233f;
+            --accent-cyan: #00bcd4;
+            --text-color: #ffffff;
+            --input-bg: #02111e;
+            --border-color: #0d47a1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 25px;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
+        }
+
+        h2, h3 { color: var(--accent-cyan); margin-top: 0; }
+
+        /* Auth Screen */
+        #auth-screen {
+            max-width: 400px;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        input[type="password"], input[type="text"], select {
+            background-color: var(--input-bg);
+            color: #fff;
+            border: 1px solid var(--accent-cyan);
+            padding: 8px 12px;
+            border-radius: 3px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--accent-cyan);
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-cyan);
+            color: #000;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #e0e0e0;
+            color: #000;
+        }
+
+        th, td {
+            border: 1px solid #9e9e9e;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #06233f;
+            color: #fff;
+        }
+
+        tr:nth-child(even) { background-color: #eeeeee; }
+
+        .hidden { display: none !important; }
+
+        .form-inline {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Authentication Screen -->
+    <div id="auth-screen" class="container">
+        <h2>SUPERVISOR ACCESS</h2>
+        <p>Please enter the password to view reporting.</p>
+        <input type="password" id="passwordInput" placeholder="Enter Password" style="width: 100%; margin-bottom: 15px;">
+        <button class="btn" style="width: 100%;" onclick="authenticate()">LOGIN</button>
+        <p id="authError" style="color: #ff5252; margin-top: 10px;" class="hidden">Incorrect password.</p>
+    </div>
+
+    <!-- Protected Supervisor Content -->
+    <div id="dashboard-content" class="hidden" style="width: 100%; max-width: 1000px;">
+        
+        <!-- Roster Management -->
+        <div class="container">
+            <h3>Manage Support Roster</h3>
+            <div class="form-inline">
+                <input type="text" id="newName" placeholder="Support Name" style="flex: 2;">
+                <select id="newTeam" style="flex: 1;">
+                    <option value="Tucson">Tucson</option>
+                    <option value="Manila">Manila</option>
+                </select>
+                <button class="btn" onclick="addSupportMember()">Add Support Member</button>
+            </div>
+        </div>
+
+        <!-- Analytics & Filter Dashboard -->
+        <div class="container">
+            <h3>Supervisor Dashboard & Filters</h3>
+            
+            <div class="filter-bar">
+                <label>Filter Team:</label>
+                <select id="teamFilter" onchange="renderDashboard()">
+                    <option value="ALL">All Teams</option>
+                    <option value="Tucson">Tucson Support</option>
+                    <option value="Manila">Manila Support</option>
+                </select>
+
+                <label>Filter Month:</label>
+                <select id="monthFilter" onchange="renderDashboard()"></select>
+            </div>
+
+            <!-- Average Summary Table -->
+            <h4 style="color: var(--accent-cyan); margin-bottom: 5px;">Support Average Survey Feedback</h4>
+            <table style="background: #fff; margin-bottom: 25px;">
+                <thead>
+                    <tr>
+                        <th>Support Name</th>
+                        <th>Team</th>
+                        <th>Total Feedback Submissions</th>
+                        <th>Average Rating</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody"></tbody>
+            </table>
+
+            <!-- Detailed Feedback Submissions Log -->
+            <h4 style="color: var(--accent-cyan); margin-bottom: 5px;">All Submitted Feedback Log</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date & Time Submitted</th>
+                        <th>Agent Name</th>
+                        <th>Case Number</th>
+                        <th>Support Name</th>
+                        <th>Team</th>
+                        <th>Rating</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody id="detailsBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        const AUTH_PASS = "Verifone123";
+
+        function authenticate() {
+            const input = document.getElementById('passwordInput').value;
+            if (input === AUTH_PASS) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('dashboard-content').classList.remove('hidden');
+                initDashboard();
+            } else {
+                document.getElementById('authError').classList.remove('hidden');
+            }
+        }
+
+        function initDashboard() {
+            populateMonthFilter();
+            renderDashboard();
+        }
+
+        function addSupportMember() {
+            const nameInput = document.getElementById('newName');
+            const name = nameInput.value.trim();
+            const team = document.getElementById('newTeam').value;
+
+            if (!name) return alert('Please enter a name.');
+
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
+            if (roster.some(m => m.name.toLowerCase() === name.toLowerCase())) {
+                return alert('This support person already exists.');
+            }
+
+            roster.push({ name, team });
+            localStorage.setItem('supportRoster', JSON.stringify(roster));
+            nameInput.value = '';
+            alert(`${name} added to ${team} support roster!`);
+            renderDashboard();
+        }
+
+        function populateMonthFilter() {
+            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
+            const months = [...new Set(submissions.map(s => s.monthKey))].sort().reverse();
+            
+            const monthSelect = document.getElementById('monthFilter');
+            monthSelect.innerHTML = '<option value="ALL">All Months</option>';
+            
+            months.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m;
+                monthSelect.appendChild(opt);
+            });
+        }
+
+        function renderDashboard() {
+            const teamVal = document.getElementById('teamFilter').value;
+            const monthVal = document.getElementById('monthFilter').value;
+            
+            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
+
+            // Filter submissions
+            const filteredData = submissions.filter(s => {
+                const matchTeam = (teamVal === 'ALL') || (s.team === teamVal);
+                const matchMonth = (monthVal === 'ALL') || (s.monthKey === monthVal);
+                return matchTeam && matchMonth;
+            });
+
+            // 1. Render Summary Table
+            const summaryBody = document.getElementById('summaryBody');
+            summaryBody.innerHTML = '';
+
+            // Group data
+            const stats = {};
+            filteredData.forEach(item => {
+                if (!stats[item.supportName]) {
+                    stats[item.supportName] = { team: item.team, count: 0, sum: 0 };
+                }
+                stats[item.supportName].count += 1;
+                stats[item.supportName].sum += item.rating;
+            });
+
+            for (const [name, data] of Object.entries(stats)) {
+                const avg = (data.sum / data.count).toFixed(2);
+                summaryBody.innerHTML += `
+                    <tr>
+                        <td><strong>${name}</strong></td>
+                        <td>${data.team}</td>
+                        <td>${data.count}</td>
+                        <td><strong>${avg} / 5.00</strong></td>
+                    </tr>
+                `;
+            }
+
+            // 2. Render Detail Logs
+            const detailsBody = document.getElementById('detailsBody');
+            detailsBody.innerHTML = '';
+
+            filteredData.forEach(item => {
+                detailsBody.innerHTML += `
+                    <tr>
+                        <td>${item.timestamp}</td>
+                        <td>${item.agentUser}</td>
+                        <td>${item.caseNumber}</td>
+                        <td>${item.supportName}</td>
+                        <td>${item.team}</td>
+                        <td>${item.rating}</td>
+                        <td>${item.comments}</td>
+                    </tr>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
