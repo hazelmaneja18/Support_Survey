@@ -3,54 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support Script Hub - Service Rating</title>
+    <title>Verifone | Support Service Rating</title>
     <style>
         :root {
-            --bg-color: #03182b;
-            --card-bg: #06233f;
-            --accent-cyan: #00bcd4;
-            --text-color: #ffffff;
-            --input-bg: #02111e;
-            --border-color: #0d47a1;
+            --primary-blue: #0a2540;
+            --accent-cyan: #00d4e5;
+            --glass-bg: rgba(6, 35, 63, 0.65);
+            --glass-border: rgba(0, 212, 229, 0.25);
+            --text-main: #f6f9fc;
+            --text-sub: #adbdcc;
+            --input-bg: rgba(2, 17, 30, 0.6);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at top left, #0d3b66, #03182b 70%);
+            color: var(--text-main);
             margin: 0;
-            padding: 40px 20px;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
+            align-items: center;
+            padding: 30px 15px;
+            box-sizing: border-box;
         }
 
         .container {
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-            padding: 30px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 40px 35px;
             width: 100%;
-            max-width: 550px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            max-width: 520px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             position: relative;
         }
 
-        .header-actions {
+        .header-top {
             display: flex;
-            justify-content: flex-end;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .verifone-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .verifone-logo svg {
+            fill: #ffffff;
+            height: 28px;
         }
 
         .btn-supervisor {
-            background-color: transparent;
+            background: rgba(0, 212, 229, 0.1);
             color: var(--accent-cyan);
             border: 1px solid var(--accent-cyan);
-            padding: 6px 14px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: bold;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.25s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -58,125 +76,171 @@
         }
 
         .btn-supervisor:hover {
-            background-color: var(--accent-cyan);
-            color: #000;
+            background: var(--accent-cyan);
+            color: #03182b;
+            box-shadow: 0 0 12px rgba(0, 212, 229, 0.4);
+        }
+
+        .title-block {
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         h2 {
-            color: var(--accent-cyan);
-            text-align: center;
-            margin-top: 0;
-            letter-spacing: 1px;
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            letter-spacing: 0.5px;
         }
 
         .subtitle {
-            text-align: center;
-            font-size: 0.9em;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .quote-banner {
+            background: rgba(255, 255, 255, 0.04);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 10px 14px;
+            border-radius: 0 6px 6px 0;
             margin-bottom: 25px;
-            color: #b0bec5;
+            font-style: italic;
+            font-size: 12px;
+            color: #d1dbe5;
         }
 
         .form-group {
-            display: grid;
-            grid-template-columns: 140px 1fr;
-            align-items: center;
             margin-bottom: 18px;
         }
 
         label {
-            font-weight: bold;
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-sub);
         }
 
         input[type="text"], select, textarea {
-            background-color: var(--input-bg);
+            background: var(--input-bg);
             color: #fff;
-            border: 1px solid var(--accent-cyan);
-            padding: 8px 12px;
-            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 11px 14px;
+            border-radius: 6px;
             font-size: 14px;
             width: 100%;
             box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 8px rgba(0, 212, 229, 0.3);
         }
 
         textarea {
-            height: 90px;
+            height: 85px;
             resize: vertical;
         }
 
+        option, optgroup {
+            background-color: #06233f;
+            color: #fff;
+        }
+
         .btn-submit {
-            background-color: transparent;
-            color: var(--text-color);
-            border: 2px solid var(--accent-cyan);
-            padding: 12px;
+            background: linear-gradient(135deg, #00d4e5, #008fa3);
+            color: #03182b;
+            border: none;
+            padding: 13px;
             width: 100%;
-            font-weight: bold;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 15px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-top: 15px;
-            transition: 0.2s;
+            margin-top: 10px;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
         }
 
         .btn-submit:hover {
-            background-color: var(--accent-cyan);
-            color: #000;
+            box-shadow: 0 4px 15px rgba(0, 212, 229, 0.4);
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="header-actions">
+        <div class="header-top">
+            <div class="verifone-logo">
+                <svg viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="8" cy="8" r="3.5"/>
+                    <circle cx="8" cy="22" r="3.5"/>
+                    <circle cx="16" cy="27" r="3.5"/>
+                    <circle cx="24" cy="8" r="3.5"/>
+                    <circle cx="24" cy="17" r="3.5"/>
+                    <circle cx="24" cy="26" r="3.5"/>
+                    <path d="M 12,12 C 12,19 20,13 20,20" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <text x="36" y="23" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700" fill="#ffffff" letter-spacing="-0.5">verifone</text>
+                </svg>
+            </div>
             <a href="supervisor.html" target="_blank" class="btn-supervisor">
                 🔒 Supervisor Access
             </a>
         </div>
 
-        <h2>SUPPORT SERVICE RATING</h2>
-        <div class="subtitle">Submit feedback for technical support assistance</div>
+        <div class="title-block">
+            <h2>SUPPORT SERVICE RATING</h2>
+            <div class="subtitle">Technical Support Assistance Feedback</div>
+        </div>
+
+        <div class="quote-banner">
+            "Excellence is not an act, but a habit. Your feedback drives our continuous improvement."
+        </div>
 
         <form id="ratingForm">
             <div class="form-group">
-                <label for="agentUser">Agent Name:</label>
-                <input type="text" id="agentUser" placeholder="Enter your full name / ID" required>
+                <label for="agentUser">Agent Name / ID:</label>
+                <input type="text" id="agentUser" placeholder="e.g. Jane Doe / hmaneja" required>
             </div>
 
             <div class="form-group">
                 <label for="caseNumber">Case Number:</label>
-                <input type="text" id="caseNumber" placeholder="Enter case number" required>
+                <input type="text" id="caseNumber" placeholder="Enter support case number" required>
             </div>
 
             <div class="form-group">
-                <label for="supportPerson">Support Person:</label>
+                <label for="supportPerson">Support Person Assisting You:</label>
                 <select id="supportPerson" required>
                     <option value="">-- Select Support Person --</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="rating">Rating (1 - 5):</label>
+                <label for="rating">Rating (1 - 5 Stars):</label>
                 <select id="rating" required>
                     <option value="">-- Select Rating --</option>
-                    <option value="5">5 - Excellent</option>
-                    <option value="4">4 - Good</option>
-                    <option value="3">3 - Average</option>
-                    <option value="2">2 - Below Average</option>
-                    <option value="1">1 - Poor</option>
+                    <option value="5">5 ★★★★★ - Excellent Assistance</option>
+                    <option value="4">4 ★★★★☆ - Good Support</option>
+                    <option value="3">3 ★★★☆☆ - Average</option>
+                    <option value="2">2 ★★☆☆☆ - Needs Improvement</option>
+                    <option value="1">1 ★☆☆☆☆ - Poor</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="notes">Notes / Feedback:</label>
-                <textarea id="notes" placeholder="Additional details or comments..."></textarea>
+                <label for="notes">Notes & Constructive Feedback:</label>
+                <textarea id="notes" placeholder="Provide additional details regarding the assistance received..."></textarea>
             </div>
 
-            <button type="submit" class="btn-submit">SUBMIT RATING</button>
+            <button type="submit" class="btn-submit">SUBMIT FEEDBACK</button>
         </form>
     </div>
 
     <script>
-        // Preset Roster for Support Teams
         const defaultRoster = [
-            // Tucson Support
             { name: "Donald Sayers", team: "Tucson" },
             { name: "Gerardo Morales", team: "Tucson" },
             { name: "James Warder", team: "Tucson" },
@@ -185,7 +249,6 @@
             { name: "Kimber Dawson", team: "Tucson" },
             { name: "Robert Hasson", team: "Tucson" },
             { name: "Wendy Franco", team: "Tucson" },
-            // Manila Support
             { name: "Judy Tolentino", team: "Manila" },
             { name: "Aj Dela Cruz", team: "Manila" },
             { name: "Melvin Lagrosa", team: "Manila" },
@@ -196,12 +259,10 @@
             { name: "Gemmalyn Silvestre", team: "Manila" }
         ];
 
-        // Store roster in localStorage if not already initialized
         if (!localStorage.getItem('supportRoster')) {
             localStorage.setItem('supportRoster', JSON.stringify(defaultRoster));
         }
 
-        // Load dropdown options dynamically grouped by team
         function loadSupportDropdown() {
             const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
             const select = document.getElementById('supportPerson');
@@ -210,7 +271,7 @@
             const teams = ['Tucson', 'Manila'];
             teams.forEach(team => {
                 const optgroup = document.createElement('optgroup');
-                optgroup.label = `${team} Support`;
+                optgroup.label = `${team} Support Team`;
                 roster.filter(member => member.team === team).forEach(member => {
                     const opt = document.createElement('option');
                     opt.value = member.name;
@@ -223,7 +284,6 @@
 
         loadSupportDropdown();
 
-        // Handle Form Submission
         document.getElementById('ratingForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -250,7 +310,7 @@
             submissions.unshift(newEntry);
             localStorage.setItem('supportRatings', JSON.stringify(submissions));
 
-            alert('Rating submitted successfully!');
+            alert('Thank you! Your feedback has been recorded.');
             this.reset();
         });
     </script>
