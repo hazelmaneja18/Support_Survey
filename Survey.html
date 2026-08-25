@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Script Hub - Service Rating</title>
+    <style>
+        :root {
+            --bg-color: #03182b;
+            --card-bg: #06233f;
+            --accent-cyan: #00bcd4;
+            --text-color: #ffffff;
+            --input-bg: #02111e;
+            --border-color: #0d47a1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 30px;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            color: var(--accent-cyan);
+            text-align: center;
+            margin-top: 0;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9em;
+            margin-bottom: 25px;
+            color: #b0bec5;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"], select, textarea {
+            background-color: var(--input-bg);
+            color: #fff;
+            border: 1px solid var(--accent-cyan);
+            padding: 8px 12px;
+            border-radius: 3px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 90px;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 2px solid var(--accent-cyan);
+            padding: 12px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--accent-cyan);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>SUPPORT SERVICE RATING</h2>
+        <div class="subtitle">Submit feedback for technical support assistance</div>
+
+        <form id="ratingForm">
+            <div class="form-group">
+                <label for="agentUser">Agent User:</label>
+                <input type="text" id="agentUser" placeholder="e.g. hmaneja" required>
+            </div>
+
+            <div class="form-group">
+                <label for="caseNumber">Case Number:</label>
+                <input type="text" id="caseNumber" required>
+            </div>
+
+            <div class="form-group">
+                <label for="supportPerson">Support Person:</label>
+                <select id="supportPerson" required>
+                    <option value="">-- Select Support Person --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="rating">Rating (1 - 5):</label>
+                <select id="rating" required>
+                    <option value="">-- Select Rating --</option>
+                    <option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option>
+                    <option value="3">3 - Average</option>
+                    <option value="2">2 - Below Average</option>
+                    <option value="1">1 - Poor</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes / Feedback:</label>
+                <textarea id="notes"></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">SUBMIT RATING</button>
+        </form>
+    </div>
+
+    <script>
+        // Initial Roster Setup
+        const defaultRoster = [
+            // Tucson Support
+            { name: "Donald Sayers", team: "Tucson" },
+            { name: "Gerardo Morales", team: "Tucson" },
+            { name: "James Warder", team: "Tucson" },
+            { name: "Jesse McQueary", team: "Tucson" },
+            { name: "Justine Santa Cruz", team: "Tucson" },
+            { name: "Kimber Dawson", team: "Tucson" },
+            { name: "Robert Hasson", team: "Tucson" },
+            { name: "Wendy Franco", team: "Tucson" },
+            // Manila Support
+            { name: "Judy Tolentino", team: "Manila" },
+            { name: "Aj Dela Cruz", team: "Manila" },
+            { name: "Melvin Lagrosa", team: "Manila" },
+            { name: "Kristian Ong", team: "Manila" },
+            { name: "Zachary Jeremy Payabyab", team: "Manila" },
+            { name: "Christian Mark Patdu", team: "Manila" },
+            { name: "Glory Barbacena", team: "Manila" },
+            { name: "Gemmalyn Silvestre", team: "Manila" }
+        ];
+
+        // Ensure roster exists in localStorage
+        if (!localStorage.getItem('supportRoster')) {
+            localStorage.setItem('supportRoster', JSON.stringify(defaultRoster));
+        }
+
+        // Load dropdown options dynamically
+        function loadSupportDropdown() {
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
+            const select = document.getElementById('supportPerson');
+            select.innerHTML = '<option value="">-- Select Support Person --</option>';
+
+            // Group by team in dropdown
+            const teams = ['Tucson', 'Manila'];
+            teams.forEach(team => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = `${team} Support`;
+                roster.filter(member => member.team === team).forEach(member => {
+                    const opt = document.createElement('option');
+                    opt.value = member.name;
+                    opt.textContent = `${member.name} (${member.team})`;
+                    optgroup.appendChild(opt);
+                });
+                select.appendChild(optgroup);
+            });
+        }
+
+        loadSupportDropdown();
+
+        // Form Submit
+        document.getElementById('ratingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
+            const selectedName = document.getElementById('supportPerson').value;
+            const personObj = roster.find(m => m.name === selectedName);
+
+            const now = new Date();
+            const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`; // Format: YYYY-MM
+            const formattedDate = `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            const newEntry = {
+                timestamp: formattedDate,
+                monthKey: monthKey,
+                agentUser: document.getElementById('agentUser').value,
+                caseNumber: document.getElementById('caseNumber').value,
+                supportName: selectedName,
+                team: personObj ? personObj.team : 'Unknown',
+                rating: parseInt(document.getElementById('rating').value),
+                comments: document.getElementById('notes').value
+            };
+
+            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
+            submissions.unshift(newEntry);
+            localStorage.setItem('supportRatings', JSON.stringify(submissions));
+
+            alert('Rating submitted successfully!');
+            this.reset();
+        });
+    </script>
+</body>
+</html>
