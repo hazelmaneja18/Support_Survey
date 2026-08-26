@@ -1730,8 +1730,7 @@
                     body += `   Comment: ${item.comments ? `"${item.comments}"` : '(No written comment)'}\n`;
                 });
 
-                body += `\n\nThank you,\n`;
-                body += `Verifone Supervisor Performance Reporting`;
+  
             }
 
             const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
