@@ -6,7 +6,7 @@
     <title>Verifone | Analytics & Supervisor Portal</title>
     <style>
         :root {
-            --bg-base: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e0f2fe 100%);
+            --bg-base: #f0f4f8;
             --card-bg: rgba(255, 255, 255, 0.92);
             --card-border: rgba(203, 213, 225, 0.6);
             --primary-dark: #0f172a;
@@ -17,51 +17,18 @@
             --input-bg: #ffffff;
             --input-border: #cbd5e1;
             --danger-red: #ef4444;
-            --table-bg: #ffffff;
-            --table-row-even: #f8fafc;
-            --table-header-bg: #0f172a;
-            --table-header-text: #ffffff;
-            --badge-green-bg: #d1fae5;
-            --badge-green-text: #065f46;
-            --badge-red-bg: #fee2e2;
-            --badge-red-text: #991b1b;
-            --subcard-bg: #f8fafc;
-            --logo-color: #0f172a;
-        }
-
-        [data-theme="dark"] {
-            --bg-base: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-            --card-bg: rgba(30, 41, 59, 0.92);
-            --card-border: rgba(51, 65, 85, 0.8);
-            --primary-dark: #f8fafc;
-            --accent-teal: #14b8a6;
-            --accent-teal-light: rgba(20, 184, 166, 0.15);
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --input-bg: #0f172a;
-            --input-border: #334155;
-            --danger-red: #f87171;
-            --table-bg: #1e293b;
-            --table-row-even: #0f172a;
-            --table-header-bg: #334155;
-            --table-header-text: #f8fafc;
-            --badge-green-bg: #064e3b;
-            --badge-green-text: #a7f3d0;
-            --badge-red-bg: #7f1d1d;
-            --badge-red-text: #fecaca;
-            --subcard-bg: #0f172a;
-            --logo-color: #38bdf8;
+            --badge-green: #10b981;
+            --badge-amber: #f59e0b;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-base);
+            background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e0f2fe 100%);
             color: var(--text-main);
             margin: 0;
             padding: 30px;
             min-height: 100vh;
             box-sizing: border-box;
-            transition: background 0.3s ease, color 0.3s ease;
         }
 
         #auth-screen {
@@ -72,7 +39,7 @@
             border-radius: 12px;
             padding: 35px;
             text-align: center;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
         .app-layout {
@@ -90,7 +57,7 @@
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
 
         .main-dashboard {
@@ -105,7 +72,7 @@
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
 
         .brand-header {
@@ -128,10 +95,6 @@
             width: auto;
         }
 
-        .verifone-mark circle, .verifone-mark rect {
-            fill: var(--logo-color);
-        }
-
         .verifone-text {
             font-size: 24px;
             font-weight: 700;
@@ -147,7 +110,7 @@
             padding: 10px 15px;
             font-style: italic;
             font-size: 13px;
-            color: var(--accent-teal);
+            color: #0f766e;
             margin-bottom: 20px;
             border-radius: 0 6px 6px 0;
         }
@@ -166,7 +129,7 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--accent-teal);
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
         }
 
         .btn {
@@ -177,10 +140,10 @@
             font-weight: 700;
             cursor: pointer;
             border-radius: 6px;
-            transition: opacity 0.2s ease;
+            transition: background-color 0.2s ease;
         }
 
-        .btn:hover { opacity: 0.9; }
+        .btn:hover { background: #0f766e; }
 
         .btn-sm {
             padding: 6px 10px;
@@ -197,18 +160,25 @@
             font-weight: 600;
             border-radius: 4px;
             cursor: pointer;
+            transition: all 0.2s;
             white-space: nowrap;
         }
 
+        .btn-edit:hover {
+            background: #0284c7;
+            color: #ffffff;
+        }
+
         .btn-delete {
-            background: rgba(239, 68, 68, 0.15);
+            background: #fef2f2;
             color: var(--danger-red);
-            border: 1px solid rgba(239, 68, 68, 0.4);
+            border: 1px solid #fca5a5;
             padding: 4px 8px;
             font-size: 11px;
             font-weight: 600;
             border-radius: 4px;
             cursor: pointer;
+            transition: all 0.2s;
             white-space: nowrap;
         }
 
@@ -256,19 +226,18 @@
 
         .tab-btn-group {
             display: flex;
-            gap: 4px;
+            gap: 5px;
             margin-bottom: 15px;
-            background: var(--subcard-bg);
+            background: #e2e8f0;
             padding: 4px;
             border-radius: 6px;
-            border: 1px solid var(--card-border);
         }
 
         .tab-btn {
             flex: 1;
             background: transparent;
             border: none;
-            padding: 6px 4px;
+            padding: 6px;
             font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
@@ -278,16 +247,16 @@
         }
 
         .tab-btn.active {
-            background: var(--card-bg);
+            background: #ffffff;
             color: var(--primary-dark);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .filter-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 14px;
-            background: var(--subcard-bg);
+            background: #f8fafc;
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -307,7 +276,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            background-color: var(--table-bg);
+            background-color: #ffffff;
             color: var(--text-main);
             border-radius: 6px;
             overflow: hidden;
@@ -318,16 +287,16 @@
             padding: 11px 13px;
             text-align: left;
             font-size: 13px;
-            border-bottom: 1px solid var(--card-border);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         th {
-            background-color: var(--table-header-bg);
-            color: var(--table-header-text);
+            background-color: #0f172a;
+            color: #ffffff;
             font-weight: 600;
         }
 
-        tr:nth-child(even) { background-color: var(--table-row-even); }
+        tr:nth-child(even) { background-color: #f8fafc; }
 
         .nowrap { white-space: nowrap; }
         .hidden { display: none !important; }
@@ -343,7 +312,7 @@
         }
 
         .roster-item {
-            background: var(--table-bg);
+            background: #ffffff;
             border: 1px solid var(--card-border);
             padding: 8px 10px;
             border-radius: 6px;
@@ -362,8 +331,8 @@
             font-weight: 700;
             display: inline-block;
         }
-        .badge-success { background: var(--badge-green-bg); color: var(--badge-green-text); }
-        .badge-danger { background: var(--badge-red-bg); color: var(--badge-red-text); }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
 
         .clickable-link {
             color: var(--accent-teal);
@@ -371,11 +340,12 @@
             cursor: pointer;
             text-decoration: underline;
         }
+        .clickable-link:hover { color: #0f766e; }
 
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(15, 23, 42, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -383,15 +353,14 @@
         }
 
         .modal-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
+            background: #ffffff;
             border-radius: 12px;
             width: 90%;
             max-width: 600px;
             max-height: 80vh;
             overflow-y: auto;
             padding: 25px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             position: relative;
         }
 
@@ -399,9 +368,8 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            background: var(--subcard-bg);
-            color: var(--text-main);
-            border: 1px solid var(--card-border);
+            background: #f1f5f9;
+            border: none;
             font-size: 16px;
             font-weight: bold;
             border-radius: 50%;
@@ -411,12 +379,26 @@
         }
 
         .comment-item {
-            background: var(--subcard-bg);
+            background: #f8fafc;
             border-left: 3px solid var(--accent-teal);
             padding: 10px 12px;
             margin-bottom: 10px;
             border-radius: 0 6px 6px 0;
             font-size: 12px;
+        }
+
+        .collapsible-header {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            background: #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -425,10 +407,10 @@
     <div id="auth-screen">
         <div class="verifone-logo-wrapper" style="justify-content: center; margin-bottom: 20px;">
             <svg class="verifone-mark" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="20" cy="18" r="10"/>
-                <circle cx="20" cy="55" r="10"/>
-                <circle cx="50" cy="92" r="10"/>
-                <rect x="52" y="8" width="20" height="56" rx="10"/>
+                <circle cx="20" cy="18" r="10" fill="#0f172a"/>
+                <circle cx="20" cy="55" r="10" fill="#0f172a"/>
+                <circle cx="50" cy="92" r="10" fill="#0f172a"/>
+                <rect x="52" y="8" width="20" height="56" rx="10" fill="#0f172a"/>
             </svg>
             <span class="verifone-text">verifone</span>
         </div>
@@ -443,12 +425,10 @@
         
         <aside class="sidebar-left">
             <div class="tab-btn-group">
-                <button class="tab-btn active" id="tabSupportBtn" onclick="switchRosterTab('support')">Support</button>
-                <button class="tab-btn" id="tabAgentBtn" onclick="switchRosterTab('agent')">Agents</button>
-                <button class="tab-btn" id="tabSettingsBtn" onclick="switchRosterTab('settings')">⚙️ Settings</button>
+                <button class="tab-btn active" id="tabSupportBtn" onclick="switchRosterTab('support')">Support Roster</button>
+                <button class="tab-btn" id="tabAgentBtn" onclick="switchRosterTab('agent')">Agent Roster</button>
             </div>
 
-            <!-- SUPPORT ROSTER SECTION -->
             <div id="supportRosterSection">
                 <h3 style="font-size: 15px; margin-bottom: 6px;">Manage Support Team</h3>
                 <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Add or remove active support personnel.</p>
@@ -474,7 +454,6 @@
                 <div class="roster-list" id="rosterList"></div>
             </div>
 
-            <!-- AGENT ROSTER SECTION -->
             <div id="agentRosterSection" class="hidden">
                 <h3 style="font-size: 15px; margin-bottom: 6px;">Manage Agent List</h3>
                 <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Add agents, select team leads, and manage roster.</p>
@@ -493,6 +472,23 @@
                     <button class="btn btn-sm" style="width: 100%;" onclick="addAgentMember()">+ Add Agent</button>
                 </div>
 
+                <div class="collapsible-header" onclick="toggleTLManager()">
+                    <span>⚙️ Manage Team Leads</span>
+                    <span id="tlToggleIcon">▼</span>
+                </div>
+                <div id="tlManagerContainer" class="hidden" style="background: #f8fafc; padding: 10px; border-radius: 6px; margin-top: 6px; border: 1px solid var(--card-border);">
+                    <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
+                        <input type="text" id="newTLName" placeholder="Team Lead Full Name">
+                        <select id="newTLSite">
+                            <option value="Manila">Manila Team Lead</option>
+                            <option value="Tucson">Tucson Team Lead</option>
+                            <option value="Other">Other Location</option>
+                        </select>
+                        <button class="btn btn-sm" onclick="addTeamLead()">+ Add Team Lead</button>
+                    </div>
+                    <div style="max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;" id="tlListContainer"></div>
+                </div>
+
                 <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
 
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
@@ -507,41 +503,6 @@
                 </h4>
                 <div class="roster-list" id="agentList"></div>
             </div>
-
-            <!-- SETTINGS SECTION (TL MANAGEMENT & THEME) -->
-            <div id="settingsSection" class="hidden">
-                <h3 style="font-size: 15px; margin-bottom: 6px;">Portal Settings</h3>
-                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Configure theme preferences and Team Leads.</p>
-
-                <div style="background: var(--subcard-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 18px;">
-                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px;">
-                        🎨 Theme Mode
-                    </label>
-                    <select id="themeSelector" onchange="toggleTheme(this.value)">
-                        <option value="light">☀️ Light Mode</option>
-                        <option value="dark">🌙 Dark Mode</option>
-                    </select>
-                </div>
-
-                <div style="background: var(--subcard-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border);">
-                    <h4 style="font-size: 12px; margin-bottom: 6px; color: var(--primary-dark);">⚙️ Team Lead Management</h4>
-                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Add or remove supervisors/leads.</p>
-
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-                        <input type="text" id="newTLName" placeholder="Team Lead Full Name">
-                        <select id="newTLSite">
-                            <option value="Manila">Manila Team Lead</option>
-                            <option value="Tucson">Tucson Team Lead</option>
-                            <option value="Other">Other Location</option>
-                        </select>
-                        <button class="btn btn-sm" onclick="addTeamLead()">+ Add Team Lead</button>
-                    </div>
-
-                    <h5 style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Active Team Leads</h5>
-                    <div style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;" id="tlListContainer"></div>
-                </div>
-            </div>
-
         </aside>
 
         <main class="main-dashboard">
@@ -550,10 +511,10 @@
                 <div class="brand-header">
                     <div class="verifone-logo-wrapper">
                         <svg class="verifone-mark" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="20" cy="18" r="10"/>
-                            <circle cx="20" cy="55" r="10"/>
-                            <circle cx="50" cy="92" r="10"/>
-                            <rect x="52" y="8" width="20" height="56" rx="10"/>
+                            <circle cx="20" cy="18" r="10" fill="#0f172a"/>
+                            <circle cx="20" cy="55" r="10" fill="#0f172a"/>
+                            <circle cx="50" cy="92" r="10" fill="#0f172a"/>
+                            <rect x="52" y="8" width="20" height="56" rx="10" fill="#0f172a"/>
                         </svg>
                         <span class="verifone-text">verifone</span>
                     </div>
@@ -569,7 +530,6 @@
                     "Data-driven decisions empower operational efficiency and elevate team performance."
                 </div>
 
-                <!-- SUPPORT PERFORMANCE TAB -->
                 <div id="supportPerformanceView">
                     <div class="filter-grid" style="grid-template-columns: repeat(5, 1fr);">
                         <div class="filter-item">
@@ -652,7 +612,6 @@
                     </table>
                 </div>
 
-                <!-- AGENT CREDITS TAB -->
                 <div id="agentCreditsView" class="hidden">
                     <div class="filter-grid">
                         <div class="filter-item">
@@ -751,6 +710,7 @@
         const AUTH_PASS = "Verifone123";
         const BASE_MONTHLY_CREDITS = 4;
 
+        // Default Team Leads seed list if none present
         const DEFAULT_TEAM_LEADS = [
             { name: "Kristin Manning", site: "Tucson" },
             { name: "Nathan Malis", site: "Tucson" },
@@ -772,7 +732,6 @@
         }
 
         function initDashboard() {
-            loadSavedTheme();
             ensureInitialTLData();
             populateFilterOptions();
             renderRosterManagement();
@@ -781,21 +740,21 @@
             renderDashboard();
         }
 
-        function loadSavedTheme() {
-            const savedTheme = localStorage.getItem('portalTheme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            const selector = document.getElementById('themeSelector');
-            if (selector) selector.value = savedTheme;
-        }
-
-        function toggleTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('portalTheme', theme);
-        }
-
         function ensureInitialTLData() {
             if (!localStorage.getItem('teamLeadsRoster')) {
                 localStorage.setItem('teamLeadsRoster', JSON.stringify(DEFAULT_TEAM_LEADS));
+            }
+        }
+
+        function toggleTLManager() {
+            const container = document.getElementById('tlManagerContainer');
+            const icon = document.getElementById('tlToggleIcon');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                icon.textContent = '▲';
+            } else {
+                container.classList.add('hidden');
+                icon.textContent = '▼';
             }
         }
 
@@ -821,29 +780,19 @@
         function switchRosterTab(type) {
             const supportSec = document.getElementById('supportRosterSection');
             const agentSec = document.getElementById('agentRosterSection');
-            const settingsSec = document.getElementById('settingsSection');
-            
             const supportBtn = document.getElementById('tabSupportBtn');
             const agentBtn = document.getElementById('tabAgentBtn');
-            const settingsBtn = document.getElementById('tabSettingsBtn');
-
-            supportSec.classList.add('hidden');
-            agentSec.classList.add('hidden');
-            settingsSec.classList.add('hidden');
-
-            supportBtn.classList.remove('active');
-            agentBtn.classList.remove('active');
-            settingsBtn.classList.remove('active');
 
             if (type === 'support') {
                 supportSec.classList.remove('hidden');
+                agentSec.classList.add('hidden');
                 supportBtn.classList.add('active');
-            } else if (type === 'agent') {
+                agentBtn.classList.remove('active');
+            } else {
+                supportSec.classList.add('hidden');
                 agentSec.classList.remove('hidden');
+                supportBtn.classList.remove('active');
                 agentBtn.classList.add('active');
-            } else if (type === 'settings') {
-                settingsSec.classList.remove('hidden');
-                settingsBtn.classList.add('active');
             }
         }
 
@@ -858,7 +807,7 @@
 
             const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
             if (tls.some(t => t.name.toLowerCase() === name.toLowerCase())) {
-                return alert('This Team Lead is already registered.');
+                return alert('This Team Lead is already in the system.');
             }
 
             tls.push({ name, site });
@@ -871,12 +820,13 @@
         }
 
         function deleteTeamLead(tlName) {
-            if (!confirm(`Remove Team Lead '${tlName}'? Agents under this TL will be updated to 'Unassigned'.`)) return;
+            if (!confirm(`Are you sure you want to remove Team Lead '${tlName}'? Any existing agents under this TL will be marked as 'Unassigned'.`)) return;
 
             let tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
             tls = tls.filter(t => t.name !== tlName);
             localStorage.setItem('teamLeadsRoster', JSON.stringify(tls));
 
+            // Unassign agents under this deleted TL
             let agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
             agents.forEach(a => {
                 if (a.supervisor === tlName) {
@@ -898,7 +848,7 @@
 
             tls.forEach(tl => {
                 const item = document.createElement('div');
-                item.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: var(--table-bg); padding: 5px 8px; border-radius: 4px; font-size: 11px; border: 1px solid var(--card-border);";
+                item.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #e2e8f0;";
                 item.innerHTML = `
                     <div>
                         <strong>${tl.name}</strong> <span style="color: var(--text-muted);">(${tl.site})</span>
@@ -967,13 +917,13 @@
             if (!agent) return;
 
             const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
-            let promptText = `Select Team Lead for ${agent.name}:\n`;
+            let promptText = `Select Team Lead for ${agent.name}:\nAvailable Team Leads:\n`;
             tls.forEach((t, i) => promptText += `${i+1}. ${t.name} (${t.site})\n`);
             
-            const selection = prompt(promptText + `\nEnter Team Lead Full Name:`, agent.supervisor || '');
+            const selection = prompt(promptText + `\nEnter the full name of Team Lead:`, agent.supervisor || '');
             if (selection === null) return;
 
-            const newLoc = prompt(`Update Location for ${agent.name}:`, agent.location || '');
+            const newLoc = prompt(`Update Location for ${agent.name} (e.g. MNL - Manila, TUS - Tucson, BLR - Bangalore, MIS - Canada):`, agent.location || '');
             if (newLoc === null) return;
 
             agent.supervisor = selection.trim() || 'Unassigned';
@@ -1005,7 +955,7 @@
         }
 
         function clearAllTestFeedback() {
-            if (!confirm("Are you sure you want to clear ALL feedback submissions?")) return;
+            if (!confirm("Are you sure you want to clear ALL feedback submissions for testing? This cannot be undone.")) return;
             localStorage.setItem('supportRatings', JSON.stringify([]));
             populateFilterOptions();
             renderDashboard();
@@ -1070,6 +1020,7 @@
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
 
+            // Populate Year Filters
             const years = [...new Set(submissions.map(s => s.year).filter(Boolean))].sort().reverse();
             const yearSelects = [document.getElementById('yearFilter'), document.getElementById('creditYearFilter')];
             yearSelects.forEach(select => {
@@ -1080,6 +1031,7 @@
                 select.value = currentVal;
             });
 
+            // Populate Categorized Team Lead Select Boxes
             const tlSelect = document.getElementById('tlFilter');
             const rosterTLSelect = document.getElementById('rosterTLFilter');
             const newAgentTLSelect = document.getElementById('newAgentSupervisorSelect');
@@ -1139,7 +1091,7 @@
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
 
-            // Support Performance Tab
+            // 1. SUPPORT PERFORMANCE TAB LOGIC
             const teamVal = document.getElementById('teamFilter').value;
             const yearVal = document.getElementById('yearFilter').value;
             const monthVal = document.getElementById('monthFilter').value;
@@ -1181,7 +1133,7 @@
             });
 
             if (Object.keys(stats).length === 0) {
-                summaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No feedback records found.</td></tr>`;
+                summaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No feedback records found for selected filters.</td></tr>`;
             } else {
                 for (const [name, data] of Object.entries(stats)) {
                     const avg = (data.sum / data.count).toFixed(2);
@@ -1201,13 +1153,17 @@
             detailsBody.innerHTML = '';
 
             if (filteredSupportData.length === 0) {
-                detailsBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No log entries match your criteria.</td></tr>`;
+                detailsBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No entries in the log matching current filters.</td></tr>`;
             } else {
                 filteredSupportData.forEach((item, index) => {
                     const agentName = item.agentUser || item.agentName || 'N/A';
                     const commentsText = item.comments || 'N/A';
-                    const escapedAgentName = agentName.replace(/'/g, "\\'");
+                    const isTestEntry = agentName.toLowerCase().includes('test') || commentsText.toLowerCase().includes('test');
+                    const actionBtn = isTestEntry 
+                        ? `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete Test</button>` 
+                        : `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>`;
 
+                    const escapedAgentName = agentName.replace(/'/g, "\\'");
                     detailsBody.innerHTML += `
                         <tr>
                             <td class="nowrap">${item.timestamp || item.dateISO || 'N/A'}</td>
@@ -1216,13 +1172,13 @@
                             <td>${item.team}</td>
                             <td><strong>${item.rating} / 5</strong></td>
                             <td>${commentsText}</td>
-                            <td><button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button></td>
+                            <td>${actionBtn}</td>
                         </tr>
                     `;
                 });
             }
 
-            // Agent Credits Tab
+            // 2. AGENT SURVEY CREDITS TAB LOGIC
             const creditYear = document.getElementById('creditYearFilter').value;
             const creditMonth = document.getElementById('creditMonthFilter').value;
             const creditStart = document.getElementById('creditStartDate').value;
@@ -1297,7 +1253,7 @@
                 });
 
                 if (agentCreditBody.innerHTML === '') {
-                    agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents match the selected category filter.</td></tr>`;
+                    agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents match the selected credit category filter.</td></tr>`;
                 }
             }
         }
@@ -1316,7 +1272,7 @@
             commentsList.innerHTML = '';
 
             if (agentComments.length === 0) {
-                commentsList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No feedback records found for this agent.</p>`;
+                commentsList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No feedback or comments found for this agent in the current system.</p>`;
             } else {
                 agentComments.forEach(c => {
                     commentsList.innerHTML += `
@@ -1343,7 +1299,7 @@
             const supportFeedbacks = submissions.filter(s => s.supportName.toLowerCase() === supportName.toLowerCase());
 
             document.getElementById('modalTitle').textContent = `Anonymous Feedback: ${supportName}`;
-            document.getElementById('modalSubtitle').textContent = `Showing all feedback for ${supportName} (Agent details hidden to maintain anonymity)`;
+            document.getElementById('modalSubtitle').textContent = `Showing all comments for ${supportName} (Agent details hidden to maintain anonymity)`;
 
             const commentsList = document.getElementById('modalCommentsList');
             commentsList.innerHTML = '';
