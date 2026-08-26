@@ -255,7 +255,7 @@
 
         .filter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 12px;
             background: #f8fafc;
             padding: 15px;
@@ -336,13 +336,13 @@
         .badge-success { background: #d1fae5; color: #065f46; }
         .badge-danger { background: #fee2e2; color: #991b1b; }
 
-        .clickable-agent {
+        .clickable-link {
             color: var(--accent-teal);
             font-weight: 700;
             cursor: pointer;
             text-decoration: underline;
         }
-        .clickable-agent:hover { color: #0f766e; }
+        .clickable-link:hover { color: #0f766e; }
 
         /* Modal Popup */
         .modal-overlay {
@@ -504,57 +504,57 @@
                     "Data-driven decisions empower operational efficiency and elevate team performance."
                 </div>
 
-                <!-- Shared Date & Team Filters -->
-                <div class="filter-grid">
-                    <div class="filter-item">
-                        <label>Support Team</label>
-                        <select id="teamFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Teams</option>
-                            <option value="Tucson">Tucson Support</option>
-                            <option value="Manila">Manila Support</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Year</label>
-                        <select id="yearFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Years</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Month</label>
-                        <select id="monthFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Months</option>
-                            <option value="01">January</option>
-                            <option value="02">February</option>
-                            <option value="03">March</option>
-                            <option value="04">April</option>
-                            <option value="05">May</option>
-                            <option value="06">June</option>
-                            <option value="07">July</option>
-                            <option value="08">August</option>
-                            <option value="09">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Start Date</label>
-                        <input type="date" id="startDate" onchange="renderDashboard()">
-                    </div>
-
-                    <div class="filter-item">
-                        <label>End Date</label>
-                        <input type="date" id="endDate" onchange="renderDashboard()">
-                    </div>
-                </div>
-
-                <!-- TAB 1: Support Performance & Audit View -->
+                <!-- TAB 1: Support Performance View -->
                 <div id="supportPerformanceView">
-                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Support Performance Summary</h3>
+                    <!-- Filters specifically for Support Performance -->
+                    <div class="filter-grid">
+                        <div class="filter-item">
+                            <label>Support Team</label>
+                            <select id="teamFilter" onchange="renderDashboard()">
+                                <option value="ALL">All Teams</option>
+                                <option value="Tucson">Tucson Support</option>
+                                <option value="Manila">Manila Support</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label>Year</label>
+                            <select id="yearFilter" onchange="renderDashboard()">
+                                <option value="ALL">All Years</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label>Month</label>
+                            <select id="monthFilter" onchange="renderDashboard()">
+                                <option value="ALL">All Months</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label>Start Date</label>
+                            <input type="date" id="startDate" onchange="renderDashboard()">
+                        </div>
+
+                        <div class="filter-item">
+                            <label>End Date</label>
+                            <input type="date" id="endDate" onchange="renderDashboard()">
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Support Performance Summary (Click name for anonymous comments)</h3>
                     <table>
                         <thead>
                             <tr>
@@ -591,13 +591,11 @@
 
                 <!-- TAB 2: Agent Credits View -->
                 <div id="agentCreditsView" class="hidden">
-                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 12px;">Agent Specific Filters</h3>
-                    
-                    <!-- Dedicated Agent Credit Filters -->
-                    <div class="filter-grid" style="margin-bottom: 20px; background: #ffffff;">
+                    <!-- Filters specifically for Agent Survey Credits -->
+                    <div class="filter-grid">
                         <div class="filter-item">
                             <label>Search Agent</label>
-                            <input type="text" id="agentSearchInput" placeholder="Filter Agent Name..." onkeyup="renderDashboard()">
+                            <input type="text" id="agentSearchInput" placeholder="Agent Name..." onkeyup="renderDashboard()">
                         </div>
 
                         <div class="filter-item">
@@ -612,8 +610,48 @@
                             <select id="creditCategoryFilter" onchange="renderDashboard()">
                                 <option value="ALL">All Categories</option>
                                 <option value="LEFT">Credits Left (> 0)</option>
-                                <option value="MAX">Maxed Out (0 Left)</option>
+                                <option value="MAX">0 Left (Maxed Out)</option>
+                                <option value="4">4 Credits Remaining</option>
+                                <option value="3">3 Credits Remaining</option>
+                                <option value="2">2 Credits Remaining</option>
+                                <option value="1">1 Credit Remaining</option>
                             </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label>Year</label>
+                            <select id="creditYearFilter" onchange="renderDashboard()">
+                                <option value="ALL">All Years</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label>Month</label>
+                            <select id="creditMonthFilter" onchange="renderDashboard()">
+                                <option value="ALL">All Months</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label>Start Date</label>
+                            <input type="date" id="creditStartDate" onchange="renderDashboard()">
+                        </div>
+
+                        <div class="filter-item">
+                            <label>End Date</label>
+                            <input type="date" id="creditEndDate" onchange="renderDashboard()">
                         </div>
                     </div>
 
@@ -621,10 +659,10 @@
                     <table>
                         <thead>
                             <tr>
-                                <th class="nowrap">Agent Name (Click for Comments)</th>
+                                <th class="nowrap">Agent Name (Click for Details)</th>
                                 <th>Team Lead / TL</th>
                                 <th>Location</th>
-                                <th class="text-center">Used This Month</th>
+                                <th class="text-center">Used in Period</th>
                                 <th class="text-center">Credits Remaining</th>
                                 <th class="text-center">Status</th>
                             </tr>
@@ -641,9 +679,9 @@
     <!-- Agent Comments Modal Dialog -->
     <div id="commentsModal" class="modal-overlay hidden">
         <div class="modal-card">
-            <button class="modal-close" onclick="closeCommentsModal()">✕</button>
-            <h3 id="modalAgentName" style="color: var(--primary-dark); margin-bottom: 4px;">Agent Comments</h3>
-            <p id="modalAgentTL" style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;"></p>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h3 id="modalTitle" style="color: var(--primary-dark); margin-bottom: 4px;">Feedback & Comments</h3>
+            <p id="modalSubtitle" style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;"></p>
             <div id="modalCommentsList"></div>
         </div>
     </div>
@@ -858,59 +896,73 @@
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
 
-            // Populate Year Filter
+            // Populate Year Filters
             const years = [...new Set(submissions.map(s => s.year).filter(Boolean))].sort().reverse();
-            const yearSelect = document.getElementById('yearFilter');
-            yearSelect.innerHTML = '<option value="ALL">All Years</option>';
-            years.forEach(y => yearSelect.innerHTML += `<option value="${y}">${y}</option>`);
+            const yearSelects = [document.getElementById('yearFilter'), document.getElementById('creditYearFilter')];
+            yearSelects.forEach(select => {
+                if (!select) return;
+                const currentVal = select.value;
+                select.innerHTML = '<option value="ALL">All Years</option>';
+                years.forEach(y => select.innerHTML += `<option value="${y}">${y}</option>`);
+                select.value = currentVal;
+            });
 
-            // Populate Team Lead (TL) Filter
-            const tls = [...new Set(agents.map(a => a.supervisor).filter(Boolean))].sort();
+            // Populate Team Lead (TL) Filter grouped by Location
             const tlSelect = document.getElementById('tlFilter');
             const currentTLVal = tlSelect.value;
             tlSelect.innerHTML = '<option value="ALL">All Team Leads</option>';
-            tls.forEach(tl => tlSelect.innerHTML += `<option value="${tl}">${tl}</option>`);
-            if (tls.includes(currentTLVal)) tlSelect.value = currentTLVal;
-        }
 
-        function getCurrentSelectedMonthYear() {
-            const now = new Date();
-            const monthVal = document.getElementById('monthFilter').value;
-            const yearVal = document.getElementById('yearFilter').value;
+            const manilaTLs = [...new Set(agents.filter(a => a.location && a.location.includes('MNL')).map(a => a.supervisor).filter(Boolean))].sort();
+            const tucsonTLs = [...new Set(agents.filter(a => a.location && a.location.includes('TUS')).map(a => a.supervisor).filter(Boolean))].sort();
+            const otherTLs = [...new Set(agents.filter(a => !a.location || (!a.location.includes('MNL') && !a.location.includes('TUS'))).map(a => a.supervisor).filter(Boolean))].sort();
 
-            const selectedMonth = monthVal === 'ALL' ? String(now.getMonth() + 1).padStart(2, '0') : monthVal;
-            const selectedYear = yearVal === 'ALL' ? String(now.getFullYear()) : yearVal;
+            if (manilaTLs.length > 0) {
+                let mnlGroup = '<optgroup label="Manila Team Leads">';
+                manilaTLs.forEach(tl => mnlGroup += `<option value="${tl}">${tl}</option>`);
+                mnlGroup += '</optgroup>';
+                tlSelect.innerHTML += mnlGroup;
+            }
 
-            return { selectedMonth, selectedYear };
+            if (tucsonTLs.length > 0) {
+                let tusGroup = '<optgroup label="Tucson Team Leads">';
+                tucsonTLs.forEach(tl => tusGroup += `<option value="${tl}">${tl}</option>`);
+                tusGroup += '</optgroup>';
+                tlSelect.innerHTML += tusGroup;
+            }
+
+            if (otherTLs.length > 0) {
+                let othGroup = '<optgroup label="Other Locations">';
+                otherTLs.forEach(tl => othGroup += `<option value="${tl}">${tl}</option>`);
+                othGroup += '</optgroup>';
+                tlSelect.innerHTML += othGroup;
+            }
+
+            tlSelect.value = currentTLVal;
         }
 
         function renderDashboard() {
+            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
+            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+
+            // -------------------------------------------------------------
+            // 1. SUPPORT PERFORMANCE TAB LOGIC
+            // -------------------------------------------------------------
             const teamVal = document.getElementById('teamFilter').value;
             const yearVal = document.getElementById('yearFilter').value;
             const monthVal = document.getElementById('monthFilter').value;
             const startVal = document.getElementById('startDate').value;
             const endVal = document.getElementById('endDate').value;
-            const searchVal = document.getElementById('agentSearchInput').value.toLowerCase().trim();
-            const tlVal = document.getElementById('tlFilter').value;
-            const creditCatVal = document.getElementById('creditCategoryFilter').value;
 
-            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-
-            // 1. Filter Submissions
-            const filteredData = submissions.filter(s => {
+            const filteredSupportData = submissions.filter(s => {
                 const matchTeam = (teamVal === 'ALL') || (s.team === teamVal);
                 const matchYear = (yearVal === 'ALL') || (s.year === yearVal);
 
                 let matchMonth = true;
                 if (monthVal !== 'ALL') {
                     if (s.dateISO) {
-                        const sMonth = s.dateISO.split('-')[1];
-                        matchMonth = (sMonth === monthVal);
+                        matchMonth = (s.dateISO.split('-')[1] === monthVal);
                     } else if (s.timestamp) {
-                        const dateObj = new Date(s.timestamp);
-                        const sMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
-                        matchMonth = (sMonth === monthVal);
+                        matchMonth = (String(new Date(s.timestamp).getMonth() + 1).padStart(2, '0') === monthVal);
                     }
                 }
 
@@ -923,8 +975,78 @@
                 return matchTeam && matchYear && matchMonth && matchDateRange;
             });
 
-            // 2. Render Agent Credit Table
-            const { selectedMonth, selectedYear } = getCurrentSelectedMonthYear();
+            // Render Support Summary Table
+            const summaryBody = document.getElementById('summaryBody');
+            summaryBody.innerHTML = '';
+            const stats = {};
+
+            filteredSupportData.forEach(item => {
+                if (!stats[item.supportName]) {
+                    stats[item.supportName] = { team: item.team, count: 0, sum: 0 };
+                }
+                stats[item.supportName].count += 1;
+                stats[item.supportName].sum += item.rating;
+            });
+
+            if (Object.keys(stats).length === 0) {
+                summaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No feedback records found for selected filters.</td></tr>`;
+            } else {
+                for (const [name, data] of Object.entries(stats)) {
+                    const avg = (data.sum / data.count).toFixed(2);
+                    const escapedName = name.replace(/'/g, "\\'");
+                    summaryBody.innerHTML += `
+                        <tr>
+                            <td class="nowrap"><span class="clickable-link" onclick="showAnonymousSupportFeedback('${escapedName}')">${name}</span></td>
+                            <td>${data.team}</td>
+                            <td class="text-center">${data.count}</td>
+                            <td><strong>${avg} / 5.00</strong></td>
+                        </tr>
+                    `;
+                }
+            }
+
+            // Render Detailed Audit Log Table
+            const detailsBody = document.getElementById('detailsBody');
+            detailsBody.innerHTML = '';
+
+            if (filteredSupportData.length === 0) {
+                detailsBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No entries in the log matching current filters.</td></tr>`;
+            } else {
+                filteredSupportData.forEach((item, index) => {
+                    const agentName = item.agentUser || item.agentName || 'N/A';
+                    const commentsText = item.comments || 'N/A';
+                    const isTestEntry = agentName.toLowerCase().includes('test') || commentsText.toLowerCase().includes('test');
+                    const actionBtn = isTestEntry 
+                        ? `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete Test</button>` 
+                        : `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>`;
+
+                    const escapedAgentName = agentName.replace(/'/g, "\\'");
+                    detailsBody.innerHTML += `
+                        <tr>
+                            <td class="nowrap">${item.timestamp || item.dateISO || 'N/A'}</td>
+                            <td class="nowrap"><span class="clickable-link" onclick="showAgentComments('${escapedAgentName}')">${agentName}</span></td>
+                            <td>${item.caseNumber || 'N/A'}</td>
+                            <td class="nowrap">${item.supportName}</td>
+                            <td>${item.team}</td>
+                            <td><strong>${item.rating} / 5</strong></td>
+                            <td>${commentsText}</td>
+                            <td>${actionBtn}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // -------------------------------------------------------------
+            // 2. AGENT SURVEY CREDITS TAB LOGIC
+            // -------------------------------------------------------------
+            const creditYear = document.getElementById('creditYearFilter').value;
+            const creditMonth = document.getElementById('creditMonthFilter').value;
+            const creditStart = document.getElementById('creditStartDate').value;
+            const creditEnd = document.getElementById('creditEndDate').value;
+            const searchVal = document.getElementById('agentSearchInput').value.toLowerCase().trim();
+            const tlVal = document.getElementById('tlFilter').value;
+            const creditCatVal = document.getElementById('creditCategoryFilter').value;
+
             const agentCreditBody = document.getElementById('agentCreditBody');
             agentCreditBody.innerHTML = '';
 
@@ -938,19 +1060,31 @@
                 agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents matching criteria.</td></tr>`;
             } else {
                 filteredAgents.forEach(agent => {
+                    // Count submissions for this agent in the requested timeframe
                     const usedCredits = submissions.filter(s => {
                         const agentMatch = (s.agentUser || s.agentName || '').toLowerCase() === agent.name.toLowerCase();
                         let dateObj = s.dateISO ? new Date(s.dateISO) : (s.timestamp ? new Date(s.timestamp) : new Date());
                         const sMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
                         const sYear = String(dateObj.getFullYear());
 
-                        return agentMatch && (sMonth === selectedMonth) && (sYear === selectedYear);
+                        const matchYear = (creditYear === 'ALL') || (sYear === creditYear);
+                        const matchMonth = (creditMonth === 'ALL') || (sMonth === creditMonth);
+
+                        let matchDateRange = true;
+                        if (s.dateISO) {
+                            if (creditStart && s.dateISO < creditStart) matchDateRange = false;
+                            if (creditEnd && s.dateISO > creditEnd) matchDateRange = false;
+                        }
+
+                        return agentMatch && matchYear && matchMonth && matchDateRange;
                     }).length;
 
                     const creditsLeft = Math.max(0, MAX_MONTHLY_CREDITS - usedCredits);
 
+                    // Credit Category Filtering Logic
                     if (creditCatVal === 'LEFT' && creditsLeft === 0) return;
                     if (creditCatVal === 'MAX' && creditsLeft > 0) return;
+                    if (['1', '2', '3', '4'].includes(creditCatVal) && creditsLeft !== parseInt(creditCatVal)) return;
 
                     const statusBadge = creditsLeft > 0
                         ? `<span class="badge badge-success">${creditsLeft} Credit(s) Left</span>`
@@ -959,7 +1093,7 @@
                     const escapedName = agent.name.replace(/'/g, "\\'");
                     agentCreditBody.innerHTML += `
                         <tr>
-                            <td><span class="clickable-agent" onclick="showAgentComments('${escapedName}')">${agent.name}</span></td>
+                            <td><span class="clickable-link" onclick="showAgentComments('${escapedName}')">${agent.name}</span></td>
                             <td>${agent.supervisor || 'Unassigned'}</td>
                             <td>${agent.location || 'N/A'}</td>
                             <td class="text-center">${usedCredits} / ${MAX_MONTHLY_CREDITS}</td>
@@ -970,100 +1104,12 @@
                 });
 
                 if (agentCreditBody.innerHTML === '') {
-                    agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents match the credit category filter.</td></tr>`;
-                }
-            }
-
-            // 3. Render Support Summary
-            const summaryBody = document.getElementById('summaryBody');
-            summaryBody.innerHTML = '';
-            const stats = {};
-
-            filteredData.forEach(item => {
-                if (!stats[item.supportName]) {
-                    stats[item.supportName] = { team: item.team, count: 0, sum: 0 };
-                }
-                stats[item.supportName].count += 1;
-                stats[item.supportName].sum += item.rating;
-            });
-
-            if (Object.keys(stats).length === 0) {
-                summaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No feedback records found for selected filters.</td></tr>`;
-            } else {
-                for (const [name, data] of Object.entries(stats)) {
-                    const avg = (data.sum / data.count).toFixed(2);
-                    summaryBody.innerHTML += `
-                        <tr>
-                            <td class="nowrap"><strong>${name}</strong></td>
-                            <td>${data.team}</td>
-                            <td class="text-center">${data.count}</td>
-                            <td><strong>${avg} / 5.00</strong></td>
-                        </tr>
-                    `;
-                }
-            }
-
-            // 4. Detailed Audit Log
-            const detailsBody = document.getElementById('detailsBody');
-            detailsBody.innerHTML = '';
-
-            if (submissions.length === 0) {
-                detailsBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No entries in the log.</td></tr>`;
-            } else {
-                submissions.forEach((item, index) => {
-                    const matchTeam = (teamVal === 'ALL') || (item.team === teamVal);
-                    const matchYear = (yearVal === 'ALL') || (item.year === yearVal);
-
-                    let matchMonth = true;
-                    if (monthVal !== 'ALL') {
-                        if (item.dateISO) {
-                            const sMonth = item.dateISO.split('-')[1];
-                            matchMonth = (sMonth === monthVal);
-                        } else if (item.timestamp) {
-                            const dateObj = new Date(item.timestamp);
-                            const sMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
-                            matchMonth = (sMonth === monthVal);
-                        }
-                    }
-
-                    let matchDateRange = true;
-                    if (item.dateISO) {
-                        if (startVal && item.dateISO < startVal) matchDateRange = false;
-                        if (endVal && item.dateISO > endVal) matchDateRange = false;
-                    }
-
-                    const agentName = item.agentUser || item.agentName || 'N/A';
-
-                    if (matchTeam && matchYear && matchMonth && matchDateRange) {
-                        const commentsText = item.comments || 'N/A';
-                        const isTestEntry = agentName.toLowerCase().includes('test') || commentsText.toLowerCase().includes('test');
-                        const actionBtn = isTestEntry 
-                            ? `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete Test</button>` 
-                            : `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>`;
-
-                        const escapedName = agentName.replace(/'/g, "\\'");
-                        detailsBody.innerHTML += `
-                            <tr>
-                                <td class="nowrap">${item.timestamp || item.dateISO || 'N/A'}</td>
-                                <td class="nowrap"><span class="clickable-agent" onclick="showAgentComments('${escapedName}')">${agentName}</span></td>
-                                <td>${item.caseNumber || 'N/A'}</td>
-                                <td class="nowrap">${item.supportName}</td>
-                                <td>${item.team}</td>
-                                <td><strong>${item.rating} / 5</strong></td>
-                                <td>${commentsText}</td>
-                                <td>${actionBtn}</td>
-                            </tr>
-                        `;
-                    }
-                });
-
-                if (detailsBody.innerHTML === '') {
-                    detailsBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No entries match current filters.</td></tr>`;
+                    agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents match the selected credit category filter.</td></tr>`;
                 }
             }
         }
 
-        // Modal Functionality for Agent Comments
+        // Modal for Agent Comments
         function showAgentComments(agentName) {
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
@@ -1071,14 +1117,14 @@
             const agentInfo = agents.find(a => a.name.toLowerCase() === agentName.toLowerCase());
             const agentComments = submissions.filter(s => (s.agentUser || s.agentName || '').toLowerCase() === agentName.toLowerCase());
 
-            document.getElementById('modalAgentName').textContent = `Feedback & Comments: ${agentName}`;
-            document.getElementById('modalAgentTL').textContent = `Team Lead: ${agentInfo ? agentInfo.supervisor : 'Unassigned'} | Location: ${agentInfo ? agentInfo.location : 'N/A'}`;
+            document.getElementById('modalTitle').textContent = `Agent Submissions: ${agentName}`;
+            document.getElementById('modalSubtitle').textContent = `Team Lead: ${agentInfo ? agentInfo.supervisor : 'Unassigned'} | Location: ${agentInfo ? agentInfo.location : 'N/A'}`;
 
             const commentsList = document.getElementById('modalCommentsList');
             commentsList.innerHTML = '';
 
             if (agentComments.length === 0) {
-                commentsList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No feedback or comments found for this agent.</p>`;
+                commentsList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No feedback or comments found for this agent in the current system.</p>`;
             } else {
                 agentComments.forEach(c => {
                     commentsList.innerHTML += `
@@ -1100,7 +1146,41 @@
             document.getElementById('commentsModal').classList.remove('hidden');
         }
 
-        function closeCommentsModal() {
+        // Modal for Anonymous Support Member Feedback
+        function showAnonymousSupportFeedback(supportName) {
+            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
+            const supportFeedbacks = submissions.filter(s => s.supportName.toLowerCase() === supportName.toLowerCase());
+
+            document.getElementById('modalTitle').textContent = `Anonymous Feedback: ${supportName}`;
+            document.getElementById('modalSubtitle').textContent = `Showing all comments for ${supportName} (Agent details hidden to maintain anonymity)`;
+
+            const commentsList = document.getElementById('modalCommentsList');
+            commentsList.innerHTML = '';
+
+            if (supportFeedbacks.length === 0) {
+                commentsList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No comments available for this support member.</p>`;
+            } else {
+                supportFeedbacks.forEach(c => {
+                    commentsList.innerHTML += `
+                        <div class="comment-item">
+                            <div style="font-weight:700; color: var(--primary-dark); margin-bottom: 3px;">
+                                Rating Given: ${c.rating} / 5
+                            </div>
+                            <div style="color: var(--text-main); font-style: italic; margin-bottom: 4px;">
+                                "${c.comments || 'No written comment provided.'}"
+                            </div>
+                            <div style="font-size: 10px; color: var(--text-muted);">
+                                Case #: ${c.caseNumber || 'N/A'} | Submitted: ${c.timestamp || c.dateISO || 'N/A'}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('commentsModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
             document.getElementById('commentsModal').classList.add('hidden');
         }
     </script>
