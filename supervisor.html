@@ -726,7 +726,7 @@
         const AUTH_PASS = "Verifone123";
         const BASE_MONTHLY_CREDITS = 4;
 
-        // Corrected Team Leads with exact site locations matching user roster
+        // Team Leads List
         const DEFAULT_TEAM_LEADS = [
             { name: "Andrew Marsh", site: "TUS - Tucson" },
             { name: "Edwin Cuesta", site: "MNL - Manila" },
@@ -741,6 +741,114 @@
             { name: "Vineed Alexander", site: "BLR - Bangalore" }
         ];
 
+        // Complete Agent Roster Mapped with Team Leads and Locations
+        const DEFAULT_AGENTS = [
+            { name: "Alexander Hassel", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Alfredo Ceno", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "Amado Villela", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Andres Fimbres", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Anila Jast", tl: "Kristin Manning", location: "MIS - Canada" },
+            { name: "Anupama Chakrabhavi Manjunath", tl: "Vineed Alexander", location: "BLR - Bangalore" },
+            { name: "Arlenne Labagala", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
+            { name: "Ashley Busch Maynard", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Bench Manuel", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "Boh Daclis", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "Braven Ocampo", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "Brian Fisher", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Bryan Capili", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Carlos Sancez", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Christian Mark Patdu", tl: "Hazel Maneja", location: "MNL - Manila" },
+            { name: "Christian Quimno", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "Christina Caicedo", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Cici Carrell", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Cresencio Nacua", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Cyler David", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Damon McBride", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Daniel Arago", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
+            { name: "Davareo Hill", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "David Hilton", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Dean Clemente", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "Dinesh Kumavat", tl: "Vineed Alexander", location: "BLR - Bangalore" },
+            { name: "Eljul Maligalig", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
+            { name: "Erika Fletcher", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Felisha Sy", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "George Munoz", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Gregorio Villalobos", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Gustavo Verdugo", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Harold Reyes", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "Harold Rodilas", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Hazel Bongalos", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "James Hodgin", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "James Querubin", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
+            { name: "Jan Cedric Tarroza", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Jan Karlo Bamba", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Jan Neri", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "Japteg Singh", tl: "Kristin Manning", location: "MIS - Canada" },
+            { name: "Jasmine Comia", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
+            { name: "Jayson Derick Camero", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Jazmine Chase", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Jeraldyn Relata", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "Jerrold Ramirez", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Jerry Perez", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Joan Favela", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "John Drew", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "John Guzman", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "Jonathan Morley", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Joneil Obus", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
+            { name: "Joshua Clement Fernandez", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Joshua Galante", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Judah Carrillo", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Justin Lawrence Castro", tl: "Hazel Maneja", location: "MNL - Manila" },
+            { name: "Justine Bagalihog", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "Kaligh Gradall", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Katia Ballesteros", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Kevin Christopher", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Kimberly Torres", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "Kurt Martin Block", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Kyle Mcginn", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Lowella Alacida", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
+            { name: "Luis Armenta", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Madel Negrete", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
+            { name: "Mani Ratnam", tl: "Vineed Alexander", location: "BLR - Bangalore" },
+            { name: "Mark Angelus Biscarra", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Max Kushner", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Mical-alexandra Warren", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Michael Beaman", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Micheal Morales", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Mickey Gonzales", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Mohammed Tariq", tl: "Vineed Alexander", location: "BLR - Bangalore" },
+            { name: "Nicolas Varona", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Omar Dominguez", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Paul Bandilla", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Pranav Ranjan", tl: "Vineed Alexander", location: "BLR - Bangalore" },
+            { name: "Rachelle Rubio", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
+            { name: "Raven Guasis", tl: "Hazel Maneja", location: "MNL - Manila" },
+            { name: "Raymart John Cabudil", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Rebecca Guthery", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Remond Licayan", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "Renard Relova", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "Renisha McCrimmon", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Reshma Bhanu", tl: "Vineed Alexander", location: "BLR - Bangalore" },
+            { name: "Rex Riell", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Rey Caicedo", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Ricardo Andrade", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Roi Lumtao", tl: "Edwin Cuesta", location: "MNL - Manila" },
+            { name: "Ryan Chavez Higel", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Salvador Rubio Jr", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "Samuel Shocknesse", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Savannah Caicedo", tl: "Nathan Malis", location: "TUS - Tucson" },
+            { name: "Sheenam Dhiman", tl: "Kristin Manning", location: "MIS - Canada" },
+            { name: "Shurray Barnes", tl: "Robert Hayes", location: "TUS - Tucson" },
+            { name: "Sidrick Mondalo", tl: "Franco Molina", location: "MNL - Manila" },
+            { name: "Spencer Cockrell", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "Stephanie Webb", tl: "Nicole Garcia", location: "TUS - Tucson" },
+            { name: "Supriya Shetty", tl: "Vineed Alexander", location: "BLR - Bangalore" },
+            { name: "Vanessa Aguda", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "Welene Escarez", tl: "Paul Batol", location: "MNL - Manila" },
+            { name: "William Burns", tl: "Andrew Marsh", location: "TUS - Tucson" },
+            { name: "William Potts", tl: "Nicole Garcia", location: "TUS - Tucson" }
+        ];
+
         function authenticate() {
             const input = document.getElementById('passwordInput').value;
             if (input === AUTH_PASS) {
@@ -753,7 +861,7 @@
         }
 
         function initDashboard() {
-            ensureInitialTLData();
+            ensureInitialData();
             initTheme();
             populateFilterOptions();
             renderRosterManagement();
@@ -762,9 +870,10 @@
             renderDashboard();
         }
 
-        function ensureInitialTLData() {
-            // Force reset or initialize team leads to ensure correct locations take effect
+        function ensureInitialData() {
+            // Force reset or initialize team leads and agent roster with the correct mappings
             localStorage.setItem('teamLeadsRoster', JSON.stringify(DEFAULT_TEAM_LEADS));
+            localStorage.setItem('agentRoster', JSON.stringify(DEFAULT_AGENTS));
         }
 
         function toggleTheme() {
