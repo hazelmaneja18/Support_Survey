@@ -6,7 +6,7 @@
     <title>Verifone | Analytics & Supervisor Portal</title>
     <style>
         :root {
-            --bg-base: #f0f4f8;
+            --bg-base: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e0f2fe 100%);
             --card-bg: rgba(255, 255, 255, 0.92);
             --card-border: rgba(203, 213, 225, 0.6);
             --primary-dark: #0f172a;
@@ -17,18 +17,51 @@
             --input-bg: #ffffff;
             --input-border: #cbd5e1;
             --danger-red: #ef4444;
-            --badge-green: #10b981;
-            --badge-amber: #f59e0b;
+            --table-bg: #ffffff;
+            --table-row-even: #f8fafc;
+            --table-header-bg: #0f172a;
+            --table-header-text: #ffffff;
+            --badge-green-bg: #d1fae5;
+            --badge-green-text: #065f46;
+            --badge-red-bg: #fee2e2;
+            --badge-red-text: #991b1b;
+            --subcard-bg: #f8fafc;
+            --logo-color: #0f172a;
+        }
+
+        [data-theme="dark"] {
+            --bg-base: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            --card-bg: rgba(30, 41, 59, 0.92);
+            --card-border: rgba(51, 65, 85, 0.8);
+            --primary-dark: #f8fafc;
+            --accent-teal: #14b8a6;
+            --accent-teal-light: rgba(20, 184, 166, 0.15);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --danger-red: #f87171;
+            --table-bg: #1e293b;
+            --table-row-even: #0f172a;
+            --table-header-bg: #334155;
+            --table-header-text: #f8fafc;
+            --badge-green-bg: #064e3b;
+            --badge-green-text: #a7f3d0;
+            --badge-red-bg: #7f1d1d;
+            --badge-red-text: #fecaca;
+            --subcard-bg: #0f172a;
+            --logo-color: #38bdf8;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e0f2fe 100%);
+            background: var(--bg-base);
             color: var(--text-main);
             margin: 0;
             padding: 30px;
             min-height: 100vh;
             box-sizing: border-box;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         #auth-screen {
@@ -39,7 +72,7 @@
             border-radius: 12px;
             padding: 35px;
             text-align: center;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
         .app-layout {
@@ -51,13 +84,13 @@
         }
 
         .sidebar-left {
-            width: 320px;
+            width: 330px;
             flex-shrink: 0;
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .main-dashboard {
@@ -72,7 +105,7 @@
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .brand-header {
@@ -95,6 +128,10 @@
             width: auto;
         }
 
+        .verifone-mark circle, .verifone-mark rect {
+            fill: var(--logo-color);
+        }
+
         .verifone-text {
             font-size: 24px;
             font-weight: 700;
@@ -110,7 +147,7 @@
             padding: 10px 15px;
             font-style: italic;
             font-size: 13px;
-            color: #0f766e;
+            color: var(--accent-teal);
             margin-bottom: 20px;
             border-radius: 0 6px 6px 0;
         }
@@ -129,7 +166,7 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--accent-teal);
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25);
         }
 
         .btn {
@@ -140,10 +177,10 @@
             font-weight: 700;
             cursor: pointer;
             border-radius: 6px;
-            transition: background-color 0.2s ease;
+            transition: opacity 0.2s ease;
         }
 
-        .btn:hover { background: #0f766e; }
+        .btn:hover { opacity: 0.9; }
 
         .btn-sm {
             padding: 6px 10px;
@@ -160,25 +197,18 @@
             font-weight: 600;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s;
             white-space: nowrap;
         }
 
-        .btn-edit:hover {
-            background: #0284c7;
-            color: #ffffff;
-        }
-
         .btn-delete {
-            background: #fef2f2;
+            background: rgba(239, 68, 68, 0.15);
             color: var(--danger-red);
-            border: 1px solid #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
             padding: 4px 8px;
             font-size: 11px;
             font-weight: 600;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s;
             white-space: nowrap;
         }
 
@@ -199,7 +229,6 @@
             float: right;
         }
 
-        /* View Nav Tabs */
         .main-nav-tabs {
             display: flex;
             gap: 10px;
@@ -227,18 +256,19 @@
 
         .tab-btn-group {
             display: flex;
-            gap: 5px;
+            gap: 4px;
             margin-bottom: 15px;
-            background: #e2e8f0;
+            background: var(--subcard-bg);
             padding: 4px;
             border-radius: 6px;
+            border: 1px solid var(--card-border);
         }
 
         .tab-btn {
             flex: 1;
             background: transparent;
             border: none;
-            padding: 6px;
+            padding: 6px 4px;
             font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
@@ -248,17 +278,16 @@
         }
 
         .tab-btn.active {
-            background: #ffffff;
+            background: var(--card-bg);
             color: var(--primary-dark);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
-        /* Clean 4-column balanced grid layout */
         .filter-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 14px;
-            background: #f8fafc;
+            background: var(--subcard-bg);
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -278,7 +307,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            background-color: #ffffff;
+            background-color: var(--table-bg);
             color: var(--text-main);
             border-radius: 6px;
             overflow: hidden;
@@ -289,16 +318,16 @@
             padding: 11px 13px;
             text-align: left;
             font-size: 13px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--card-border);
         }
 
         th {
-            background-color: #0f172a;
-            color: #ffffff;
+            background-color: var(--table-header-bg);
+            color: var(--table-header-text);
             font-weight: 600;
         }
 
-        tr:nth-child(even) { background-color: #f8fafc; }
+        tr:nth-child(even) { background-color: var(--table-row-even); }
 
         .nowrap { white-space: nowrap; }
         .hidden { display: none !important; }
@@ -308,13 +337,13 @@
             flex-direction: column;
             gap: 8px;
             margin-top: 10px;
-            max-height: 380px;
+            max-height: 280px;
             overflow-y: auto;
             padding-right: 4px;
         }
 
         .roster-item {
-            background: #ffffff;
+            background: var(--table-bg);
             border: 1px solid var(--card-border);
             padding: 8px 10px;
             border-radius: 6px;
@@ -326,7 +355,6 @@
 
         .text-center { text-align: center; }
 
-        /* Status Badges */
         .badge {
             padding: 3px 8px;
             border-radius: 12px;
@@ -334,8 +362,8 @@
             font-weight: 700;
             display: inline-block;
         }
-        .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-success { background: var(--badge-green-bg); color: var(--badge-green-text); }
+        .badge-danger { background: var(--badge-red-bg); color: var(--badge-red-text); }
 
         .clickable-link {
             color: var(--accent-teal);
@@ -343,13 +371,11 @@
             cursor: pointer;
             text-decoration: underline;
         }
-        .clickable-link:hover { color: #0f766e; }
 
-        /* Modal Popup */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.7);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -357,14 +383,15 @@
         }
 
         .modal-card {
-            background: #ffffff;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 12px;
             width: 90%;
             max-width: 600px;
             max-height: 80vh;
             overflow-y: auto;
             padding: 25px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
             position: relative;
         }
 
@@ -372,8 +399,9 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            background: #f1f5f9;
-            border: none;
+            background: var(--subcard-bg);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
             font-size: 16px;
             font-weight: bold;
             border-radius: 50%;
@@ -383,7 +411,7 @@
         }
 
         .comment-item {
-            background: #f8fafc;
+            background: var(--subcard-bg);
             border-left: 3px solid var(--accent-teal);
             padding: 10px 12px;
             margin-bottom: 10px;
@@ -394,14 +422,13 @@
 </head>
 <body>
 
-    <!-- Login Screen -->
     <div id="auth-screen">
         <div class="verifone-logo-wrapper" style="justify-content: center; margin-bottom: 20px;">
             <svg class="verifone-mark" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="20" cy="18" r="10" fill="#0f172a"/>
-                <circle cx="20" cy="55" r="10" fill="#0f172a"/>
-                <circle cx="50" cy="92" r="10" fill="#0f172a"/>
-                <rect x="52" y="8" width="20" height="56" rx="10" fill="#0f172a"/>
+                <circle cx="20" cy="18" r="10"/>
+                <circle cx="20" cy="55" r="10"/>
+                <circle cx="50" cy="92" r="10"/>
+                <rect x="52" y="8" width="20" height="56" rx="10"/>
             </svg>
             <span class="verifone-text">verifone</span>
         </div>
@@ -412,17 +439,16 @@
         <p id="authError" style="color: var(--danger-red); font-size: 13px; margin-top: 12px;" class="hidden">Access Denied: Invalid password.</p>
     </div>
 
-    <!-- Main Workspace -->
     <div id="dashboard-content" class="app-layout hidden">
         
-        <!-- LEFT SIDEBAR -->
         <aside class="sidebar-left">
             <div class="tab-btn-group">
-                <button class="tab-btn active" id="tabSupportBtn" onclick="switchRosterTab('support')">Support Roster</button>
-                <button class="tab-btn" id="tabAgentBtn" onclick="switchRosterTab('agent')">Agent Roster</button>
+                <button class="tab-btn active" id="tabSupportBtn" onclick="switchRosterTab('support')">Support</button>
+                <button class="tab-btn" id="tabAgentBtn" onclick="switchRosterTab('agent')">Agents</button>
+                <button class="tab-btn" id="tabSettingsBtn" onclick="switchRosterTab('settings')">⚙️ Settings</button>
             </div>
 
-            <!-- Support Roster Section -->
+            <!-- SUPPORT ROSTER SECTION -->
             <div id="supportRosterSection">
                 <h3 style="font-size: 15px; margin-bottom: 6px;">Manage Support Team</h3>
                 <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Add or remove active support personnel.</p>
@@ -448,14 +474,16 @@
                 <div class="roster-list" id="rosterList"></div>
             </div>
 
-            <!-- Agent Roster Section -->
+            <!-- AGENT ROSTER SECTION -->
             <div id="agentRosterSection" class="hidden">
                 <h3 style="font-size: 15px; margin-bottom: 6px;">Manage Agent List</h3>
-                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Manage agents, team leads, and locations.</p>
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Add agents, select team leads, and manage roster.</p>
 
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
                     <input type="text" id="newAgentName" placeholder="Agent Full Name">
-                    <input type="text" id="newAgentSupervisor" placeholder="Team Lead / Supervisor">
+                    <select id="newAgentSupervisorSelect">
+                        <option value="">Select Team Lead / TL</option>
+                    </select>
                     <select id="newAgentLocation">
                         <option value="MNL - Manila">MNL - Manila</option>
                         <option value="TUS - Tucson">TUS - Tucson</option>
@@ -467,7 +495,6 @@
 
                 <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
 
-                <!-- Agent Filter Controls -->
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
                     <input type="text" id="searchAgentRoster" placeholder="🔍 Search Agent Name..." onkeyup="renderAgentRosterManagement()">
                     <select id="rosterTLFilter" onchange="renderAgentRosterManagement()">
@@ -480,26 +507,59 @@
                 </h4>
                 <div class="roster-list" id="agentList"></div>
             </div>
+
+            <!-- SETTINGS SECTION (TL MANAGEMENT & THEME) -->
+            <div id="settingsSection" class="hidden">
+                <h3 style="font-size: 15px; margin-bottom: 6px;">Portal Settings</h3>
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Configure theme preferences and Team Leads.</p>
+
+                <div style="background: var(--subcard-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 18px;">
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px;">
+                        🎨 Theme Mode
+                    </label>
+                    <select id="themeSelector" onchange="toggleTheme(this.value)">
+                        <option value="light">☀️ Light Mode</option>
+                        <option value="dark">🌙 Dark Mode</option>
+                    </select>
+                </div>
+
+                <div style="background: var(--subcard-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border);">
+                    <h4 style="font-size: 12px; margin-bottom: 6px; color: var(--primary-dark);">⚙️ Team Lead Management</h4>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Add or remove supervisors/leads.</p>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                        <input type="text" id="newTLName" placeholder="Team Lead Full Name">
+                        <select id="newTLSite">
+                            <option value="Manila">Manila Team Lead</option>
+                            <option value="Tucson">Tucson Team Lead</option>
+                            <option value="Other">Other Location</option>
+                        </select>
+                        <button class="btn btn-sm" onclick="addTeamLead()">+ Add Team Lead</button>
+                    </div>
+
+                    <h5 style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Active Team Leads</h5>
+                    <div style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;" id="tlListContainer"></div>
+                </div>
+            </div>
+
         </aside>
 
-        <!-- RIGHT MAIN AREA -->
         <main class="main-dashboard">
             
             <div class="container-card">
                 <div class="brand-header">
                     <div class="verifone-logo-wrapper">
                         <svg class="verifone-mark" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="20" cy="18" r="10" fill="#0f172a"/>
-                            <circle cx="20" cy="55" r="10" fill="#0f172a"/>
-                            <circle cx="50" cy="92" r="10" fill="#0f172a"/>
-                            <rect x="52" y="8" width="20" height="56" rx="10" fill="#0f172a"/>
+                            <circle cx="20" cy="18" r="10"/>
+                            <circle cx="20" cy="55" r="10"/>
+                            <circle cx="50" cy="92" r="10"/>
+                            <rect x="52" y="8" width="20" height="56" rx="10"/>
                         </svg>
                         <span class="verifone-text">verifone</span>
                     </div>
                     <span style="font-weight: 600; color: var(--accent-teal);">Supervisor Performance Reporting</span>
                 </div>
 
-                <!-- Navigation Tabs for Views -->
                 <div class="main-nav-tabs">
                     <button class="main-nav-btn active" id="navSupportBtn" onclick="switchMainView('support')">Support Performance</button>
                     <button class="main-nav-btn" id="navCreditsBtn" onclick="switchMainView('credits')">Agent Survey Credits</button>
@@ -509,9 +569,8 @@
                     "Data-driven decisions empower operational efficiency and elevate team performance."
                 </div>
 
-                <!-- TAB 1: Support Performance View -->
+                <!-- SUPPORT PERFORMANCE TAB -->
                 <div id="supportPerformanceView">
-                    <!-- Filters specifically for Support Performance -->
                     <div class="filter-grid" style="grid-template-columns: repeat(5, 1fr);">
                         <div class="filter-item">
                             <label>Support Team</label>
@@ -593,9 +652,8 @@
                     </table>
                 </div>
 
-                <!-- TAB 2: Agent Credits View -->
+                <!-- AGENT CREDITS TAB -->
                 <div id="agentCreditsView" class="hidden">
-                    <!-- Clean 4-column balanced layout -->
                     <div class="filter-grid">
                         <div class="filter-item">
                             <label>Search Agent</label>
@@ -659,7 +717,7 @@
                         </div>
                     </div>
 
-                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Agent Survey Credit Allowance (4 Max / Month)</h3>
+                    <h3 id="creditSectionHeader" style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Agent Survey Credit Allowance (4 Max / Month)</h3>
                     <table>
                         <thead>
                             <tr>
@@ -680,7 +738,6 @@
         </main>
     </div>
 
-    <!-- Comments Modal Dialog -->
     <div id="commentsModal" class="modal-overlay hidden">
         <div class="modal-card">
             <button class="modal-close" onclick="closeModal()">✕</button>
@@ -692,7 +749,16 @@
 
     <script>
         const AUTH_PASS = "Verifone123";
-        const MAX_MONTHLY_CREDITS = 4;
+        const BASE_MONTHLY_CREDITS = 4;
+
+        const DEFAULT_TEAM_LEADS = [
+            { name: "Kristin Manning", site: "Tucson" },
+            { name: "Nathan Malis", site: "Tucson" },
+            { name: "NLETUS", site: "Tucson" },
+            { name: "Robert Hayes", site: "Tucson" },
+            { name: "Edwin Cuesta", site: "Manila" },
+            { name: "Kyle Sioson", site: "Manila" }
+        ];
 
         function authenticate() {
             const input = document.getElementById('passwordInput').value;
@@ -706,10 +772,31 @@
         }
 
         function initDashboard() {
+            loadSavedTheme();
+            ensureInitialTLData();
             populateFilterOptions();
             renderRosterManagement();
             renderAgentRosterManagement();
+            renderTLList();
             renderDashboard();
+        }
+
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('portalTheme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const selector = document.getElementById('themeSelector');
+            if (selector) selector.value = savedTheme;
+        }
+
+        function toggleTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('portalTheme', theme);
+        }
+
+        function ensureInitialTLData() {
+            if (!localStorage.getItem('teamLeadsRoster')) {
+                localStorage.setItem('teamLeadsRoster', JSON.stringify(DEFAULT_TEAM_LEADS));
+            }
         }
 
         function switchMainView(view) {
@@ -734,22 +821,95 @@
         function switchRosterTab(type) {
             const supportSec = document.getElementById('supportRosterSection');
             const agentSec = document.getElementById('agentRosterSection');
+            const settingsSec = document.getElementById('settingsSection');
+            
             const supportBtn = document.getElementById('tabSupportBtn');
             const agentBtn = document.getElementById('tabAgentBtn');
+            const settingsBtn = document.getElementById('tabSettingsBtn');
+
+            supportSec.classList.add('hidden');
+            agentSec.classList.add('hidden');
+            settingsSec.classList.add('hidden');
+
+            supportBtn.classList.remove('active');
+            agentBtn.classList.remove('active');
+            settingsBtn.classList.remove('active');
 
             if (type === 'support') {
                 supportSec.classList.remove('hidden');
-                agentSec.classList.add('hidden');
                 supportBtn.classList.add('active');
-                agentBtn.classList.remove('active');
-            } else {
-                supportSec.classList.add('hidden');
+            } else if (type === 'agent') {
                 agentSec.classList.remove('hidden');
-                supportBtn.classList.remove('active');
                 agentBtn.classList.add('active');
+            } else if (type === 'settings') {
+                settingsSec.classList.remove('hidden');
+                settingsBtn.classList.add('active');
             }
         }
 
+        // --- TEAM LEAD MANAGEMENT ---
+        function addTeamLead() {
+            const nameInput = document.getElementById('newTLName');
+            const siteSelect = document.getElementById('newTLSite');
+            const name = nameInput.value.trim();
+            const site = siteSelect.value;
+
+            if (!name) return alert('Please enter a Team Lead name.');
+
+            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
+            if (tls.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+                return alert('This Team Lead is already registered.');
+            }
+
+            tls.push({ name, site });
+            localStorage.setItem('teamLeadsRoster', JSON.stringify(tls));
+            nameInput.value = '';
+            
+            renderTLList();
+            populateFilterOptions();
+            renderAgentRosterManagement();
+        }
+
+        function deleteTeamLead(tlName) {
+            if (!confirm(`Remove Team Lead '${tlName}'? Agents under this TL will be updated to 'Unassigned'.`)) return;
+
+            let tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
+            tls = tls.filter(t => t.name !== tlName);
+            localStorage.setItem('teamLeadsRoster', JSON.stringify(tls));
+
+            let agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            agents.forEach(a => {
+                if (a.supervisor === tlName) {
+                    a.supervisor = 'Unassigned';
+                }
+            });
+            localStorage.setItem('agentRoster', JSON.stringify(agents));
+
+            renderTLList();
+            populateFilterOptions();
+            renderAgentRosterManagement();
+            renderDashboard();
+        }
+
+        function renderTLList() {
+            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
+            const container = document.getElementById('tlListContainer');
+            container.innerHTML = '';
+
+            tls.forEach(tl => {
+                const item = document.createElement('div');
+                item.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: var(--table-bg); padding: 5px 8px; border-radius: 4px; font-size: 11px; border: 1px solid var(--card-border);";
+                item.innerHTML = `
+                    <div>
+                        <strong>${tl.name}</strong> <span style="color: var(--text-muted);">(${tl.site})</span>
+                    </div>
+                    <button class="btn-delete" style="padding: 2px 6px; font-size: 10px;" onclick="deleteTeamLead('${tl.name.replace(/'/g, "\\'")}')">Remove</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // --- SUPPORT & AGENT ROSTER MANAGEMENT ---
         function addSupportMember() {
             const nameInput = document.getElementById('newName');
             const name = nameInput.value.trim();
@@ -780,9 +940,9 @@
 
         function addAgentMember() {
             const nameInput = document.getElementById('newAgentName');
-            const supInput = document.getElementById('newAgentSupervisor');
+            const supSelect = document.getElementById('newAgentSupervisorSelect');
             const name = nameInput.value.trim();
-            const supervisor = supInput.value.trim() || 'Unassigned';
+            const supervisor = supSelect.value || 'Unassigned';
             const location = document.getElementById('newAgentLocation').value;
 
             if (!name) return alert('Please enter an agent name.');
@@ -795,7 +955,7 @@
             agents.push({ name, supervisor, location });
             localStorage.setItem('agentRoster', JSON.stringify(agents));
             nameInput.value = '';
-            supInput.value = '';
+            supSelect.value = '';
             renderAgentRosterManagement();
             populateFilterOptions();
             renderDashboard();
@@ -806,13 +966,17 @@
             const agent = agents.find(a => a.name === agentName);
             if (!agent) return;
 
-            const newSup = prompt(`Update Team Lead / Supervisor for ${agent.name}:`, agent.supervisor || '');
-            if (newSup === null) return;
+            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
+            let promptText = `Select Team Lead for ${agent.name}:\n`;
+            tls.forEach((t, i) => promptText += `${i+1}. ${t.name} (${t.site})\n`);
+            
+            const selection = prompt(promptText + `\nEnter Team Lead Full Name:`, agent.supervisor || '');
+            if (selection === null) return;
 
-            const newLoc = prompt(`Update Location for ${agent.name} (e.g. MNL - Manila, TUS - Tucson, BLR - Bangalore, MIS - Canada):`, agent.location || '');
+            const newLoc = prompt(`Update Location for ${agent.name}:`, agent.location || '');
             if (newLoc === null) return;
 
-            agent.supervisor = newSup.trim() || 'Unassigned';
+            agent.supervisor = selection.trim() || 'Unassigned';
             agent.location = newLoc.trim() || agent.location;
 
             localStorage.setItem('agentRoster', JSON.stringify(agents));
@@ -841,7 +1005,7 @@
         }
 
         function clearAllTestFeedback() {
-            if (!confirm("Are you sure you want to clear ALL feedback submissions for testing? This cannot be undone.")) return;
+            if (!confirm("Are you sure you want to clear ALL feedback submissions?")) return;
             localStorage.setItem('supportRatings', JSON.stringify([]));
             populateFilterOptions();
             renderDashboard();
@@ -904,9 +1068,8 @@
 
         function populateFilterOptions() {
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
 
-            // Populate Year Filters
             const years = [...new Set(submissions.map(s => s.year).filter(Boolean))].sort().reverse();
             const yearSelects = [document.getElementById('yearFilter'), document.getElementById('creditYearFilter')];
             yearSelects.forEach(select => {
@@ -917,61 +1080,66 @@
                 select.value = currentVal;
             });
 
-            // Populate Team Lead (TL) Filter grouped by Location
             const tlSelect = document.getElementById('tlFilter');
             const rosterTLSelect = document.getElementById('rosterTLFilter');
+            const newAgentTLSelect = document.getElementById('newAgentSupervisorSelect');
+
             const currentTLVal = tlSelect ? tlSelect.value : 'ALL';
             const currentRosterTLVal = rosterTLSelect ? rosterTLSelect.value : 'ALL';
+            const currentNewAgentTLVal = newAgentTLSelect ? newAgentTLSelect.value : '';
 
             if (tlSelect) tlSelect.innerHTML = '<option value="ALL">All Team Leads</option>';
             if (rosterTLSelect) rosterTLSelect.innerHTML = '<option value="ALL">Filter by Team Lead (All)</option>';
+            if (newAgentTLSelect) newAgentTLSelect.innerHTML = '<option value="">Select Team Lead / TL</option>';
 
-            const manilaTLs = [...new Set(agents.filter(a => a.location && a.location.includes('MNL')).map(a => a.supervisor).filter(Boolean))].sort();
-            const tucsonTLs = [...new Set(agents.filter(a => a.location && a.location.includes('TUS')).map(a => a.supervisor).filter(Boolean))].sort();
-            const otherTLs = [...new Set(agents.filter(a => !a.location || (!a.location.includes('MNL') && !a.location.includes('TUS'))).map(a => a.supervisor).filter(Boolean))].sort();
+            const manilaTLs = tls.filter(t => t.site === 'Manila').map(t => t.name).sort();
+            const tucsonTLs = tls.filter(t => t.site === 'Tucson').map(t => t.name).sort();
+            const otherTLs = tls.filter(t => t.site !== 'Manila' && t.site !== 'Tucson').map(t => t.name).sort();
 
-            const allTLs = [...new Set(agents.map(a => a.supervisor).filter(Boolean))].sort();
-
-            if (rosterTLSelect) {
-                allTLs.forEach(tl => {
-                    rosterTLSelect.innerHTML += `<option value="${tl}">${tl}</option>`;
-                });
-                rosterTLSelect.value = currentRosterTLVal;
+            let groupHTML = '';
+            if (manilaTLs.length > 0) {
+                groupHTML += '<optgroup label="Manila Team Leads">';
+                manilaTLs.forEach(tl => groupHTML += `<option value="${tl}">${tl}</option>`);
+                groupHTML += '</optgroup>';
+            }
+            if (tucsonTLs.length > 0) {
+                groupHTML += '<optgroup label="Tucson Team Leads">';
+                tucsonTLs.forEach(tl => groupHTML += `<option value="${tl}">${tl}</option>`);
+                groupHTML += '</optgroup>';
+            }
+            if (otherTLs.length > 0) {
+                groupHTML += '<optgroup label="Other Team Leads">';
+                otherTLs.forEach(tl => groupHTML += `<option value="${tl}">${tl}</option>`);
+                groupHTML += '</optgroup>';
             }
 
             if (tlSelect) {
-                if (manilaTLs.length > 0) {
-                    let mnlGroup = '<optgroup label="Manila Team Leads">';
-                    manilaTLs.forEach(tl => mnlGroup += `<option value="${tl}">${tl}</option>`);
-                    mnlGroup += '</optgroup>';
-                    tlSelect.innerHTML += mnlGroup;
-                }
-
-                if (tucsonTLs.length > 0) {
-                    let tusGroup = '<optgroup label="Tucson Team Leads">';
-                    tucsonTLs.forEach(tl => tusGroup += `<option value="${tl}">${tl}</option>`);
-                    tusGroup += '</optgroup>';
-                    tlSelect.innerHTML += tusGroup;
-                }
-
-                if (otherTLs.length > 0) {
-                    let othGroup = '<optgroup label="Other Locations">';
-                    otherTLs.forEach(tl => othGroup += `<option value="${tl}">${tl}</option>`);
-                    othGroup += '</optgroup>';
-                    tlSelect.innerHTML += othGroup;
-                }
-
+                tlSelect.innerHTML += groupHTML;
                 tlSelect.value = currentTLVal;
             }
+            if (rosterTLSelect) {
+                rosterTLSelect.innerHTML += groupHTML;
+                rosterTLSelect.value = currentRosterTLVal;
+            }
+            if (newAgentTLSelect) {
+                newAgentTLSelect.innerHTML += groupHTML;
+                newAgentTLSelect.value = currentNewAgentTLVal;
+            }
+        }
+
+        function calculateMonthsSpanned(startDateStr, endDateStr) {
+            if (!startDateStr || !endDateStr) return 1;
+            const start = new Date(startDateStr);
+            const end = new Date(endDateStr);
+            if (isNaN(start) || isNaN(end) || start > end) return 1;
+            return (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
         }
 
         function renderDashboard() {
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
 
-            // -------------------------------------------------------------
-            // 1. SUPPORT PERFORMANCE TAB LOGIC
-            // -------------------------------------------------------------
+            // Support Performance Tab
             const teamVal = document.getElementById('teamFilter').value;
             const yearVal = document.getElementById('yearFilter').value;
             const monthVal = document.getElementById('monthFilter').value;
@@ -1000,7 +1168,6 @@
                 return matchTeam && matchYear && matchMonth && matchDateRange;
             });
 
-            // Render Support Summary Table
             const summaryBody = document.getElementById('summaryBody');
             summaryBody.innerHTML = '';
             const stats = {};
@@ -1014,7 +1181,7 @@
             });
 
             if (Object.keys(stats).length === 0) {
-                summaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No feedback records found for selected filters.</td></tr>`;
+                summaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No feedback records found.</td></tr>`;
             } else {
                 for (const [name, data] of Object.entries(stats)) {
                     const avg = (data.sum / data.count).toFixed(2);
@@ -1030,22 +1197,17 @@
                 }
             }
 
-            // Render Detailed Audit Log Table (Case # Column Removed)
             const detailsBody = document.getElementById('detailsBody');
             detailsBody.innerHTML = '';
 
             if (filteredSupportData.length === 0) {
-                detailsBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No entries in the log matching current filters.</td></tr>`;
+                detailsBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No log entries match your criteria.</td></tr>`;
             } else {
                 filteredSupportData.forEach((item, index) => {
                     const agentName = item.agentUser || item.agentName || 'N/A';
                     const commentsText = item.comments || 'N/A';
-                    const isTestEntry = agentName.toLowerCase().includes('test') || commentsText.toLowerCase().includes('test');
-                    const actionBtn = isTestEntry 
-                        ? `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete Test</button>` 
-                        : `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>`;
-
                     const escapedAgentName = agentName.replace(/'/g, "\\'");
+
                     detailsBody.innerHTML += `
                         <tr>
                             <td class="nowrap">${item.timestamp || item.dateISO || 'N/A'}</td>
@@ -1054,15 +1216,13 @@
                             <td>${item.team}</td>
                             <td><strong>${item.rating} / 5</strong></td>
                             <td>${commentsText}</td>
-                            <td>${actionBtn}</td>
+                            <td><button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button></td>
                         </tr>
                     `;
                 });
             }
 
-            // -------------------------------------------------------------
-            // 2. AGENT SURVEY CREDITS TAB LOGIC
-            // -------------------------------------------------------------
+            // Agent Credits Tab
             const creditYear = document.getElementById('creditYearFilter').value;
             const creditMonth = document.getElementById('creditMonthFilter').value;
             const creditStart = document.getElementById('creditStartDate').value;
@@ -1070,6 +1230,17 @@
             const searchVal = document.getElementById('agentSearchInput').value.toLowerCase().trim();
             const tlVal = document.getElementById('tlFilter').value;
             const creditCatVal = document.getElementById('creditCategoryFilter').value;
+
+            let maxPeriodAllowance = BASE_MONTHLY_CREDITS;
+            if (creditStart && creditEnd) {
+                const monthsCount = calculateMonthsSpanned(creditStart, creditEnd);
+                maxPeriodAllowance = BASE_MONTHLY_CREDITS * monthsCount;
+            } else if (creditMonth === 'ALL') {
+                maxPeriodAllowance = BASE_MONTHLY_CREDITS * 12;
+            }
+
+            const periodLabel = (creditMonth !== 'ALL') ? `(4 Max / Month)` : `(${maxPeriodAllowance} Max / Total Period)`;
+            document.getElementById('creditSectionHeader').textContent = `Agent Survey Credit Allowance ${periodLabel}`;
 
             const agentCreditBody = document.getElementById('agentCreditBody');
             agentCreditBody.innerHTML = '';
@@ -1084,7 +1255,6 @@
                 agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents matching criteria.</td></tr>`;
             } else {
                 filteredAgents.forEach(agent => {
-                    // Count submissions dynamically for this timeframe
                     const usedCredits = submissions.filter(s => {
                         const agentMatch = (s.agentUser || s.agentName || '').toLowerCase() === agent.name.toLowerCase();
                         let dateObj = s.dateISO ? new Date(s.dateISO) : (s.timestamp ? new Date(s.timestamp) : new Date());
@@ -1103,9 +1273,8 @@
                         return agentMatch && matchYear && matchMonth && matchDateRange;
                     }).length;
 
-                    const creditsLeft = Math.max(0, MAX_MONTHLY_CREDITS - usedCredits);
+                    const creditsLeft = Math.max(0, maxPeriodAllowance - usedCredits);
 
-                    // Credit Category Filtering Logic
                     if (creditCatVal === 'LEFT' && creditsLeft === 0) return;
                     if (creditCatVal === 'MAX' && creditsLeft > 0) return;
                     if (['1', '2', '3', '4'].includes(creditCatVal) && creditsLeft !== parseInt(creditCatVal)) return;
@@ -1120,7 +1289,7 @@
                             <td><span class="clickable-link" onclick="showAgentComments('${escapedName}')">${agent.name}</span></td>
                             <td>${agent.supervisor || 'Unassigned'}</td>
                             <td>${agent.location || 'N/A'}</td>
-                            <td class="text-center">${usedCredits} / ${MAX_MONTHLY_CREDITS}</td>
+                            <td class="text-center">${usedCredits} / ${maxPeriodAllowance}</td>
                             <td class="text-center"><strong>${creditsLeft}</strong></td>
                             <td class="text-center">${statusBadge}</td>
                         </tr>
@@ -1128,12 +1297,11 @@
                 });
 
                 if (agentCreditBody.innerHTML === '') {
-                    agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents match the selected credit category filter.</td></tr>`;
+                    agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents match the selected category filter.</td></tr>`;
                 }
             }
         }
 
-        // Modal for Agent Comments
         function showAgentComments(agentName) {
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
@@ -1148,7 +1316,7 @@
             commentsList.innerHTML = '';
 
             if (agentComments.length === 0) {
-                commentsList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No feedback or comments found for this agent in the current system.</p>`;
+                commentsList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No feedback records found for this agent.</p>`;
             } else {
                 agentComments.forEach(c => {
                     commentsList.innerHTML += `
@@ -1170,13 +1338,12 @@
             document.getElementById('commentsModal').classList.remove('hidden');
         }
 
-        // Modal for Anonymous Support Member Feedback (Rating & Case # Removed)
         function showAnonymousSupportFeedback(supportName) {
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             const supportFeedbacks = submissions.filter(s => s.supportName.toLowerCase() === supportName.toLowerCase());
 
             document.getElementById('modalTitle').textContent = `Anonymous Feedback: ${supportName}`;
-            document.getElementById('modalSubtitle').textContent = `Showing all comments for ${supportName} (Agent details hidden to maintain anonymity)`;
+            document.getElementById('modalSubtitle').textContent = `Showing all feedback for ${supportName} (Agent details hidden to maintain anonymity)`;
 
             const commentsList = document.getElementById('modalCommentsList');
             commentsList.innerHTML = '';
