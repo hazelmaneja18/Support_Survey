@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifone | Support Service Rating & Supervisor Portal</title>
+    <title>Verifone | Support Service Rating</title>
     <style>
         :root {
             --bg-base: #f0f4f8;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --card-border: rgba(203, 213, 225, 0.8);
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-border: rgba(203, 213, 225, 0.6);
             --primary-dark: #0f172a;
             --accent-teal: #0d9488;
             --accent-teal-light: #ccfbf1;
-            --accent-danger: #ef4444;
             --text-main: #1e293b;
             --text-muted: #64748b;
             --input-bg: #ffffff;
             --input-border: #cbd5e1;
+            --danger-red: #ef4444;
         }
 
         body {
@@ -25,20 +25,11 @@
             color: var(--text-main);
             margin: 0;
             min-height: 100vh;
-            padding: 30px 15px;
-            box-sizing: border-box;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-        }
-
-        .view-panel {
-            display: none;
-            width: 100%;
-        }
-
-        .view-panel.active {
-            display: block;
+            align-items: center;
+            padding: 30px 15px;
+            box-sizing: border-box;
         }
 
         .container {
@@ -47,17 +38,10 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--card-border);
             border-radius: 12px;
-            padding: 35px;
-            margin: 0 auto;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-        }
-
-        .survey-container {
+            padding: 40px 35px;
+            width: 100%;
             max-width: 520px;
-        }
-
-        .supervisor-container {
-            max-width: 1100px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
         .header-top {
@@ -85,7 +69,7 @@
             letter-spacing: -0.8px;
         }
 
-        .btn-toggle {
+        .btn-supervisor {
             background: #ffffff;
             color: var(--accent-teal);
             border: 1px solid var(--accent-teal);
@@ -95,12 +79,13 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
 
-        .btn-toggle:hover {
+        .btn-supervisor:hover {
             background: var(--accent-teal);
             color: #ffffff;
             box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
@@ -135,30 +120,43 @@
             color: #0f766e;
         }
 
-        .credit-badge {
-            background: #e0f2fe;
-            border: 1px solid #0284c7;
-            color: #0369a1;
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
         .form-group {
             margin-bottom: 18px;
         }
 
         label {
-            display: block;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 6px;
             color: var(--text-main);
+        }
+
+        .credit-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .badge-success {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+
+        .badge-warning {
+            background-color: #fef9c3;
+            color: #a16207;
+            border: 1px solid #fde047;
+        }
+
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
         }
 
         input[type="text"], select, textarea {
@@ -198,7 +196,7 @@
             transition: background-color 0.2s ease, transform 0.1s ease;
         }
 
-        .btn-submit:hover:not(:disabled) {
+        .btn-submit:hover {
             background: #0f766e;
             transform: translateY(-1px);
         }
@@ -206,338 +204,88 @@
         .btn-submit:disabled {
             background: #94a3b8;
             cursor: not-allowed;
-        }
-
-        /* Supervisor Section UI */
-        .section-card {
-            background: #ffffff;
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-
-        .section-card h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 16px;
-            color: var(--primary-dark);
-            border-bottom: 2px solid var(--bg-base);
-            padding-bottom: 8px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            margin-top: 10px;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--input-border);
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .btn-danger {
-            background: var(--accent-danger);
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-add {
-            background: var(--accent-teal);
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            height: 42px;
-            align-self: flex-end;
-        }
-
-        .badge-location {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .badge-mnl { background: #dbeafe; color: #1e40af; }
-        .badge-tus { background: #fef3c7; color: #92400e; }
-        .badge-other { background: #f1f5f9; color: #475569; }
-
-        .stats-summary {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        .stat-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 12px 20px;
-            border-radius: 6px;
-            flex: 1;
-            text-align: center;
-        }
-
-        .stat-box .num {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--accent-teal);
-        }
-
-        .stat-box .label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            transform: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- AGENT SURVEY VIEW -->
-    <div id="surveyView" class="view-panel active">
-        <div class="container survey-container">
-            <div class="header-top">
-                <div class="verifone-logo-wrapper">
-                    <svg class="verifone-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="20" cy="22" r="10" fill="#0f172a"/>
-                        <circle cx="20" cy="52" r="10" fill="#0f172a"/>
-                        <circle cx="56" cy="22" r="10" fill="#0f172a"/>
-                        <circle cx="56" cy="52" r="10" fill="#0f172a"/>
-                        <rect x="46" y="22" width="20" height="30" fill="#0f172a"/>
-                        <circle cx="38" cy="82" r="10" fill="#0f172a"/>
-                    </svg>
-                    <span class="verifone-text">verifone</span>
-                </div>
-                <button class="btn-toggle" onclick="switchView('supervisorView')">🔒 Supervisor Access</button>
+    <div class="container">
+        <div class="header-top">
+            <div class="verifone-logo-wrapper">
+                <svg class="verifone-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="22" r="10" fill="#0f172a"/>
+                    <circle cx="20" cy="52" r="10" fill="#0f172a"/>
+                    <circle cx="56" cy="22" r="10" fill="#0f172a"/>
+                    <circle cx="56" cy="52" r="10" fill="#0f172a"/>
+                    <rect x="46" y="22" width="20" height="30" fill="#0f172a"/>
+                    <circle cx="38" cy="82" r="10" fill="#0f172a"/>
+                </svg>
+                <span class="verifone-text">verifone</span>
             </div>
-
-            <div class="title-block">
-                <h2>SUPPORT SERVICE RATING</h2>
-                <div class="subtitle">Technical Support Assistance Feedback</div>
-            </div>
-
-            <div class="quote-banner">
-                "Excellence is not an act, but a habit. Your feedback drives our continuous improvement."
-            </div>
-
-            <div class="credit-badge" id="creditDisplay">
-                <span>Remaining Feedback Credits:</span>
-                <strong id="creditCount">4 / 4</strong>
-            </div>
-
-            <form id="ratingForm">
-                <div class="form-group">
-                    <label for="agentSelect">Agent Name:</label>
-                    <select id="agentSelect" required onchange="updateCreditDisplay()">
-                        <option value="">-- Select Your Name --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="supportPerson">Support Person Assisting You:</label>
-                    <select id="supportPerson" required>
-                        <option value="">-- Select Support Person --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="rating">Rating (1 - 5 Stars):</label>
-                    <select id="rating" required>
-                        <option value="">-- Select Rating --</option>
-                        <option value="5">5 ★★★★★ - Excellent Assistance</option>
-                        <option value="4">4 ★★★★☆ - Good Support</option>
-                        <option value="3">3 ★★★☆☆ - Average</option>
-                        <option value="2">2 ★★☆☆☆ - Needs Improvement</option>
-                        <option value="1">1 ★☆☆☆☆ - Poor</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="notes">Notes & Constructive Feedback:</label>
-                    <textarea id="notes" placeholder="Provide additional details regarding the assistance received..."></textarea>
-                </div>
-
-                <button type="submit" id="btnSubmit" class="btn-submit">SUBMIT FEEDBACK</button>
-            </form>
+            <a href="supervisor.html" target="_blank" class="btn-supervisor">
+                🔒 Supervisor Access
+            </a>
         </div>
-    </div>
 
-    <!-- SUPERVISOR DASHBOARD VIEW -->
-    <div id="supervisorView" class="view-panel">
-        <div class="container supervisor-container">
-            <div class="header-top">
-                <div class="verifone-logo-wrapper">
-                    <svg class="verifone-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="20" cy="22" r="10" fill="#0f172a"/>
-                        <circle cx="20" cy="52" r="10" fill="#0f172a"/>
-                        <circle cx="56" cy="22" r="10" fill="#0f172a"/>
-                        <circle cx="56" cy="52" r="10" fill="#0f172a"/>
-                        <rect x="46" y="22" width="20" height="30" fill="#0f172a"/>
-                        <circle cx="38" cy="82" r="10" fill="#0f172a"/>
-                    </svg>
-                    <span class="verifone-text">verifone</span>
-                </div>
-                <button class="btn-toggle" onclick="switchView('surveyView')">📋 Back to Survey</button>
-            </div>
-
-            <div class="title-block">
-                <h2>SUPERVISOR DASHBOARD</h2>
-                <div class="subtitle">Agent Roster, Credit Management & Submission Records</div>
-            </div>
-
-            <!-- Management Section: Add New Agent -->
-            <div class="section-card">
-                <h3>Add New Agent to Roster</h3>
-                <form id="addAgentForm" onsubmit="handleAddAgent(event)" class="grid-4">
-                    <div>
-                        <label for="newAgentName">Agent Name</label>
-                        <input type="text" id="newAgentName" placeholder="Full Name" required>
-                    </div>
-                    <div>
-                        <label for="newAgentSupervisor">Team Lead / Supervisor</label>
-                        <input type="text" id="newAgentSupervisor" placeholder="Supervisor Name" required>
-                    </div>
-                    <div>
-                        <label for="newAgentLocation">Location</label>
-                        <select id="newAgentLocation" required>
-                            <option value="MNL - Manila">MNL - Manila</option>
-                            <option value="TUS - Tucson">TUS - Tucson</option>
-                            <option value="BLR - Bangalore">BLR - Bangalore</option>
-                            <option value="MIS - Canada">MIS - Canada</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-add">+ Add Agent</button>
-                </form>
-            </div>
-
-            <!-- Filtering & Credit Tracking -->
-            <div class="section-card">
-                <h3>Agent Submission & Credit Tracking</h3>
-
-                <div class="stats-summary">
-                    <div class="stat-box">
-                        <div class="num" id="statTotalAgents">0</div>
-                        <div class="label">Total Agents</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="num" id="statActiveSubmitters">0</div>
-                        <div class="label">Submitted Feedback</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="num" id="statTotalSubmissions">0</div>
-                        <div class="label">Total Feedback Entries</div>
-                    </div>
-                </div>
-
-                <!-- Filters -->
-                <div class="grid-3" style="margin-bottom: 15px;">
-                    <div>
-                        <label for="filterLocation">Filter Location:</label>
-                        <select id="filterLocation" onchange="renderSupervisorDashboard()">
-                            <option value="ALL">All Locations</option>
-                            <option value="MNL">Manila (MNL)</option>
-                            <option value="TUS">Tucson (TUS)</option>
-                            <option value="OTHER">Other Locations</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="filterSupervisor">Filter Team Lead:</label>
-                        <select id="filterSupervisor" onchange="renderSupervisorDashboard()">
-                            <option value="ALL">All Team Leads</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="filterAgent">Filter Agent:</label>
-                        <select id="filterAgent" onchange="renderSupervisorDashboard()">
-                            <option value="ALL">All Agents</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style="max-height: 350px; overflow-y: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Agent Name</th>
-                                <th>Team Lead (Supervisor)</th>
-                                <th>Location</th>
-                                <th>Submissions Used</th>
-                                <th>Credits Left</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="agentTableBody">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Submitted Feedback Logs -->
-            <div class="section-card">
-                <h3>Submitted Feedback Logs</h3>
-                <div style="max-height: 300px; overflow-y: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Submitting Agent</th>
-                                <th>Support Person</th>
-                                <th>Rating</th>
-                                <th>Comments</th>
-                            </tr>
-                        </thead>
-                        <tbody id="feedbackLogsBody">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+        <div class="title-block">
+            <h2>SUPPORT SERVICE RATING</h2>
+            <div class="subtitle">Technical Support Assistance Feedback</div>
         </div>
+
+        <div class="quote-banner">
+            "Excellence is not an act, but a habit. Your feedback drives our continuous improvement."
+        </div>
+
+        <form id="ratingForm">
+            <div class="form-group">
+                <label for="agentUser">
+                    <span>Agent Name:</span>
+                    <span id="creditBadge" class="credit-badge hidden"></span>
+                </label>
+                <select id="agentUser" required onchange="checkAgentCredits()">
+                    <option value="">-- Select Your Name --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="supportPerson">Support Person Assisting You:</label>
+                <select id="supportPerson" required>
+                    <option value="">-- Select Support Person --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="rating">Rating (1 - 5 Stars):</label>
+                <select id="rating" required>
+                    <option value="">-- Select Rating --</option>
+                    <option value="5">5 ★★★★★ - Excellent Assistance</option>
+                    <option value="4">4 ★★★★☆ - Good Support</option>
+                    <option value="3">3 ★★★☆☆ - Average</option>
+                    <option value="2">2 ★★☆☆☆ - Needs Improvement</option>
+                    <option value="1">1 ★☆☆☆☆ - Poor</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes & Constructive Feedback:</label>
+                <textarea id="notes" placeholder="Provide additional details regarding the assistance received..."></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-submit">SUBMIT FEEDBACK</button>
+        </form>
     </div>
 
     <script>
-        // Default Dataset loaded with initial prompt data
-        const initialAgentRoster = [
+        const INITIAL_CREDITS = 4;
+
+        // Master Agent List with Supervisor and Location mappings
+        const defaultAgents = [
             { name: "AJ Dela Cruz", supervisor: "Hazel Maneja", location: "MNL - Manila" },
             { name: "Albert Anaya", supervisor: "Kristin Manning", location: "TUS - Tucson" },
             { name: "Alexander Bischoff", supervisor: "Kristin Manning", location: "TUS - Tucson" },
             { name: "Alexander Hassel", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Alexander Manzutto", supervisor: "NLE", location: "TUS - Tucson" },
+            { name: "Alexander Manzutto", supervisor: "NLETUS", location: "TUS - Tucson" },
             { name: "Alfredo Ceno", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
             { name: "Amado Villela", supervisor: "Robert Hayes", location: "TUS - Tucson" },
             { name: "Andres Fimbres", supervisor: "Robert Hayes", location: "TUS - Tucson" },
@@ -658,7 +406,7 @@
             { name: "Zachary Jeremy Payabyab", supervisor: "Hazel Maneja", location: "MNL - Manila" }
         ];
 
-        const defaultSupportRoster = [
+        const defaultRoster = [
             { name: "Donald Sayers", team: "Tucson" },
             { name: "Gerardo Morales", team: "Tucson" },
             { name: "James Warder", team: "Tucson" },
@@ -668,7 +416,7 @@
             { name: "Robert Hasson", team: "Tucson" },
             { name: "Wendy Franco", team: "Tucson" },
             { name: "Judy Tolentino", team: "Manila" },
-            { name: "AJ Dela Cruz", team: "Manila" },
+            { name: "Aj Dela Cruz", team: "Manila" },
             { name: "Melvin Lagrosa", team: "Manila" },
             { name: "Kristian Ong", team: "Manila" },
             { name: "Zachary Jeremy Payabyab", team: "Manila" },
@@ -677,52 +425,36 @@
             { name: "Gemmalyn Silvestre", team: "Manila" }
         ];
 
-        // Initialize LocalStorage Data
+        // Initialize localStorage rosters
         if (!localStorage.getItem('agentRoster')) {
-            localStorage.setItem('agentRoster', JSON.stringify(initialAgentRoster));
+            localStorage.setItem('agentRoster', JSON.stringify(defaultAgents));
         }
+
         if (!localStorage.getItem('supportRoster')) {
-            localStorage.setItem('supportRoster', JSON.stringify(defaultSupportRoster));
+            localStorage.setItem('supportRoster', JSON.stringify(defaultRoster));
         }
 
-        // View Navigation
-        function switchView(viewId) {
-            document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            if (viewId === 'supervisorView') {
-                populateFilterOptions();
-                renderSupervisorDashboard();
-            } else {
-                initSurveyView();
-            }
-        }
+        function loadAgentDropdown() {
+            const agents = JSON.parse(localStorage.getItem('agentRoster')) || defaultAgents;
+            const select = document.getElementById('agentUser');
+            select.innerHTML = '<option value="">-- Select Your Name --</option>';
 
-        // --- SURVEY FORM LOGIC ---
-        function initSurveyView() {
-            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-            const agentSelect = document.getElementById('agentSelect');
-            
-            // Sort agents alphabetically
-            agents.sort((a,b) => a.name.localeCompare(b.name));
-
-            agentSelect.innerHTML = '<option value="">-- Select Your Name --</option>';
-            agents.forEach(agent => {
+            // Sort alphabetically
+            agents.sort((a, b) => a.name.localeCompare(b.name)).forEach(agent => {
                 const opt = document.createElement('option');
                 opt.value = agent.name;
                 opt.textContent = `${agent.name} (${agent.location})`;
-                agentSelect.appendChild(opt);
+                select.appendChild(opt);
             });
-
-            loadSupportDropdown();
-            updateCreditDisplay();
         }
 
         function loadSupportDropdown() {
-            const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultSupportRoster;
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
             const select = document.getElementById('supportPerson');
             select.innerHTML = '<option value="">-- Select Support Person --</option>';
 
-            ['Tucson', 'Manila'].forEach(team => {
+            const teams = ['Tucson', 'Manila'];
+            teams.forEach(team => {
                 const optgroup = document.createElement('optgroup');
                 optgroup.label = `${team} Support Team`;
                 roster.filter(member => member.team === team).forEach(member => {
@@ -735,58 +467,84 @@
             });
         }
 
-        function getAgentSubmissionCount(agentName) {
+        function getAgentRemainingCredits(agentName) {
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            return submissions.filter(s => s.agentUser === agentName).length;
+            const agentSubmissions = submissions.filter(s => s.agentUser === agentName);
+            return Math.max(0, INITIAL_CREDITS - agentSubmissions.length);
         }
 
-        function updateCreditDisplay() {
-            const selectedAgent = document.getElementById('agentSelect').value;
-            const creditCountEl = document.getElementById('creditCount');
-            const btnSubmit = document.getElementById('btnSubmit');
+        function checkAgentCredits() {
+            const agentName = document.getElementById('agentUser').value;
+            const badge = document.getElementById('creditBadge');
+            const submitBtn = document.getElementById('submitBtn');
 
-            if (!selectedAgent) {
-                creditCountEl.textContent = "4 / 4";
-                btnSubmit.disabled = false;
+            if (!agentName) {
+                badge.classList.add('hidden');
+                submitBtn.disabled = false;
                 return;
             }
 
-            const used = getAgentSubmissionCount(selectedAgent);
-            const remaining = Math.max(0, 4 - used);
+            const remaining = getAgentRemainingCredits(agentName);
+            badge.classList.remove('hidden', 'badge-success', 'badge-warning', 'badge-danger');
+            badge.textContent = `${remaining} / ${INITIAL_CREDITS} Credits Left`;
 
-            creditCountEl.textContent = `${remaining} / 4 Left`;
-
-            if (remaining <= 0) {
-                creditCountEl.textContent = "0 / 4 (Limit Reached)";
-                btnSubmit.disabled = true;
+            if (remaining > 2) {
+                badge.classList.add('badge-success');
+                submitBtn.disabled = false;
+            } else if (remaining > 0) {
+                badge.classList.add('badge-warning');
+                submitBtn.disabled = false;
             } else {
-                btnSubmit.disabled = false;
+                badge.classList.add('badge-danger');
+                badge.textContent = "0 Credits Left (Limit Reached)";
+                submitBtn.disabled = true;
             }
         }
+
+        loadAgentDropdown();
+        loadSupportDropdown();
 
         document.getElementById('ratingForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const selectedAgent = document.getElementById('agentSelect').value;
-            const used = getAgentSubmissionCount(selectedAgent);
+            const selectedAgent = document.getElementById('agentUser').value;
+            const creditsLeft = getAgentRemainingCredits(selectedAgent);
 
-            if (used >= 4) {
-                alert('You have reached the maximum limit of 4 support feedback submissions.');
+            if (creditsLeft <= 0) {
+                alert('You have used all 4 feedback submission credits.');
                 return;
             }
 
-            const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultSupportRoster;
-            const selectedSupport = document.getElementById('supportPerson').value;
-            const personObj = roster.find(m => m.name === selectedSupport);
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
+            const selectedName = document.getElementById('supportPerson').value;
+            const personObj = roster.find(m => m.name === selectedName);
 
             const now = new Date();
+            const dateISO = now.toISOString().split('T')[0];
+            const yearStr = String(now.getFullYear());
+            
+            // Calculate ISO week number
+            const tempDate = new Date(now.valueOf());
+            const dayNum = (now.getDay() + 6) % 7;
+            tempDate.setDate(tempDate.getDate() - dayNum + 3);
+            const firstThursday = tempDate.valueOf();
+            tempDate.setMonth(0, 1);
+            if (tempDate.getDay() !== 4) {
+                tempDate.setMonth(0, 1 + ((4 - tempDate.getDay() + 7) % 7));
+            }
+            const weekNum = 1 + Math.round((firstThursday - tempDate.valueOf()) / 604800000);
+
             const formattedDate = `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
             const newEntry = {
                 id: Date.now(),
                 timestamp: formattedDate,
+                dateISO: dateISO,
+                year: yearStr,
+                week: String(weekNum),
                 agentUser: selectedAgent,
-                supportName: selectedSupport,
+                caseNumber: "N/A", // Defaulted since case number is removed
+                supportName: selectedName,
                 team: personObj ? personObj.team : 'Unknown',
                 rating: parseInt(document.getElementById('rating').value),
                 comments: document.getElementById('notes').value.trim()
@@ -796,147 +554,10 @@
             submissions.unshift(newEntry);
             localStorage.setItem('supportRatings', JSON.stringify(submissions));
 
-            alert('Thank you! Your feedback has been recorded.');
+            alert(`Thank you! Your feedback has been recorded. You have ${creditsLeft - 1} credit(s) remaining.`);
             this.reset();
-            updateCreditDisplay();
+            checkAgentCredits();
         });
-
-        // --- SUPERVISOR DASHBOARD LOGIC ---
-        function handleAddAgent(e) {
-            e.preventDefault();
-            const name = document.getElementById('newAgentName').value.trim();
-            const supervisor = document.getElementById('newAgentSupervisor').value.trim();
-            const location = document.getElementById('newAgentLocation').value;
-
-            let agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-            if (agents.some(a => a.name.toLowerCase() === name.toLowerCase())) {
-                alert('An agent with this name already exists.');
-                return;
-            }
-
-            agents.push({ name, supervisor, location });
-            localStorage.setItem('agentRoster', JSON.stringify(agents));
-
-            document.getElementById('addAgentForm').reset();
-            populateFilterOptions();
-            renderSupervisorDashboard();
-            alert(`Agent ${name} added successfully!`);
-        }
-
-        function deleteAgent(agentName) {
-            if (confirm(`Are you sure you want to remove ${agentName} from the roster?`)) {
-                let agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-                agents = agents.filter(a => a.name !== agentName);
-                localStorage.setItem('agentRoster', JSON.stringify(agents));
-                populateFilterOptions();
-                renderSupervisorDashboard();
-            }
-        }
-
-        function populateFilterOptions() {
-            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-            const supSelect = document.getElementById('filterSupervisor');
-            const agentSelect = document.getElementById('filterAgent');
-
-            const currentSup = supSelect.value;
-            const currentAgent = agentSelect.value;
-
-            // Collect unique Supervisors
-            const supervisors = [...new Set(agents.map(a => a.supervisor))].sort();
-            supSelect.innerHTML = '<option value="ALL">All Team Leads</option>';
-            supervisors.forEach(sup => {
-                const opt = document.createElement('option');
-                opt.value = sup;
-                opt.textContent = sup;
-                supSelect.appendChild(opt);
-            });
-
-            // Collect Agents
-            agentSelect.innerHTML = '<option value="ALL">All Agents</option>';
-            agents.sort((a,b) => a.name.localeCompare(b.name)).forEach(agent => {
-                const opt = document.createElement('option');
-                opt.value = agent.name;
-                opt.textContent = agent.name;
-                agentSelect.appendChild(opt);
-            });
-
-            supSelect.value = supervisors.includes(currentSup) ? currentSup : 'ALL';
-            agentSelect.value = agents.some(a => a.name === currentAgent) ? currentAgent : 'ALL';
-        }
-
-        function renderSupervisorDashboard() {
-            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-
-            const locFilter = document.getElementById('filterLocation').value;
-            const supFilter = document.getElementById('filterSupervisor').value;
-            const agentFilter = document.getElementById('filterAgent').value;
-
-            const tbody = document.getElementById('agentTableBody');
-            tbody.innerHTML = '';
-
-            let filteredAgents = agents.filter(agent => {
-                // Location Filter
-                if (locFilter === 'MNL' && !agent.location.includes('MNL')) return false;
-                if (locFilter === 'TUS' && !agent.location.includes('TUS')) return false;
-                if (locFilter === 'OTHER' && (agent.location.includes('MNL') || agent.location.includes('TUS'))) return false;
-
-                // Supervisor Filter
-                if (supFilter !== 'ALL' && agent.supervisor !== supFilter) return false;
-
-                // Agent Filter
-                if (agentFilter !== 'ALL' && agent.name !== agentFilter) return false;
-
-                return true;
-            });
-
-            let activeSubmittersCount = 0;
-
-            filteredAgents.sort((a,b) => a.name.localeCompare(b.name)).forEach(agent => {
-                const used = submissions.filter(s => s.agentUser === agent.name).length;
-                const remaining = Math.max(0, 4 - used);
-                if (used > 0) activeSubmittersCount++;
-
-                let locBadgeClass = 'badge-other';
-                if (agent.location.includes('MNL')) locBadgeClass = 'badge-mnl';
-                if (agent.location.includes('TUS')) locBadgeClass = 'badge-tus';
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${agent.name}</strong></td>
-                    <td>${agent.supervisor}</td>
-                    <td><span class="badge-location ${locBadgeClass}">${agent.location}</span></td>
-                    <td>${used} / 4</td>
-                    <td><strong style="color: ${remaining === 0 ? 'var(--accent-danger)' : 'var(--accent-teal)'};">${remaining}</strong></td>
-                    <td><button class="btn-danger" onclick="deleteAgent('${agent.name}')">Delete</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            // Update Statistics
-            document.getElementById('statTotalAgents').textContent = agents.length;
-            document.getElementById('statActiveSubmitters').textContent = activeSubmittersCount;
-            document.getElementById('statTotalSubmissions').textContent = submissions.length;
-
-            // Render Feedback Logs Table
-            const logsBody = document.getElementById('feedbackLogsBody');
-            logsBody.innerHTML = '';
-
-            submissions.forEach(sub => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${sub.timestamp}</td>
-                    <td><strong>${sub.agentUser}</strong></td>
-                    <td>${sub.supportName}</td>
-                    <td>${'★'.repeat(sub.rating)}${'☆'.repeat(5 - sub.rating)}</td>
-                    <td>${sub.comments || '<em>No notes</em>'}</td>
-                `;
-                logsBody.appendChild(tr);
-            });
-        }
-
-        // Initialize Application
-        initSurveyView();
     </script>
 </body>
 </html>
