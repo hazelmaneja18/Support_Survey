@@ -253,12 +253,13 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
+        /* Clean 4-column balanced grid layout */
         .filter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
             background: #f8fafc;
-            padding: 15px;
+            padding: 16px;
             border-radius: 8px;
             margin-bottom: 20px;
             border: 1px solid var(--card-border);
@@ -307,7 +308,7 @@
             flex-direction: column;
             gap: 8px;
             margin-top: 10px;
-            max-height: 400px;
+            max-height: 380px;
             overflow-y: auto;
             padding-right: 4px;
         }
@@ -466,8 +467,12 @@
 
                 <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
 
-                <div style="margin-bottom: 8px;">
+                <!-- Agent Filter Controls -->
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
                     <input type="text" id="searchAgentRoster" placeholder="🔍 Search Agent Name..." onkeyup="renderAgentRosterManagement()">
+                    <select id="rosterTLFilter" onchange="renderAgentRosterManagement()">
+                        <option value="ALL">Filter by Team Lead (All)</option>
+                    </select>
                 </div>
 
                 <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
@@ -507,7 +512,7 @@
                 <!-- TAB 1: Support Performance View -->
                 <div id="supportPerformanceView">
                     <!-- Filters specifically for Support Performance -->
-                    <div class="filter-grid">
+                    <div class="filter-grid" style="grid-template-columns: repeat(5, 1fr);">
                         <div class="filter-item">
                             <label>Support Team</label>
                             <select id="teamFilter" onchange="renderDashboard()">
@@ -554,7 +559,7 @@
                         </div>
                     </div>
 
-                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Support Performance Summary (Click name for anonymous comments)</h3>
+                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Support Performance Summary (Click name for comments)</h3>
                     <table>
                         <thead>
                             <tr>
@@ -577,7 +582,6 @@
                             <tr>
                                 <th class="nowrap">Date & Time</th>
                                 <th class="nowrap">Agent Name</th>
-                                <th>Case #</th>
                                 <th class="nowrap">Support Name</th>
                                 <th>Team</th>
                                 <th>Rating</th>
@@ -591,7 +595,7 @@
 
                 <!-- TAB 2: Agent Credits View -->
                 <div id="agentCreditsView" class="hidden">
-                    <!-- Filters specifically for Agent Survey Credits -->
+                    <!-- Clean 4-column balanced layout -->
                     <div class="filter-grid">
                         <div class="filter-item">
                             <label>Search Agent</label>
@@ -676,7 +680,7 @@
         </main>
     </div>
 
-    <!-- Agent Comments Modal Dialog -->
+    <!-- Comments Modal Dialog -->
     <div id="commentsModal" class="modal-overlay hidden">
         <div class="modal-card">
             <button class="modal-close" onclick="closeModal()">✕</button>
@@ -870,8 +874,14 @@
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
             const container = document.getElementById('agentList');
             const filterText = (document.getElementById('searchAgentRoster')?.value || '').toLowerCase().trim();
+            const selectedTL = document.getElementById('rosterTLFilter')?.value || 'ALL';
 
-            const filteredAgents = agents.filter(a => a.name.toLowerCase().includes(filterText));
+            const filteredAgents = agents.filter(a => {
+                const matchName = a.name.toLowerCase().includes(filterText);
+                const matchTL = (selectedTL === 'ALL') || (a.supervisor === selectedTL);
+                return matchName && matchTL;
+            });
+
             document.getElementById('agentCount').textContent = filteredAgents.length;
             container.innerHTML = '';
 
@@ -909,35 +919,50 @@
 
             // Populate Team Lead (TL) Filter grouped by Location
             const tlSelect = document.getElementById('tlFilter');
-            const currentTLVal = tlSelect.value;
-            tlSelect.innerHTML = '<option value="ALL">All Team Leads</option>';
+            const rosterTLSelect = document.getElementById('rosterTLFilter');
+            const currentTLVal = tlSelect ? tlSelect.value : 'ALL';
+            const currentRosterTLVal = rosterTLSelect ? rosterTLSelect.value : 'ALL';
+
+            if (tlSelect) tlSelect.innerHTML = '<option value="ALL">All Team Leads</option>';
+            if (rosterTLSelect) rosterTLSelect.innerHTML = '<option value="ALL">Filter by Team Lead (All)</option>';
 
             const manilaTLs = [...new Set(agents.filter(a => a.location && a.location.includes('MNL')).map(a => a.supervisor).filter(Boolean))].sort();
             const tucsonTLs = [...new Set(agents.filter(a => a.location && a.location.includes('TUS')).map(a => a.supervisor).filter(Boolean))].sort();
             const otherTLs = [...new Set(agents.filter(a => !a.location || (!a.location.includes('MNL') && !a.location.includes('TUS'))).map(a => a.supervisor).filter(Boolean))].sort();
 
-            if (manilaTLs.length > 0) {
-                let mnlGroup = '<optgroup label="Manila Team Leads">';
-                manilaTLs.forEach(tl => mnlGroup += `<option value="${tl}">${tl}</option>`);
-                mnlGroup += '</optgroup>';
-                tlSelect.innerHTML += mnlGroup;
+            const allTLs = [...new Set(agents.map(a => a.supervisor).filter(Boolean))].sort();
+
+            if (rosterTLSelect) {
+                allTLs.forEach(tl => {
+                    rosterTLSelect.innerHTML += `<option value="${tl}">${tl}</option>`;
+                });
+                rosterTLSelect.value = currentRosterTLVal;
             }
 
-            if (tucsonTLs.length > 0) {
-                let tusGroup = '<optgroup label="Tucson Team Leads">';
-                tucsonTLs.forEach(tl => tusGroup += `<option value="${tl}">${tl}</option>`);
-                tusGroup += '</optgroup>';
-                tlSelect.innerHTML += tusGroup;
-            }
+            if (tlSelect) {
+                if (manilaTLs.length > 0) {
+                    let mnlGroup = '<optgroup label="Manila Team Leads">';
+                    manilaTLs.forEach(tl => mnlGroup += `<option value="${tl}">${tl}</option>`);
+                    mnlGroup += '</optgroup>';
+                    tlSelect.innerHTML += mnlGroup;
+                }
 
-            if (otherTLs.length > 0) {
-                let othGroup = '<optgroup label="Other Locations">';
-                otherTLs.forEach(tl => othGroup += `<option value="${tl}">${tl}</option>`);
-                othGroup += '</optgroup>';
-                tlSelect.innerHTML += othGroup;
-            }
+                if (tucsonTLs.length > 0) {
+                    let tusGroup = '<optgroup label="Tucson Team Leads">';
+                    tucsonTLs.forEach(tl => tusGroup += `<option value="${tl}">${tl}</option>`);
+                    tusGroup += '</optgroup>';
+                    tlSelect.innerHTML += tusGroup;
+                }
 
-            tlSelect.value = currentTLVal;
+                if (otherTLs.length > 0) {
+                    let othGroup = '<optgroup label="Other Locations">';
+                    otherTLs.forEach(tl => othGroup += `<option value="${tl}">${tl}</option>`);
+                    othGroup += '</optgroup>';
+                    tlSelect.innerHTML += othGroup;
+                }
+
+                tlSelect.value = currentTLVal;
+            }
         }
 
         function renderDashboard() {
@@ -1005,12 +1030,12 @@
                 }
             }
 
-            // Render Detailed Audit Log Table
+            // Render Detailed Audit Log Table (Case # Column Removed)
             const detailsBody = document.getElementById('detailsBody');
             detailsBody.innerHTML = '';
 
             if (filteredSupportData.length === 0) {
-                detailsBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No entries in the log matching current filters.</td></tr>`;
+                detailsBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No entries in the log matching current filters.</td></tr>`;
             } else {
                 filteredSupportData.forEach((item, index) => {
                     const agentName = item.agentUser || item.agentName || 'N/A';
@@ -1025,7 +1050,6 @@
                         <tr>
                             <td class="nowrap">${item.timestamp || item.dateISO || 'N/A'}</td>
                             <td class="nowrap"><span class="clickable-link" onclick="showAgentComments('${escapedAgentName}')">${agentName}</span></td>
-                            <td>${item.caseNumber || 'N/A'}</td>
                             <td class="nowrap">${item.supportName}</td>
                             <td>${item.team}</td>
                             <td><strong>${item.rating} / 5</strong></td>
@@ -1060,7 +1084,7 @@
                 agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents matching criteria.</td></tr>`;
             } else {
                 filteredAgents.forEach(agent => {
-                    // Count submissions for this agent in the requested timeframe
+                    // Count submissions dynamically for this timeframe
                     const usedCredits = submissions.filter(s => {
                         const agentMatch = (s.agentUser || s.agentName || '').toLowerCase() === agent.name.toLowerCase();
                         let dateObj = s.dateISO ? new Date(s.dateISO) : (s.timestamp ? new Date(s.timestamp) : new Date());
@@ -1136,7 +1160,7 @@
                                 "${c.comments || 'No written comment provided.'}"
                             </div>
                             <div style="font-size: 10px; color: var(--text-muted);">
-                                Case #: ${c.caseNumber || 'N/A'} | Date: ${c.timestamp || c.dateISO || 'N/A'}
+                                Date: ${c.timestamp || c.dateISO || 'N/A'}
                             </div>
                         </div>
                     `;
@@ -1146,7 +1170,7 @@
             document.getElementById('commentsModal').classList.remove('hidden');
         }
 
-        // Modal for Anonymous Support Member Feedback
+        // Modal for Anonymous Support Member Feedback (Rating & Case # Removed)
         function showAnonymousSupportFeedback(supportName) {
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             const supportFeedbacks = submissions.filter(s => s.supportName.toLowerCase() === supportName.toLowerCase());
@@ -1163,14 +1187,11 @@
                 supportFeedbacks.forEach(c => {
                     commentsList.innerHTML += `
                         <div class="comment-item">
-                            <div style="font-weight:700; color: var(--primary-dark); margin-bottom: 3px;">
-                                Rating Given: ${c.rating} / 5
-                            </div>
-                            <div style="color: var(--text-main); font-style: italic; margin-bottom: 4px;">
+                            <div style="color: var(--text-main); font-style: italic; font-size: 13px; margin-bottom: 6px;">
                                 "${c.comments || 'No written comment provided.'}"
                             </div>
                             <div style="font-size: 10px; color: var(--text-muted);">
-                                Case #: ${c.caseNumber || 'N/A'} | Submitted: ${c.timestamp || c.dateISO || 'N/A'}
+                                Submitted: ${c.timestamp || c.dateISO || 'N/A'}
                             </div>
                         </div>
                     `;
