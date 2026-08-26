@@ -146,7 +146,7 @@
         .btn:hover { background: #0f766e; }
 
         .btn-sm {
-            padding: 4px 8px;
+            padding: 6px 10px;
             font-size: 11px;
             border-radius: 4px;
         }
@@ -199,6 +199,32 @@
             float: right;
         }
 
+        /* View Nav Tabs */
+        .main-nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--card-border);
+            padding-bottom: 10px;
+        }
+
+        .main-nav-btn {
+            background: transparent;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .main-nav-btn.active {
+            background: var(--accent-teal);
+            color: #ffffff;
+        }
+
         .tab-btn-group {
             display: flex;
             gap: 5px;
@@ -229,7 +255,7 @@
 
         .filter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 12px;
             background: #f8fafc;
             padding: 15px;
@@ -280,8 +306,8 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            margin-top: 15px;
-            max-height: 480px;
+            margin-top: 10px;
+            max-height: 400px;
             overflow-y: auto;
             padding-right: 4px;
         }
@@ -395,7 +421,7 @@
                 <button class="tab-btn" id="tabAgentBtn" onclick="switchRosterTab('agent')">Agent Roster</button>
             </div>
 
-            <!-- Support Roster -->
+            <!-- Support Roster Section -->
             <div id="supportRosterSection">
                 <h3 style="font-size: 15px; margin-bottom: 6px;">Manage Support Team</h3>
                 <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Add or remove active support personnel.</p>
@@ -411,13 +437,17 @@
 
                 <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
 
+                <div style="margin-bottom: 8px;">
+                    <input type="text" id="searchSupportRoster" placeholder="🔍 Search Support Name..." onkeyup="renderRosterManagement()">
+                </div>
+
                 <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
                     Active Support (<span id="rosterCount">0</span>)
                 </h4>
                 <div class="roster-list" id="rosterList"></div>
             </div>
 
-            <!-- Agent Roster -->
+            <!-- Agent Roster Section -->
             <div id="agentRosterSection" class="hidden">
                 <h3 style="font-size: 15px; margin-bottom: 6px;">Manage Agent List</h3>
                 <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Manage agents, team leads, and locations.</p>
@@ -435,6 +465,10 @@
                 </div>
 
                 <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
+
+                <div style="margin-bottom: 8px;">
+                    <input type="text" id="searchAgentRoster" placeholder="🔍 Search Agent Name..." onkeyup="renderAgentRosterManagement()">
+                </div>
 
                 <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
                     Agent Roster (<span id="agentCount">0</span>)
@@ -460,33 +494,18 @@
                     <span style="font-weight: 600; color: var(--accent-teal);">Supervisor Performance Reporting</span>
                 </div>
 
+                <!-- Navigation Tabs for Views -->
+                <div class="main-nav-tabs">
+                    <button class="main-nav-btn active" id="navSupportBtn" onclick="switchMainView('support')">Support Performance</button>
+                    <button class="main-nav-btn" id="navCreditsBtn" onclick="switchMainView('credits')">Agent Survey Credits</button>
+                </div>
+
                 <div class="quote-box">
                     "Data-driven decisions empower operational efficiency and elevate team performance."
                 </div>
 
-                <!-- Custom Filters Bar -->
+                <!-- Shared Date & Team Filters -->
                 <div class="filter-grid">
-                    <div class="filter-item">
-                        <label>Search Agent</label>
-                        <input type="text" id="agentSearchInput" placeholder="Name..." onkeyup="renderDashboard()">
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Team Lead</label>
-                        <select id="tlFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Team Leads</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-item">
-                        <label>Credit Category</label>
-                        <select id="creditCategoryFilter" onchange="renderDashboard()">
-                            <option value="ALL">All Categories</option>
-                            <option value="LEFT">Credits Left (> 0)</option>
-                            <option value="MAX">Maxed Out (0 Left)</option>
-                        </select>
-                    </div>
-
                     <div class="filter-item">
                         <label>Support Team</label>
                         <select id="teamFilter" onchange="renderDashboard()">
@@ -533,61 +552,87 @@
                     </div>
                 </div>
 
-                <!-- Agent Credit Status Summary Table -->
-                <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Agent Survey Credit Allowance (4 Max / Month)</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="nowrap">Agent Name (Click for Comments)</th>
-                            <th>Team Lead / TL</th>
-                            <th>Location</th>
-                            <th class="text-center">Used This Month</th>
-                            <th class="text-center">Credits Remaining</th>
-                            <th class="text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="agentCreditBody"></tbody>
-                </table>
-            </div>
+                <!-- TAB 1: Support Performance & Audit View -->
+                <div id="supportPerformanceView">
+                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Support Performance Summary</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="nowrap">Support Name</th>
+                                <th>Team</th>
+                                <th class="text-center">Total Submissions</th>
+                                <th>Average Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryBody"></tbody>
+                    </table>
 
-            <!-- Support Performance Summary Card -->
-            <div class="container-card">
-                <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Support Performance Summary</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="nowrap">Support Name</th>
-                            <th>Team</th>
-                            <th class="text-center">Total Submissions</th>
-                            <th>Average Rating</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summaryBody"></tbody>
-                </table>
-            </div>
+                    <div style="margin-top: 25px;">
+                        <button class="btn-clear-all" onclick="clearAllTestFeedback()">Clear All Test Submissions</button>
+                        <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Detailed Audit Log</h3>
+                    </div>
 
-            <!-- Detailed Audit Log Card -->
-            <div class="container-card">
-                <div>
-                    <button class="btn-clear-all" onclick="clearAllTestFeedback()">Clear All Test Submissions</button>
-                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Detailed Audit Log</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="nowrap">Date & Time</th>
+                                <th class="nowrap">Agent Name</th>
+                                <th>Case #</th>
+                                <th class="nowrap">Support Name</th>
+                                <th>Team</th>
+                                <th>Rating</th>
+                                <th>Comments</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailsBody"></tbody>
+                    </table>
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="nowrap">Date & Time</th>
-                            <th class="nowrap">Agent Name</th>
-                            <th>Case #</th>
-                            <th class="nowrap">Support Name</th>
-                            <th>Team</th>
-                            <th>Rating</th>
-                            <th>Comments</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detailsBody"></tbody>
-                </table>
+                <!-- TAB 2: Agent Credits View -->
+                <div id="agentCreditsView" class="hidden">
+                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 12px;">Agent Specific Filters</h3>
+                    
+                    <!-- Dedicated Agent Credit Filters -->
+                    <div class="filter-grid" style="margin-bottom: 20px; background: #ffffff;">
+                        <div class="filter-item">
+                            <label>Search Agent</label>
+                            <input type="text" id="agentSearchInput" placeholder="Filter Agent Name..." onkeyup="renderDashboard()">
+                        </div>
+
+                        <div class="filter-item">
+                            <label>Team Lead</label>
+                            <select id="tlFilter" onchange="renderDashboard()">
+                                <option value="ALL">All Team Leads</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label>Credit Category</label>
+                            <select id="creditCategoryFilter" onchange="renderDashboard()">
+                                <option value="ALL">All Categories</option>
+                                <option value="LEFT">Credits Left (> 0)</option>
+                                <option value="MAX">Maxed Out (0 Left)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-teal); font-size: 16px; margin-bottom: 8px;">Agent Survey Credit Allowance (4 Max / Month)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="nowrap">Agent Name (Click for Comments)</th>
+                                <th>Team Lead / TL</th>
+                                <th>Location</th>
+                                <th class="text-center">Used This Month</th>
+                                <th class="text-center">Credits Remaining</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agentCreditBody"></tbody>
+                    </table>
+                </div>
+
             </div>
 
         </main>
@@ -623,6 +668,25 @@
             renderRosterManagement();
             renderAgentRosterManagement();
             renderDashboard();
+        }
+
+        function switchMainView(view) {
+            const supportView = document.getElementById('supportPerformanceView');
+            const creditsView = document.getElementById('agentCreditsView');
+            const navSupportBtn = document.getElementById('navSupportBtn');
+            const navCreditsBtn = document.getElementById('navCreditsBtn');
+
+            if (view === 'support') {
+                supportView.classList.remove('hidden');
+                creditsView.classList.add('hidden');
+                navSupportBtn.classList.add('active');
+                navCreditsBtn.classList.remove('active');
+            } else {
+                supportView.classList.add('hidden');
+                creditsView.classList.remove('hidden');
+                navSupportBtn.classList.remove('active');
+                navCreditsBtn.classList.add('active');
+            }
         }
 
         function switchRosterTab(type) {
@@ -744,10 +808,13 @@
         function renderRosterManagement() {
             const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
             const container = document.getElementById('rosterList');
-            document.getElementById('rosterCount').textContent = roster.length;
+            const filterText = (document.getElementById('searchSupportRoster')?.value || '').toLowerCase().trim();
+
+            const filteredRoster = roster.filter(m => m.name.toLowerCase().includes(filterText));
+            document.getElementById('rosterCount').textContent = filteredRoster.length;
             container.innerHTML = '';
 
-            roster.forEach(member => {
+            filteredRoster.forEach(member => {
                 const item = document.createElement('div');
                 item.className = 'roster-item';
                 item.innerHTML = `
@@ -764,10 +831,13 @@
         function renderAgentRosterManagement() {
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
             const container = document.getElementById('agentList');
-            document.getElementById('agentCount').textContent = agents.length;
+            const filterText = (document.getElementById('searchAgentRoster')?.value || '').toLowerCase().trim();
+
+            const filteredAgents = agents.filter(a => a.name.toLowerCase().includes(filterText));
+            document.getElementById('agentCount').textContent = filteredAgents.length;
             container.innerHTML = '';
 
-            agents.sort((a, b) => a.name.localeCompare(b.name)).forEach(agent => {
+            filteredAgents.sort((a, b) => a.name.localeCompare(b.name)).forEach(agent => {
                 const item = document.createElement('div');
                 item.className = 'roster-item';
                 item.innerHTML = `
@@ -868,7 +938,6 @@
                 agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents matching criteria.</td></tr>`;
             } else {
                 filteredAgents.forEach(agent => {
-                    // Count submissions for this agent in selected month & year
                     const usedCredits = submissions.filter(s => {
                         const agentMatch = (s.agentUser || s.agentName || '').toLowerCase() === agent.name.toLowerCase();
                         let dateObj = s.dateISO ? new Date(s.dateISO) : (s.timestamp ? new Date(s.timestamp) : new Date());
@@ -880,7 +949,6 @@
 
                     const creditsLeft = Math.max(0, MAX_MONTHLY_CREDITS - usedCredits);
 
-                    // Category Filter matching
                     if (creditCatVal === 'LEFT' && creditsLeft === 0) return;
                     if (creditCatVal === 'MAX' && creditsLeft > 0) return;
 
@@ -965,9 +1033,8 @@
                     }
 
                     const agentName = item.agentUser || item.agentName || 'N/A';
-                    const matchAgentSearch = !searchVal || agentName.toLowerCase().includes(searchVal);
 
-                    if (matchTeam && matchYear && matchMonth && matchDateRange && matchAgentSearch) {
+                    if (matchTeam && matchYear && matchMonth && matchDateRange) {
                         const commentsText = item.comments || 'N/A';
                         const isTestEntry = agentName.toLowerCase().includes('test') || commentsText.toLowerCase().includes('test');
                         const actionBtn = isTestEntry 
