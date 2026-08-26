@@ -51,7 +51,7 @@
         }
 
         .sidebar-left {
-            width: 280px;
+            width: 320px;
             flex-shrink: 0;
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -145,6 +145,30 @@
 
         .btn:hover { background: #0f766e; }
 
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 4px;
+        }
+
+        .btn-edit {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #7dd3fc;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-edit:hover {
+            background: #0284c7;
+            color: #ffffff;
+        }
+
         .btn-delete {
             background: #fef2f2;
             color: var(--danger-red);
@@ -173,6 +197,34 @@
             border-radius: 6px;
             cursor: pointer;
             float: right;
+        }
+
+        .tab-btn-group {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: var(--primary-dark);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         /* Responsive Multi-Filter Grid */
@@ -233,7 +285,7 @@
             flex-direction: column;
             gap: 8px;
             margin-top: 15px;
-            max-height: 520px;
+            max-height: 480px;
             overflow-y: auto;
             padding-right: 4px;
         }
@@ -277,24 +329,59 @@
     <!-- Main Workspace (Hidden until auth) -->
     <div id="dashboard-content" class="app-layout hidden">
         
-        <!-- LEFT SIDEBAR: Manage Support Roster -->
+        <!-- LEFT SIDEBAR: Manage Support & Agent Rosters -->
         <aside class="sidebar-left">
-            <h3 style="font-size: 16px; margin-bottom: 12px;">Manage Roster</h3>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Add or delete active support personnel.</p>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-                <input type="text" id="newName" placeholder="Support Full Name">
-                <select id="newTeam">
-                    <option value="Tucson">Tucson</option>
-                    <option value="Manila">Manila</option>
-                </select>
-                <button class="btn" style="width: 100%;" onclick="addSupportMember()">+ Add Member</button>
+            <div class="tab-btn-group">
+                <button class="tab-btn active" id="tabSupportBtn" onclick="switchRosterTab('support')">Support Roster</button>
+                <button class="tab-btn" id="tabAgentBtn" onclick="switchRosterTab('agent')">Agent Roster</button>
             </div>
 
-            <hr style="border: none; border-top: 1px solid var(--card-border); margin: 15px 0;">
+            <!-- SECTION 1: Support Persons Roster -->
+            <div id="supportRosterSection">
+                <h3 style="font-size: 15px; margin-bottom: 6px;">Manage Support Team</h3>
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Add or remove active support personnel.</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                    <input type="text" id="newName" placeholder="Support Full Name">
+                    <select id="newTeam">
+                        <option value="Tucson">Tucson</option>
+                        <option value="Manila">Manila</option>
+                    </select>
+                    <button class="btn btn-sm" style="width: 100%;" onclick="addSupportMember()">+ Add Support Member</button>
+                </div>
 
-            <h4 style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Active Roster (<span id="rosterCount">0</span>)</h4>
-            <div class="roster-list" id="rosterList"></div>
+                <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
+
+                <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                    Active Support (<span id="rosterCount">0</span>)
+                </h4>
+                <div class="roster-list" id="rosterList"></div>
+            </div>
+
+            <!-- SECTION 2: Submitting Agents Roster -->
+            <div id="agentRosterSection" class="hidden">
+                <h3 style="font-size: 15px; margin-bottom: 6px;">Manage Agent List</h3>
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Manage agents, team leads, and locations.</p>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                    <input type="text" id="newAgentName" placeholder="Agent Full Name">
+                    <input type="text" id="newAgentSupervisor" placeholder="Team Lead / Supervisor">
+                    <select id="newAgentLocation">
+                        <option value="MNL - Manila">MNL - Manila</option>
+                        <option value="TUS - Tucson">TUS - Tucson</option>
+                        <option value="BLR - Bangalore">BLR - Bangalore</option>
+                        <option value="MIS - Canada">MIS - Canada</option>
+                    </select>
+                    <button class="btn btn-sm" style="width: 100%;" onclick="addAgentMember()">+ Add Agent</button>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
+
+                <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                    Agent Roster (<span id="agentCount">0</span>)
+                </h4>
+                <div class="roster-list" id="agentList"></div>
+            </div>
         </aside>
 
         <!-- RIGHT MAIN AREA: Focus on Performance Reporting & Detailed Audit Log -->
@@ -425,7 +512,27 @@
         function initDashboard() {
             populateFilterOptions();
             renderRosterManagement();
+            renderAgentRosterManagement();
             renderDashboard();
+        }
+
+        function switchRosterTab(type) {
+            const supportSec = document.getElementById('supportRosterSection');
+            const agentSec = document.getElementById('agentRosterSection');
+            const supportBtn = document.getElementById('tabSupportBtn');
+            const agentBtn = document.getElementById('tabAgentBtn');
+
+            if (type === 'support') {
+                supportSec.classList.remove('hidden');
+                agentSec.classList.add('hidden');
+                supportBtn.classList.add('active');
+                agentBtn.classList.remove('active');
+            } else {
+                supportSec.classList.add('hidden');
+                agentSec.classList.remove('hidden');
+                supportBtn.classList.remove('active');
+                agentBtn.classList.add('active');
+            }
         }
 
         function addSupportMember() {
@@ -437,7 +544,7 @@
 
             const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
             if (roster.some(m => m.name.toLowerCase() === name.toLowerCase())) {
-                return alert('This member is already on the roster.');
+                return alert('This member is already on the support roster.');
             }
 
             roster.push({ name, team });
@@ -454,6 +561,54 @@
             localStorage.setItem('supportRoster', JSON.stringify(roster));
             renderRosterManagement();
             renderDashboard();
+        }
+
+        function addAgentMember() {
+            const nameInput = document.getElementById('newAgentName');
+            const supInput = document.getElementById('newAgentSupervisor');
+            const name = nameInput.value.trim();
+            const supervisor = supInput.value.trim() || 'Unassigned';
+            const location = document.getElementById('newAgentLocation').value;
+
+            if (!name) return alert('Please enter an agent name.');
+
+            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            if (agents.some(a => a.name.toLowerCase() === name.toLowerCase())) {
+                return alert('This agent is already registered in the roster.');
+            }
+
+            agents.push({ name, supervisor, location });
+            localStorage.setItem('agentRoster', JSON.stringify(agents));
+            nameInput.value = '';
+            supInput.value = '';
+            renderAgentRosterManagement();
+        }
+
+        function editAgentMember(agentName) {
+            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            const agent = agents.find(a => a.name === agentName);
+            if (!agent) return;
+
+            const newSup = prompt(`Update Team Lead / Supervisor for ${agent.name}:`, agent.supervisor || '');
+            if (newSup === null) return; // Cancelled
+
+            const newLoc = prompt(`Update Location for ${agent.name} (e.g. MNL - Manila, TUS - Tucson, BLR - Bangalore, MIS - Canada):`, agent.location || '');
+            if (newLoc === null) return; // Cancelled
+
+            agent.supervisor = newSup.trim() || 'Unassigned';
+            agent.location = newLoc.trim() || agent.location;
+
+            localStorage.setItem('agentRoster', JSON.stringify(agents));
+            renderAgentRosterManagement();
+            alert(`Updated information for ${agent.name}.`);
+        }
+
+        function deleteAgentMember(agentName) {
+            if (!confirm(`Remove agent ${agentName} from the database?`)) return;
+            let agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            agents = agents.filter(a => a.name !== agentName);
+            localStorage.setItem('agentRoster', JSON.stringify(agents));
+            renderAgentRosterManagement();
         }
 
         function deleteFeedback(indexToDelete) {
@@ -487,6 +642,29 @@
                         <div style="font-size: 10px; color: var(--text-muted);">${member.team}</div>
                     </div>
                     <button class="btn-delete" onclick="deleteSupportMember('${member.name}')">Remove</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function renderAgentRosterManagement() {
+            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            const container = document.getElementById('agentList');
+            document.getElementById('agentCount').textContent = agents.length;
+            container.innerHTML = '';
+
+            agents.sort((a, b) => a.name.localeCompare(b.name)).forEach(agent => {
+                const item = document.createElement('div');
+                item.className = 'roster-item';
+                item.innerHTML = `
+                    <div style="overflow: hidden; padding-right: 6px;">
+                        <strong style="color: var(--primary-dark); font-size: 12px;">${agent.name}</strong>
+                        <div style="font-size: 10px; color: var(--text-muted);">TL: ${agent.supervisor || 'N/A'} | ${agent.location}</div>
+                    </div>
+                    <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                        <button class="btn-edit" onclick="editAgentMember('${agent.name.replace(/'/g, "\\'")}')">Edit</button>
+                        <button class="btn-delete" onclick="deleteAgentMember('${agent.name.replace(/'/g, "\\'")}')">Remove</button>
+                    </div>
                 `;
                 container.appendChild(item);
             });
@@ -598,7 +776,7 @@
                         const agentName = item.agentUser || item.agentName || 'N/A';
                         const commentsText = item.comments || '';
 
-                        // Only display the Delete button if Agent Name or Comments contain "test"
+                        // Display the Delete button if Agent Name OR Comments contain "test" (case-insensitive)
                         const isTestEntry = agentName.toLowerCase().includes('test') || commentsText.toLowerCase().includes('test');
                         const actionCellContent = isTestEntry 
                             ? `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>` 
