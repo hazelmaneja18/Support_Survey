@@ -1123,7 +1123,7 @@
                 return alert('Team Lead already exists.');
             }
 
-            tls.push({ name, site });
+            tls.push({ name, site }); 
             localStorage.setItem('teamLeadsRoster', JSON.stringify(tls));
             nameInput.value = '';
             renderTLList();
