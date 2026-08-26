@@ -725,6 +725,7 @@
     <script>
         const AUTH_PASS = "Verifone123";
         const BASE_MONTHLY_CREDITS = 4;
+        const FEEDBACK_KEY = "supportRatings";
 
         // Team Leads List
         const DEFAULT_TEAM_LEADS = [
@@ -739,6 +740,26 @@
             { name: "Paul Batol", site: "MNL - Manila" },
             { name: "Robert Hayes", site: "TUS - Tucson" },
             { name: "Vineed Alexander", site: "BLR - Bangalore" }
+        ];
+
+        // Default Support Roster (Tucson / Manila support personnel)
+        const DEFAULT_SUPPORT_ROSTER = [
+            { name: "Donald Sayers", team: "Tucson" },
+            { name: "Gerardo Morales", team: "Tucson" },
+            { name: "James Warder", team: "Tucson" },
+            { name: "Jesse McQueary", team: "Tucson" },
+            { name: "Justine Santa Cruz", team: "Tucson" },
+            { name: "Kimber Dawson", team: "Tucson" },
+            { name: "Robert Hasson", team: "Tucson" },
+            { name: "Wendy Franco", team: "Tucson" },
+            { name: "Judy Tolentino", team: "Manila" },
+            { name: "Aj Dela Cruz", team: "Manila" },
+            { name: "Melvin Lagrosa", team: "Manila" },
+            { name: "Kristian Ong", team: "Manila" },
+            { name: "Zachary Jeremy Payabyab", team: "Manila" },
+            { name: "Christian Mark Patdu", team: "Manila" },
+            { name: "Glory Barbacena", team: "Manila" },
+            { name: "Gemmalyn Silvestre", team: "Manila" }
         ];
 
         // Complete Agent Roster Mapped with Team Leads and Locations
@@ -872,7 +893,12 @@
 
         function ensureInitialData() {
             localStorage.setItem('teamLeadsRoster', JSON.stringify(DEFAULT_TEAM_LEADS));
-            
+
+            // Seed the Support roster if it doesn't exist yet (fixes "Active Support (0)")
+            if (!localStorage.getItem('supportRoster')) {
+                localStorage.setItem('supportRoster', JSON.stringify(DEFAULT_SUPPORT_ROSTER));
+            }
+
             // Smart merge/sync: Update existing agents with new default TL mappings while keeping custom ones
             let agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
             if (agents.length === 0) {
@@ -1034,8 +1060,8 @@
             });
 
             // Populate Years in Filters
-            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
-            const years = new Set(feedback.map(f => new Date(f.timestamp).getFullYear()).filter(y => !isNaN(y)));
+            const feedback = loadFeedbackData();
+            const years = new Set(feedback.map(f => f.dateObj.getFullYear()).filter(y => !isNaN(y)));
             const currentYear = new Date().getFullYear();
             years.add(currentYear);
 
@@ -1164,9 +1190,31 @@
             renderDashboard();
         }
 
+        // --- FEEDBACK DATA (SHARED WITH index.html) ---
+        // index.html writes new submissions to the "supportRatings" key using
+        // fields like agentUser / dateISO. This normalizes that raw data into
+        // the shape the rest of this dashboard expects (agentName, dateObj, etc).
+        function loadFeedbackData() {
+            const raw = JSON.parse(localStorage.getItem(FEEDBACK_KEY)) || [];
+            return raw.map(item => {
+                let dateObj = item.dateISO ? new Date(item.dateISO) : new Date(item.timestamp);
+                if (isNaN(dateObj.getTime())) dateObj = new Date(item.timestamp);
+                return {
+                    id: item.id,
+                    timestamp: item.timestamp,
+                    dateObj: dateObj,
+                    agentName: item.agentName || item.agentUser || 'N/A',
+                    supportName: item.supportName,
+                    team: item.team,
+                    rating: item.rating,
+                    comments: item.comments
+                };
+            });
+        }
+
         // --- DASHBOARD RENDER & FILTERING ---
         function renderDashboard() {
-            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+            const feedback = loadFeedbackData();
             const teamFilter = document.getElementById('teamFilter').value;
             const yearFilter = document.getElementById('yearFilter').value;
             const monthFilter = document.getElementById('monthFilter').value;
@@ -1175,7 +1223,7 @@
 
             // Filter Submissions
             let filteredFeedback = feedback.filter(item => {
-                const itemDate = new Date(item.timestamp);
+                const itemDate = item.dateObj;
                 if (teamFilter !== 'ALL' && item.team !== teamFilter) return false;
                 if (yearFilter !== 'ALL' && itemDate.getFullYear().toString() !== yearFilter) return false;
                 if (monthFilter !== 'ALL' && (itemDate.getMonth() + 1).toString().padStart(2, '0') !== monthFilter) return false;
@@ -1206,7 +1254,7 @@
                         agent: item.agentName,
                         rating: item.rating,
                         comment: item.comments,
-                        date: new Date(item.timestamp).toLocaleString()
+                        date: item.dateObj.toLocaleString()
                     });
                 }
             });
@@ -1238,8 +1286,8 @@
                 return;
             }
 
-            feedbackList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach((item, index) => {
-                const dateStr = new Date(item.timestamp).toLocaleString();
+            feedbackList.sort((a, b) => b.dateObj - a.dateObj).forEach((item, index) => {
+                const dateStr = item.timestamp || item.dateObj.toLocaleString();
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="nowrap">${dateStr}</td>
@@ -1248,7 +1296,7 @@
                     <td>${item.team}</td>
                     <td>${item.rating} ⭐</td>
                     <td>${item.comments || '<i style="color: var(--text-muted);">None</i>'}</td>
-                    <td><button class="btn-delete" onclick="deleteSingleFeedback('${item.timestamp}')">Delete</button></td>
+                    <td><button class="btn-delete" onclick="deleteSingleFeedback(${JSON.stringify(item.id)})">Delete</button></td>
                 `;
                 detailsBody.appendChild(tr);
             });
@@ -1256,7 +1304,7 @@
 
         function renderAgentCredits() {
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+            const feedback = loadFeedbackData();
 
             const search = (document.getElementById('agentSearchInput').value || '').toLowerCase();
             const tlFilter = document.getElementById('tlFilter').value;
@@ -1279,8 +1327,8 @@
 
             filteredAgents.forEach(agent => {
                 const agentSubmissions = feedback.filter(f => {
-                    if (f.agentName !== agent.name) return false;
-                    const fDate = new Date(f.timestamp);
+                    if ((f.agentName || '').toLowerCase() !== agent.name.toLowerCase()) return false;
+                    const fDate = f.dateObj;
                     if (yearFilter !== 'ALL' && fDate.getFullYear().toString() !== yearFilter) return false;
                     if (monthFilter !== 'ALL' && (fDate.getMonth() + 1).toString().padStart(2, '0') !== monthFilter) return false;
                     if (startDate && fDate < new Date(startDate)) return false;
@@ -1314,7 +1362,7 @@
 
         // --- MODALS & ACTIONS ---
         function openCommentsModal(supportName) {
-            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+            const feedback = loadFeedbackData();
             const modal = document.getElementById('commentsModal');
             const title = document.getElementById('modalTitle');
             const subtitle = document.getElementById('modalSubtitle');
@@ -1335,7 +1383,7 @@
                     div.innerHTML = `
                         <div><strong>Agent:</strong> ${item.agentName || 'Anonymous'} | <strong>Rating:</strong> ${item.rating} ⭐</div>
                         <div style="margin-top: 4px;">"${item.comments}"</div>
-                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${new Date(item.timestamp).toLocaleString()}</div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${item.timestamp || item.dateObj.toLocaleString()}</div>
                     `;
                     list.appendChild(div);
                 });
@@ -1345,13 +1393,13 @@
         }
 
         function openAgentHistoryModal(agentName) {
-            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+            const feedback = loadFeedbackData();
             const modal = document.getElementById('commentsModal');
             const title = document.getElementById('modalTitle');
             const subtitle = document.getElementById('modalSubtitle');
             const list = document.getElementById('modalCommentsList');
 
-            const filtered = feedback.filter(f => f.agentName === agentName);
+            const filtered = feedback.filter(f => (f.agentName || '').toLowerCase() === agentName.toLowerCase());
 
             title.textContent = `Submission History for ${agentName}`;
             subtitle.textContent = `Total Submissions: ${filtered.length}`;
@@ -1366,7 +1414,7 @@
                     div.innerHTML = `
                         <div><strong>Support Name:</strong> ${item.supportName} | <strong>Rating:</strong> ${item.rating} ⭐</div>
                         <div style="margin-top: 4px;"><strong>Comments:</strong> ${item.comments || 'N/A'}</div>
-                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${new Date(item.timestamp).toLocaleString()}</div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${item.timestamp || item.dateObj.toLocaleString()}</div>
                     `;
                     list.appendChild(div);
                 });
@@ -1379,19 +1427,33 @@
             document.getElementById('commentsModal').classList.add('hidden');
         }
 
-        function deleteSingleFeedback(timestamp) {
+        function deleteSingleFeedback(id) {
             if (!confirm('Are you sure you want to delete this log entry?')) return;
-            let feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
-            feedback = feedback.filter(f => f.timestamp !== timestamp);
-            localStorage.setItem('verifoneFeedback', JSON.stringify(feedback));
+            let feedback = JSON.parse(localStorage.getItem(FEEDBACK_KEY)) || [];
+            feedback = feedback.filter(f => f.id !== id);
+            localStorage.setItem(FEEDBACK_KEY, JSON.stringify(feedback));
             renderDashboard();
         }
 
         function clearAllTestFeedback() {
             if (!confirm('⚠️ WARNING: This will permanently delete ALL feedback submission logs! Continue?')) return;
-            localStorage.removeItem('verifoneFeedback');
+            localStorage.removeItem(FEEDBACK_KEY);
             renderDashboard();
         }
+
+        // --- LIVE SYNC ACROSS TABS ---
+        // If index.html (open in another tab) submits new feedback, or the
+        // roster lists change, refresh this dashboard automatically.
+        window.addEventListener('storage', function(e) {
+            if (!document.getElementById('dashboard-content') || document.getElementById('dashboard-content').classList.contains('hidden')) return;
+            if ([FEEDBACK_KEY, 'supportRoster', 'agentRoster', 'teamLeadsRoster'].includes(e.key)) {
+                populateFilterOptions();
+                renderRosterManagement();
+                renderAgentRosterManagement();
+                renderTLList();
+                renderDashboard();
+            }
+        });
     </script>
 </body>
 </html>
