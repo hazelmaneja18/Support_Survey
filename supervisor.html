@@ -195,6 +195,85 @@
             color: #ffffff;
         }
 
+        .btn-edit {
+            background: var(--accent-teal-light);
+            color: var(--accent-teal);
+            border: 1px solid var(--accent-teal);
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-edit:hover {
+            background: var(--accent-teal);
+            color: #ffffff;
+        }
+
+        .roster-item-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Color-coded rating pills */
+        .rating-pill {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+        .rating-excellent { background: #d1fae5; color: #065f46; }
+        .rating-good { background: #dcfce7; color: #166534; }
+        .rating-average { background: #fef9c3; color: #a16207; }
+        .rating-poor { background: #ffedd5; color: #c2410c; }
+        .rating-critical { background: #fee2e2; color: #991b1b; }
+
+        [data-theme="dark"] .rating-excellent { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        [data-theme="dark"] .rating-good { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        [data-theme="dark"] .rating-average { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+        [data-theme="dark"] .rating-poor { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+        [data-theme="dark"] .rating-critical { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        .btn-email {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #93c5fd;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        [data-theme="dark"] .btn-email {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.4);
+            color: #60a5fa;
+        }
+
+        .btn-email:hover {
+            background: #1d4ed8;
+            color: #ffffff;
+        }
+
+        .modal-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
         .btn-clear-all {
             background: #dc2626;
             color: white;
@@ -716,9 +795,42 @@
     <div id="commentsModal" class="modal-overlay hidden">
         <div class="modal-card">
             <button class="modal-close" onclick="closeModal()">✕</button>
-            <h3 id="modalTitle" style="color: var(--primary-dark); margin-bottom: 4px;">Feedback & Comments</h3>
-            <p id="modalSubtitle" style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;"></p>
+            <div class="modal-header-row">
+                <div>
+                    <h3 id="modalTitle" style="color: var(--primary-dark); margin-bottom: 4px;">Feedback & Comments</h3>
+                    <p id="modalSubtitle" style="font-size: 12px; color: var(--text-muted); margin-bottom: 0;"></p>
+                </div>
+                <button class="btn-email" id="modalEmailBtn" onclick="emailModalFeedback()">📧 Email Summary</button>
+            </div>
+            <hr style="border: none; border-top: 1px solid var(--card-border); margin: 15px 0;">
             <div id="modalCommentsList"></div>
+        </div>
+    </div>
+
+    <div id="editAgentModal" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 420px;">
+            <button class="modal-close" onclick="closeEditAgentModal()">✕</button>
+            <h3 style="color: var(--primary-dark); margin-bottom: 15px;">Edit Agent</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Agent Name</label>
+                    <input type="text" id="editAgentNameDisplay" disabled style="background: var(--input-border); color: var(--text-main); opacity: 0.8;">
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Team Lead / TL</label>
+                    <select id="editAgentTLSelect"></select>
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Location</label>
+                    <select id="editAgentLocationSelect">
+                        <option value="MNL - Manila">MNL - Manila</option>
+                        <option value="TUS - Tucson">TUS - Tucson</option>
+                        <option value="BLR - Bangalore">BLR - Bangalore</option>
+                        <option value="MIS - Canada">MIS - Canada</option>
+                    </select>
+                </div>
+                <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveAgentEdit()">Save Changes</button>
+            </div>
         </div>
     </div>
 
@@ -1152,10 +1264,56 @@
                         <strong>${agent.name}</strong>
                         <div style="font-size: 10px; color: var(--text-muted);">TL: ${agent.tl || 'N/A'} | ${agent.location || 'N/A'}</div>
                     </div>
-                    <button class="btn-delete" onclick="deleteAgentMember(${index})">Remove</button>
+                    <div class="roster-item-actions">
+                        <button class="btn-edit" onclick='openEditAgentModal("${agent.name.replace(/'/g, "\\'")}")'>Edit</button>
+                        <button class="btn-delete" onclick="deleteAgentMember(${index})">Remove</button>
+                    </div>
                 `;
                 listContainer.appendChild(item);
             });
+        }
+
+        // --- AGENT EDIT (TL / Location) ---
+        let editingAgentOriginalName = null;
+
+        function openEditAgentModal(name) {
+            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            const agent = agents.find(a => a.name === name);
+            if (!agent) return;
+
+            editingAgentOriginalName = agent.name;
+            document.getElementById('editAgentNameDisplay').value = agent.name;
+
+            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
+            const tlSelect = document.getElementById('editAgentTLSelect');
+            tlSelect.innerHTML = '<option value="">Select Team Lead / TL</option>';
+            tls.forEach(tl => {
+                const selected = tl.name === agent.tl ? 'selected' : '';
+                tlSelect.innerHTML += `<option value="${tl.name}" ${selected}>${tl.name}</option>`;
+            });
+
+            document.getElementById('editAgentLocationSelect').value = agent.location || 'MNL - Manila';
+            document.getElementById('editAgentModal').classList.remove('hidden');
+        }
+
+        function closeEditAgentModal() {
+            document.getElementById('editAgentModal').classList.add('hidden');
+            editingAgentOriginalName = null;
+        }
+
+        function saveAgentEdit() {
+            if (!editingAgentOriginalName) return;
+            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            const idx = agents.findIndex(a => a.name === editingAgentOriginalName);
+            if (idx === -1) return;
+
+            agents[idx].tl = document.getElementById('editAgentTLSelect').value;
+            agents[idx].location = document.getElementById('editAgentLocationSelect').value;
+
+            localStorage.setItem('agentRoster', JSON.stringify(agents));
+            closeEditAgentModal();
+            renderAgentRosterManagement();
+            renderDashboard();
         }
 
         function addAgentMember() {
@@ -1210,6 +1368,22 @@
                     comments: item.comments
                 };
             });
+        }
+
+        // --- RATING VISUALS ---
+        // Returns a color-coded pill with an icon that scales with the rating value.
+        function getRatingBadge(avgValue) {
+            const num = parseFloat(avgValue);
+            if (isNaN(num)) return `<span class="rating-pill rating-average">N/A</span>`;
+
+            let cls, icon;
+            if (num >= 4.5) { cls = 'rating-excellent'; icon = '🌟'; }
+            else if (num >= 3.5) { cls = 'rating-good'; icon = '😊'; }
+            else if (num >= 2.5) { cls = 'rating-average'; icon = '😐'; }
+            else if (num >= 1.5) { cls = 'rating-poor'; icon = '⚠️'; }
+            else { cls = 'rating-critical'; icon = '🚨'; }
+
+            return `<span class="rating-pill ${cls}">${icon} ${num.toFixed(2)} / 5.0</span>`;
         }
 
         // --- DASHBOARD RENDER & FILTERING ---
@@ -1271,7 +1445,7 @@
                     <td class="clickable-link" onclick='openCommentsModal("${name.replace(/'/g, "\\'")}")'>${name}</td>
                     <td>${stats[name].team}</td>
                     <td class="text-center">${stats[name].count}</td>
-                    <td><strong>${avg} ⭐</strong></td>
+                    <td>${getRatingBadge(avg)}</td>
                 `;
                 summaryBody.appendChild(tr);
             });
@@ -1361,6 +1535,9 @@
         }
 
         // --- MODALS & ACTIONS ---
+        // Tracks what the "Email Summary" button in the modal should export.
+        let currentModalExport = null;
+
         function openCommentsModal(supportName) {
             const feedback = loadFeedbackData();
             const modal = document.getElementById('commentsModal');
@@ -1368,26 +1545,38 @@
             const subtitle = document.getElementById('modalSubtitle');
             const list = document.getElementById('modalCommentsList');
 
-            const filtered = feedback.filter(f => f.supportName === supportName && f.comments);
+            const allForSupport = feedback.filter(f => f.supportName === supportName);
+            const withComments = allForSupport.filter(f => f.comments);
+            const avgRating = allForSupport.length
+                ? (allForSupport.reduce((sum, f) => sum + parseFloat(f.rating || 0), 0) / allForSupport.length)
+                : NaN;
 
             title.textContent = `Feedback for ${supportName}`;
-            subtitle.textContent = `Total Comments: ${filtered.length}`;
+            subtitle.innerHTML = `Total Comments: ${withComments.length} &nbsp;•&nbsp; Overall Rating: ${getRatingBadge(avgRating)}`;
             list.innerHTML = '';
 
-            if (filtered.length === 0) {
+            if (withComments.length === 0) {
                 list.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">No comments provided for this support member.</p>`;
             } else {
-                filtered.forEach(item => {
+                withComments.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'comment-item';
                     div.innerHTML = `
-                        <div><strong>Agent:</strong> ${item.agentName || 'Anonymous'} | <strong>Rating:</strong> ${item.rating} ⭐</div>
+                        <div><strong>Agent:</strong> ${item.agentName || 'Anonymous'}</div>
                         <div style="margin-top: 4px;">"${item.comments}"</div>
                         <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${item.timestamp || item.dateObj.toLocaleString()}</div>
                     `;
                     list.appendChild(div);
                 });
             }
+
+            currentModalExport = {
+                type: 'support',
+                name: supportName,
+                avgRating: avgRating,
+                totalSubmissions: allForSupport.length,
+                comments: withComments
+            };
 
             modal.classList.remove('hidden');
         }
@@ -1400,9 +1589,12 @@
             const list = document.getElementById('modalCommentsList');
 
             const filtered = feedback.filter(f => (f.agentName || '').toLowerCase() === agentName.toLowerCase());
+            const avgRating = filtered.length
+                ? (filtered.reduce((sum, f) => sum + parseFloat(f.rating || 0), 0) / filtered.length)
+                : NaN;
 
             title.textContent = `Submission History for ${agentName}`;
-            subtitle.textContent = `Total Submissions: ${filtered.length}`;
+            subtitle.innerHTML = `Total Submissions: ${filtered.length} &nbsp;•&nbsp; Average Given: ${getRatingBadge(avgRating)}`;
             list.innerHTML = '';
 
             if (filtered.length === 0) {
@@ -1420,11 +1612,65 @@
                 });
             }
 
+            currentModalExport = {
+                type: 'agent',
+                name: agentName,
+                avgRating: avgRating,
+                totalSubmissions: filtered.length,
+                entries: filtered
+            };
+
             modal.classList.remove('hidden');
         }
 
         function closeModal() {
             document.getElementById('commentsModal').classList.add('hidden');
+            currentModalExport = null;
+        }
+
+        // Builds a mailto: link summarizing the currently open modal
+        // (support feedback or agent submission history) and opens the
+        // person's default email client with it pre-filled.
+        function emailModalFeedback() {
+            if (!currentModalExport) return;
+            const data = currentModalExport;
+            let subject, body;
+
+            if (data.type === 'support') {
+                const avgText = isNaN(data.avgRating) ? 'N/A' : `${data.avgRating.toFixed(2)} / 5.0`;
+                subject = `Support Feedback Summary - ${data.name}`;
+                body = `Support Performance Feedback Summary\n`;
+                body += `--------------------------------------\n`;
+                body += `Support Person: ${data.name}\n`;
+                body += `Overall Average Rating: ${avgText}\n`;
+                body += `Total Submissions: ${data.totalSubmissions}\n\n`;
+                body += `Comments:\n`;
+                if (data.comments.length === 0) {
+                    body += `(No written comments submitted)\n`;
+                } else {
+                    data.comments.forEach((item, i) => {
+                        body += `\n${i + 1}. "${item.comments}"\n`;
+                        body += `   - Submitted by: ${item.agentName || 'Anonymous'} on ${item.timestamp || ''}\n`;
+                    });
+                }
+            } else {
+                const avgText = isNaN(data.avgRating) ? 'N/A' : `${data.avgRating.toFixed(2)} / 5.0`;
+                subject = `Agent Submission History - ${data.name}`;
+                body = `Agent Survey Submission History\n`;
+                body += `--------------------------------------\n`;
+                body += `Agent: ${data.name}\n`;
+                body += `Average Rating Given: ${avgText}\n`;
+                body += `Total Submissions: ${data.totalSubmissions}\n\n`;
+                body += `Details:\n`;
+                data.entries.forEach((item, i) => {
+                    body += `\n${i + 1}. Support: ${item.supportName} | Rating: ${item.rating} / 5\n`;
+                    body += `   Comments: ${item.comments || 'N/A'}\n`;
+                    body += `   Date: ${item.timestamp || ''}\n`;
+                });
+            }
+
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
         }
 
         function deleteSingleFeedback(id) {
