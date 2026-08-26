@@ -1685,7 +1685,7 @@
                 body += `----------------------------------------\n`;
                 body += `Average Rating: ${avgText}\n`;
                 body += `Total Submissions: ${data.totalSubmissions}\n`;
-                body += `Rating Breakdown: 5★ x${breakdown[5]}, 4★ x${breakdown[4]}, 3★ x${breakdown[3]}, 2★ x${breakdown[2]}, 1★ x${breakdown[1]}\n\n`;
+                body += `Rating Breakdown: 5 = ${breakdown[5]}, 4 = ${breakdown[4]}, 3 = ${breakdown[3]}, 2 = ${breakdown[2]}, 1 = ${breakdown[1]}\n\n`;
 
                 body += `OPPORTUNITY & SUMMARY\n`;
                 body += `----------------------------------------\n`;
@@ -1726,8 +1726,6 @@
                     body += `   Comment: ${item.comments ? `"${item.comments}"` : '(No written comment)'}\n`;
                 });
 
-                body += `\n\nThank you,\n`;
-                body += `Verifone Supervisor Performance Reporting`;
             }
 
             const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
