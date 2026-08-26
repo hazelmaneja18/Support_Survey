@@ -871,9 +871,31 @@
         }
 
         function ensureInitialData() {
-            // Force reset or initialize team leads and agent roster with the correct mappings
             localStorage.setItem('teamLeadsRoster', JSON.stringify(DEFAULT_TEAM_LEADS));
-            localStorage.setItem('agentRoster', JSON.stringify(DEFAULT_AGENTS));
+            
+            // Smart merge/sync: Update existing agents with new default TL mappings while keeping custom ones
+            let agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            if (agents.length === 0) {
+                localStorage.setItem('agentRoster', JSON.stringify(DEFAULT_AGENTS));
+            } else {
+                const defaultMap = new Map(DEFAULT_AGENTS.map(a => [a.name.toLowerCase(), a]));
+                agents = agents.map(agent => {
+                    const def = defaultMap.get(agent.name.toLowerCase());
+                    if (def) {
+                        return { ...agent, tl: def.tl, location: def.location };
+                    }
+                    return agent;
+                });
+                
+                // Also add any missing agents from DEFAULT_AGENTS if not present
+                DEFAULT_AGENTS.forEach(defAgent => {
+                    if (!agents.some(a => a.name.toLowerCase() === defAgent.name.toLowerCase())) {
+                        agents.push(defAgent);
+                    }
+                });
+
+                localStorage.setItem('agentRoster', JSON.stringify(agents));
+            }
         }
 
         function toggleTheme() {
