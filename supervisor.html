@@ -21,6 +21,22 @@
             --badge-amber: #f59e0b;
         }
 
+        [data-theme="dark"] {
+            --bg-base: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.92);
+            --card-border: rgba(51, 65, 85, 0.8);
+            --primary-dark: #f8fafc;
+            --accent-teal: #14b8a6;
+            --accent-teal-light: rgba(20, 184, 166, 0.15);
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --danger-red: #f87171;
+            --badge-green: #34d399;
+            --badge-amber: #fbbf24;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e0f2fe 100%);
@@ -29,6 +45,11 @@
             padding: 30px;
             min-height: 100vh;
             box-sizing: border-box;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e1b4b 100%);
         }
 
         #auth-screen {
@@ -110,7 +131,7 @@
             padding: 10px 15px;
             font-style: italic;
             font-size: 13px;
-            color: #0f766e;
+            color: var(--accent-teal);
             margin-bottom: 20px;
             border-radius: 0 6px 6px 0;
         }
@@ -164,6 +185,11 @@
             white-space: nowrap;
         }
 
+        [data-theme="dark"] .btn-delete {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
         .btn-delete:hover {
             background: var(--danger-red);
             color: #ffffff;
@@ -208,9 +234,9 @@
 
         .tab-btn-group {
             display: flex;
-            gap: 5px;
+            gap: 4px;
             margin-bottom: 15px;
-            background: #e2e8f0;
+            background: var(--input-border);
             padding: 4px;
             border-radius: 6px;
         }
@@ -219,17 +245,18 @@
             flex: 1;
             background: transparent;
             border: none;
-            padding: 6px;
+            padding: 6px 4px;
             font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
             border-radius: 4px;
             transition: all 0.2s;
+            text-align: center;
         }
 
         .tab-btn.active {
-            background: #ffffff;
+            background: var(--card-bg);
             color: var(--primary-dark);
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
@@ -238,7 +265,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 14px;
-            background: #f8fafc;
+            background: var(--input-bg);
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -258,27 +285,28 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            background-color: #ffffff;
+            background-color: var(--input-bg);
             color: var(--text-main);
             border-radius: 6px;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--card-border);
         }
 
         th, td {
             padding: 11px 13px;
             text-align: left;
             font-size: 13px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--card-border);
         }
 
         th {
-            background-color: #0f172a;
+            background-color: var(--primary-dark);
             color: #ffffff;
             font-weight: 600;
         }
 
-        tr:nth-child(even) { background-color: #f8fafc; }
+        tr:nth-child(even) { background-color: rgba(100, 116, 139, 0.04); }
 
         .nowrap { white-space: nowrap; }
         .hidden { display: none !important; }
@@ -294,7 +322,7 @@
         }
 
         .roster-item {
-            background: #ffffff;
+            background: var(--input-bg);
             border: 1px solid var(--card-border);
             padding: 8px 10px;
             border-radius: 6px;
@@ -316,6 +344,9 @@
         .badge-success { background: #d1fae5; color: #065f46; }
         .badge-danger { background: #fee2e2; color: #991b1b; }
 
+        [data-theme="dark"] .badge-success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        [data-theme="dark"] .badge-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
         .clickable-link {
             color: var(--accent-teal);
             font-weight: 700;
@@ -335,7 +366,9 @@
         }
 
         .modal-card {
-            background: #ffffff;
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
             border-radius: 12px;
             width: 90%;
             max-width: 600px;
@@ -350,8 +383,9 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            background: #f1f5f9;
-            border: none;
+            background: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
             font-size: 16px;
             font-weight: bold;
             border-radius: 50%;
@@ -361,26 +395,13 @@
         }
 
         .comment-item {
-            background: #f8fafc;
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
             border-left: 3px solid var(--accent-teal);
             padding: 10px 12px;
             margin-bottom: 10px;
             border-radius: 0 6px 6px 0;
             font-size: 12px;
-        }
-
-        .collapsible-header {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--primary-dark);
-            background: #e2e8f0;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -407,8 +428,9 @@
         
         <aside class="sidebar-left">
             <div class="tab-btn-group">
-                <button class="tab-btn active" id="tabSupportBtn" onclick="switchRosterTab('support')">Support Roster</button>
-                <button class="tab-btn" id="tabAgentBtn" onclick="switchRosterTab('agent')">Agent Roster</button>
+                <button class="tab-btn active" id="tabSupportBtn" onclick="switchRosterTab('support')">Support</button>
+                <button class="tab-btn" id="tabAgentBtn" onclick="switchRosterTab('agent')">Agents</button>
+                <button class="tab-btn" id="tabTLBtn" onclick="switchRosterTab('tl')">Team Leads</button>
             </div>
 
             <div id="supportRosterSection">
@@ -454,23 +476,6 @@
                     <button class="btn btn-sm" style="width: 100%;" onclick="addAgentMember()">+ Add Agent</button>
                 </div>
 
-                <div class="collapsible-header" onclick="toggleTLManager()">
-                    <span>⚙️ Manage Team Leads</span>
-                    <span id="tlToggleIcon">▼</span>
-                </div>
-                <div id="tlManagerContainer" class="hidden" style="background: #f8fafc; padding: 10px; border-radius: 6px; margin-top: 6px; border: 1px solid var(--card-border);">
-                    <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
-                        <input type="text" id="newTLName" placeholder="Team Lead Full Name">
-                        <select id="newTLSite">
-                            <option value="Manila">Manila Team Lead</option>
-                            <option value="Tucson">Tucson Team Lead</option>
-                            <option value="Other">Other Location</option>
-                        </select>
-                        <button class="btn btn-sm" onclick="addTeamLead()">+ Add Team Lead</button>
-                    </div>
-                    <div style="max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;" id="tlListContainer"></div>
-                </div>
-
                 <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
 
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
@@ -484,6 +489,35 @@
                     Agent Roster (<span id="agentCount">0</span>)
                 </h4>
                 <div class="roster-list" id="agentList"></div>
+            </div>
+
+            <div id="tlRosterSection" class="hidden">
+                <h3 style="font-size: 15px; margin-bottom: 6px;">Manage Lead List</h3>
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Add or remove active Team Leads.</p>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                    <input type="text" id="newTLName" placeholder="Team Lead Full Name">
+                    <select id="newTLSite">
+                        <option value="MNL - Manila">MNL - Manila</option>
+                        <option value="TUS - Tucson">TUS - Tucson</option>
+                        <option value="BLR - Bangalore">BLR - Bangalore</option>
+                        <option value="MIS - Canada">MIS - Canada</option>
+                    </select>
+                    <button class="btn btn-sm" style="width: 100%;" onclick="addTeamLead()">+ Add Team Lead</button>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
+
+                <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                    Team Lead List
+                </h4>
+                <div style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;" id="tlListContainer"></div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--card-border); margin: 20px 0 15px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Display Theme</span>
+                <button class="btn btn-sm" onclick="toggleTheme()" id="themeToggleBtn">🌙 Dark Mode</button>
             </div>
         </aside>
 
@@ -692,19 +726,19 @@
         const AUTH_PASS = "Verifone123";
         const BASE_MONTHLY_CREDITS = 4;
 
-        // Complete Team Leads seed list from images
+        // Corrected Team Leads with exact site locations matching user roster
         const DEFAULT_TEAM_LEADS = [
-            { name: "Andrew Marsh", site: "Manila" },
-            { name: "Edwin Cuesta", site: "Manila" },
-            { name: "Franco Molina", site: "Manila" },
-            { name: "Hazel Maneja", site: "Manila" },
-            { name: "Kristin Manning", site: "Manila" },
-            { name: "Kyle Brandon Sioson", site: "Manila" },
-            { name: "Nathan Malis", site: "Manila" },
-            { name: "Nicole Garcia", site: "Manila" },
-            { name: "Paul Batol", site: "Manila" },
-            { name: "Robert Hayes", site: "Manila" },
-            { name: "Vineed Alexander", site: "Manila" }
+            { name: "Andrew Marsh", site: "TUS - Tucson" },
+            { name: "Edwin Cuesta", site: "MNL - Manila" },
+            { name: "Franco Molina", site: "MNL - Manila" },
+            { name: "Hazel Maneja", site: "MNL - Manila" },
+            { name: "Kristin Manning", site: "MIS - Canada" },
+            { name: "Kyle Brandon Sioson", site: "MNL - Manila" },
+            { name: "Nathan Malis", site: "TUS - Tucson" },
+            { name: "Nicole Garcia", site: "TUS - Tucson" },
+            { name: "Paul Batol", site: "MNL - Manila" },
+            { name: "Robert Hayes", site: "TUS - Tucson" },
+            { name: "Vineed Alexander", site: "BLR - Bangalore" }
         ];
 
         function authenticate() {
@@ -720,6 +754,7 @@
 
         function initDashboard() {
             ensureInitialTLData();
+            initTheme();
             populateFilterOptions();
             renderRosterManagement();
             renderAgentRosterManagement();
@@ -728,20 +763,32 @@
         }
 
         function ensureInitialTLData() {
-            if (!localStorage.getItem('teamLeadsRoster')) {
-                localStorage.setItem('teamLeadsRoster', JSON.stringify(DEFAULT_TEAM_LEADS));
+            // Force reset or initialize team leads to ensure correct locations take effect
+            localStorage.setItem('teamLeadsRoster', JSON.stringify(DEFAULT_TEAM_LEADS));
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeToggleBtn');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                btn.textContent = '🌙 Dark Mode';
+                localStorage.setItem('verifoneTheme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                btn.textContent = '☀️ Light Mode';
+                localStorage.setItem('verifoneTheme', 'dark');
             }
         }
 
-        function toggleTLManager() {
-            const container = document.getElementById('tlManagerContainer');
-            const icon = document.getElementById('tlToggleIcon');
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                icon.textContent = '▲';
+        function initTheme() {
+            const savedTheme = localStorage.getItem('verifoneTheme');
+            const btn = document.getElementById('themeToggleBtn');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                if (btn) btn.textContent = '☀️ Light Mode';
             } else {
-                container.classList.add('hidden');
-                icon.textContent = '▼';
+                if (btn) btn.textContent = '🌙 Dark Mode';
             }
         }
 
@@ -767,19 +814,29 @@
         function switchRosterTab(type) {
             const supportSec = document.getElementById('supportRosterSection');
             const agentSec = document.getElementById('agentRosterSection');
+            const tlSec = document.getElementById('tlRosterSection');
+
             const supportBtn = document.getElementById('tabSupportBtn');
             const agentBtn = document.getElementById('tabAgentBtn');
+            const tlBtn = document.getElementById('tabTLBtn');
+
+            supportSec.classList.add('hidden');
+            agentSec.classList.add('hidden');
+            tlSec.classList.add('hidden');
+
+            supportBtn.classList.remove('active');
+            agentBtn.classList.remove('active');
+            tlBtn.classList.remove('active');
 
             if (type === 'support') {
                 supportSec.classList.remove('hidden');
-                agentSec.classList.add('hidden');
                 supportBtn.classList.add('active');
-                agentBtn.classList.remove('active');
-            } else {
-                supportSec.classList.add('hidden');
+            } else if (type === 'agent') {
                 agentSec.classList.remove('hidden');
-                supportBtn.classList.remove('active');
                 agentBtn.classList.add('active');
+            } else if (type === 'tl') {
+                tlSec.classList.remove('hidden');
+                tlBtn.classList.add('active');
             }
         }
 
