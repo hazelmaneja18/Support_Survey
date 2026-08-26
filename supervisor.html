@@ -151,24 +151,6 @@
             border-radius: 4px;
         }
 
-        .btn-edit {
-            background: #e0f2fe;
-            color: #0369a1;
-            border: 1px solid #7dd3fc;
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .btn-edit:hover {
-            background: #0284c7;
-            color: #ffffff;
-        }
-
         .btn-delete {
             background: #fef2f2;
             color: var(--danger-red);
@@ -710,14 +692,19 @@
         const AUTH_PASS = "Verifone123";
         const BASE_MONTHLY_CREDITS = 4;
 
-        // Default Team Leads seed list if none present
+        // Complete Team Leads seed list from images
         const DEFAULT_TEAM_LEADS = [
-            { name: "Kristin Manning", site: "Tucson" },
-            { name: "Nathan Malis", site: "Tucson" },
-            { name: "NLETUS", site: "Tucson" },
-            { name: "Robert Hayes", site: "Tucson" },
+            { name: "Andrew Marsh", site: "Manila" },
             { name: "Edwin Cuesta", site: "Manila" },
-            { name: "Kyle Sioson", site: "Manila" }
+            { name: "Franco Molina", site: "Manila" },
+            { name: "Hazel Maneja", site: "Manila" },
+            { name: "Kristin Manning", site: "Manila" },
+            { name: "Kyle Brandon Sioson", site: "Manila" },
+            { name: "Nathan Malis", site: "Manila" },
+            { name: "Nicole Garcia", site: "Manila" },
+            { name: "Paul Batol", site: "Manila" },
+            { name: "Robert Hayes", site: "Manila" },
+            { name: "Vineed Alexander", site: "Manila" }
         ];
 
         function authenticate() {
@@ -807,69 +794,108 @@
 
             const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
             if (tls.some(t => t.name.toLowerCase() === name.toLowerCase())) {
-                return alert('This Team Lead is already in the system.');
+                return alert('Team Lead already exists.');
             }
 
             tls.push({ name, site });
             localStorage.setItem('teamLeadsRoster', JSON.stringify(tls));
             nameInput.value = '';
-            
             renderTLList();
             populateFilterOptions();
-            renderAgentRosterManagement();
         }
 
-        function deleteTeamLead(tlName) {
-            if (!confirm(`Are you sure you want to remove Team Lead '${tlName}'? Any existing agents under this TL will be marked as 'Unassigned'.`)) return;
-
-            let tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
-            tls = tls.filter(t => t.name !== tlName);
+        function deleteTeamLead(index) {
+            if (!confirm('Are you sure you want to delete this Team Lead?')) return;
+            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
+            tls.splice(index, 1);
             localStorage.setItem('teamLeadsRoster', JSON.stringify(tls));
-
-            // Unassign agents under this deleted TL
-            let agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-            agents.forEach(a => {
-                if (a.supervisor === tlName) {
-                    a.supervisor = 'Unassigned';
-                }
-            });
-            localStorage.setItem('agentRoster', JSON.stringify(agents));
-
             renderTLList();
             populateFilterOptions();
-            renderAgentRosterManagement();
-            renderDashboard();
         }
 
         function renderTLList() {
-            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
             const container = document.getElementById('tlListContainer');
+            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
             container.innerHTML = '';
 
-            tls.forEach(tl => {
+            tls.forEach((tl, idx) => {
                 const item = document.createElement('div');
-                item.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #e2e8f0;";
+                item.className = 'roster-item';
                 item.innerHTML = `
-                    <div>
-                        <strong>${tl.name}</strong> <span style="color: var(--text-muted);">(${tl.site})</span>
-                    </div>
-                    <button class="btn-delete" style="padding: 2px 6px; font-size: 10px;" onclick="deleteTeamLead('${tl.name.replace(/'/g, "\\'")}')">Remove</button>
+                    <span><strong>${tl.name}</strong> (${tl.site})</span>
+                    <button class="btn-delete" onclick="deleteTeamLead(${idx})">Remove</button>
                 `;
                 container.appendChild(item);
             });
         }
 
-        // --- SUPPORT & AGENT ROSTER MANAGEMENT ---
+        function populateFilterOptions() {
+            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
+            const agentSelect = document.getElementById('newAgentSupervisorSelect');
+            const filterSelect = document.getElementById('tlFilter');
+            const rosterTLFilter = document.getElementById('rosterTLFilter');
+
+            agentSelect.innerHTML = '<option value="">Select Team Lead / TL</option>';
+            filterSelect.innerHTML = '<option value="ALL">All Team Leads</option>';
+            rosterTLFilter.innerHTML = '<option value="ALL">Filter by Team Lead (All)</option>';
+
+            tls.forEach(tl => {
+                agentSelect.innerHTML += `<option value="${tl.name}">${tl.name}</option>`;
+                filterSelect.innerHTML += `<option value="${tl.name}">${tl.name}</option>`;
+                rosterTLFilter.innerHTML += `<option value="${tl.name}">${tl.name}</option>`;
+            });
+
+            // Populate Years in Filters
+            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+            const years = new Set(feedback.map(f => new Date(f.timestamp).getFullYear()).filter(y => !isNaN(y)));
+            const currentYear = new Date().getFullYear();
+            years.add(currentYear);
+
+            const yearFilter = document.getElementById('yearFilter');
+            const creditYearFilter = document.getElementById('creditYearFilter');
+            
+            yearFilter.innerHTML = '<option value="ALL">All Years</option>';
+            creditYearFilter.innerHTML = '<option value="ALL">All Years</option>';
+
+            Array.from(years).sort((a, b) => b - a).forEach(y => {
+                yearFilter.innerHTML += `<option value="${y}">${y}</option>`;
+                creditYearFilter.innerHTML += `<option value="${y}">${y}</option>`;
+            });
+        }
+
+        // --- SUPPORT ROSTER MANAGEMENT ---
+        function renderRosterManagement() {
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
+            const search = (document.getElementById('searchSupportRoster').value || '').toLowerCase();
+            const listContainer = document.getElementById('rosterList');
+            
+            listContainer.innerHTML = '';
+            const filtered = roster.filter(r => r.name.toLowerCase().includes(search));
+            
+            document.getElementById('rosterCount').textContent = filtered.length;
+
+            filtered.forEach((member, index) => {
+                const item = document.createElement('div');
+                item.className = 'roster-item';
+                item.innerHTML = `
+                    <span><strong>${member.name}</strong> (${member.team})</span>
+                    <button class="btn-delete" onclick="deleteSupportMember(${index})">Remove</button>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
         function addSupportMember() {
             const nameInput = document.getElementById('newName');
+            const teamSelect = document.getElementById('newTeam');
             const name = nameInput.value.trim();
-            const team = document.getElementById('newTeam').value;
+            const team = teamSelect.value;
 
-            if (!name) return alert('Please enter a full name.');
+            if (!name) return alert('Please enter a support member name.');
 
             const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
-            if (roster.some(m => m.name.toLowerCase() === name.toLowerCase())) {
-                return alert('This member is already on the support roster.');
+            if (roster.some(r => r.name.toLowerCase() === name.toLowerCase())) {
+                return alert('Support member already exists.');
             }
 
             roster.push({ name, team });
@@ -879,453 +905,304 @@
             renderDashboard();
         }
 
-        function deleteSupportMember(nameToDelete) {
-            if (!confirm(`Remove ${nameToDelete} from the support roster?`)) return;
-            let roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
-            roster = roster.filter(m => m.name !== nameToDelete);
+        function deleteSupportMember(index) {
+            if (!confirm('Remove member from active roster?')) return;
+            const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
+            roster.splice(index, 1);
             localStorage.setItem('supportRoster', JSON.stringify(roster));
             renderRosterManagement();
             renderDashboard();
         }
 
+        // --- AGENT ROSTER MANAGEMENT ---
+        function renderAgentRosterManagement() {
+            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            const search = (document.getElementById('searchAgentRoster').value || '').toLowerCase();
+            const tlFilter = document.getElementById('rosterTLFilter').value;
+            const listContainer = document.getElementById('agentList');
+
+            listContainer.innerHTML = '';
+            let filtered = agents.filter(a => a.name.toLowerCase().includes(search));
+
+            if (tlFilter !== 'ALL') {
+                filtered = filtered.filter(a => a.tl === tlFilter);
+            }
+
+            document.getElementById('agentCount').textContent = filtered.length;
+
+            filtered.forEach((agent, index) => {
+                const item = document.createElement('div');
+                item.className = 'roster-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${agent.name}</strong>
+                        <div style="font-size: 10px; color: var(--text-muted);">TL: ${agent.tl || 'N/A'} | ${agent.location || 'N/A'}</div>
+                    </div>
+                    <button class="btn-delete" onclick="deleteAgentMember(${index})">Remove</button>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
         function addAgentMember() {
             const nameInput = document.getElementById('newAgentName');
-            const supSelect = document.getElementById('newAgentSupervisorSelect');
+            const tlSelect = document.getElementById('newAgentSupervisorSelect');
+            const locSelect = document.getElementById('newAgentLocation');
+
             const name = nameInput.value.trim();
-            const supervisor = supSelect.value || 'Unassigned';
-            const location = document.getElementById('newAgentLocation').value;
+            const tl = tlSelect.value;
+            const location = locSelect.value;
 
             if (!name) return alert('Please enter an agent name.');
 
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
             if (agents.some(a => a.name.toLowerCase() === name.toLowerCase())) {
-                return alert('This agent is already registered in the roster.');
+                return alert('Agent already exists.');
             }
 
-            agents.push({ name, supervisor, location });
+            agents.push({ name, tl, location });
             localStorage.setItem('agentRoster', JSON.stringify(agents));
             nameInput.value = '';
-            supSelect.value = '';
             renderAgentRosterManagement();
-            populateFilterOptions();
             renderDashboard();
         }
 
-        function editAgentMember(agentName) {
+        function deleteAgentMember(index) {
+            if (!confirm('Remove agent from active roster?')) return;
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-            const agent = agents.find(a => a.name === agentName);
-            if (!agent) return;
-
-            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
-            let promptText = `Select Team Lead for ${agent.name}:\nAvailable Team Leads:\n`;
-            tls.forEach((t, i) => promptText += `${i+1}. ${t.name} (${t.site})\n`);
-            
-            const selection = prompt(promptText + `\nEnter the full name of Team Lead:`, agent.supervisor || '');
-            if (selection === null) return;
-
-            const newLoc = prompt(`Update Location for ${agent.name} (e.g. MNL - Manila, TUS - Tucson, BLR - Bangalore, MIS - Canada):`, agent.location || '');
-            if (newLoc === null) return;
-
-            agent.supervisor = selection.trim() || 'Unassigned';
-            agent.location = newLoc.trim() || agent.location;
-
+            agents.splice(index, 1);
             localStorage.setItem('agentRoster', JSON.stringify(agents));
             renderAgentRosterManagement();
-            populateFilterOptions();
             renderDashboard();
         }
 
-        function deleteAgentMember(agentName) {
-            if (!confirm(`Remove agent ${agentName} from the database?`)) return;
-            let agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-            agents = agents.filter(a => a.name !== agentName);
-            localStorage.setItem('agentRoster', JSON.stringify(agents));
-            renderAgentRosterManagement();
-            populateFilterOptions();
-            renderDashboard();
-        }
-
-        function deleteFeedback(indexToDelete) {
-            if (!confirm("Delete this feedback log entry?")) return;
-            let submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            submissions.splice(indexToDelete, 1);
-            localStorage.setItem('supportRatings', JSON.stringify(submissions));
-            populateFilterOptions();
-            renderDashboard();
-        }
-
-        function clearAllTestFeedback() {
-            if (!confirm("Are you sure you want to clear ALL feedback submissions for testing? This cannot be undone.")) return;
-            localStorage.setItem('supportRatings', JSON.stringify([]));
-            populateFilterOptions();
-            renderDashboard();
-        }
-
-        function renderRosterManagement() {
-            const roster = JSON.parse(localStorage.getItem('supportRoster')) || [];
-            const container = document.getElementById('rosterList');
-            const filterText = (document.getElementById('searchSupportRoster')?.value || '').toLowerCase().trim();
-
-            const filteredRoster = roster.filter(m => m.name.toLowerCase().includes(filterText));
-            document.getElementById('rosterCount').textContent = filteredRoster.length;
-            container.innerHTML = '';
-
-            filteredRoster.forEach(member => {
-                const item = document.createElement('div');
-                item.className = 'roster-item';
-                item.innerHTML = `
-                    <div>
-                        <strong style="color: var(--primary-dark);">${member.name}</strong>
-                        <div style="font-size: 10px; color: var(--text-muted);">${member.team}</div>
-                    </div>
-                    <button class="btn-delete" onclick="deleteSupportMember('${member.name}')">Remove</button>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function renderAgentRosterManagement() {
-            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
-            const container = document.getElementById('agentList');
-            const filterText = (document.getElementById('searchAgentRoster')?.value || '').toLowerCase().trim();
-            const selectedTL = document.getElementById('rosterTLFilter')?.value || 'ALL';
-
-            const filteredAgents = agents.filter(a => {
-                const matchName = a.name.toLowerCase().includes(filterText);
-                const matchTL = (selectedTL === 'ALL') || (a.supervisor === selectedTL);
-                return matchName && matchTL;
-            });
-
-            document.getElementById('agentCount').textContent = filteredAgents.length;
-            container.innerHTML = '';
-
-            filteredAgents.sort((a, b) => a.name.localeCompare(b.name)).forEach(agent => {
-                const item = document.createElement('div');
-                item.className = 'roster-item';
-                item.innerHTML = `
-                    <div style="overflow: hidden; padding-right: 6px;">
-                        <strong style="color: var(--primary-dark); font-size: 12px;">${agent.name}</strong>
-                        <div style="font-size: 10px; color: var(--text-muted);">TL: ${agent.supervisor || 'N/A'} | ${agent.location}</div>
-                    </div>
-                    <div style="display: flex; gap: 4px; flex-shrink: 0;">
-                        <button class="btn-edit" onclick="editAgentMember('${agent.name.replace(/'/g, "\\'")}')">Edit</button>
-                        <button class="btn-delete" onclick="deleteAgentMember('${agent.name.replace(/'/g, "\\'")}')">Remove</button>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function populateFilterOptions() {
-            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            const tls = JSON.parse(localStorage.getItem('teamLeadsRoster')) || [];
-
-            // Populate Year Filters
-            const years = [...new Set(submissions.map(s => s.year).filter(Boolean))].sort().reverse();
-            const yearSelects = [document.getElementById('yearFilter'), document.getElementById('creditYearFilter')];
-            yearSelects.forEach(select => {
-                if (!select) return;
-                const currentVal = select.value;
-                select.innerHTML = '<option value="ALL">All Years</option>';
-                years.forEach(y => select.innerHTML += `<option value="${y}">${y}</option>`);
-                select.value = currentVal;
-            });
-
-            // Populate Categorized Team Lead Select Boxes
-            const tlSelect = document.getElementById('tlFilter');
-            const rosterTLSelect = document.getElementById('rosterTLFilter');
-            const newAgentTLSelect = document.getElementById('newAgentSupervisorSelect');
-
-            const currentTLVal = tlSelect ? tlSelect.value : 'ALL';
-            const currentRosterTLVal = rosterTLSelect ? rosterTLSelect.value : 'ALL';
-            const currentNewAgentTLVal = newAgentTLSelect ? newAgentTLSelect.value : '';
-
-            if (tlSelect) tlSelect.innerHTML = '<option value="ALL">All Team Leads</option>';
-            if (rosterTLSelect) rosterTLSelect.innerHTML = '<option value="ALL">Filter by Team Lead (All)</option>';
-            if (newAgentTLSelect) newAgentTLSelect.innerHTML = '<option value="">Select Team Lead / TL</option>';
-
-            const manilaTLs = tls.filter(t => t.site === 'Manila').map(t => t.name).sort();
-            const tucsonTLs = tls.filter(t => t.site === 'Tucson').map(t => t.name).sort();
-            const otherTLs = tls.filter(t => t.site !== 'Manila' && t.site !== 'Tucson').map(t => t.name).sort();
-
-            let groupHTML = '';
-            if (manilaTLs.length > 0) {
-                groupHTML += '<optgroup label="Manila Team Leads">';
-                manilaTLs.forEach(tl => groupHTML += `<option value="${tl}">${tl}</option>`);
-                groupHTML += '</optgroup>';
-            }
-            if (tucsonTLs.length > 0) {
-                groupHTML += '<optgroup label="Tucson Team Leads">';
-                tucsonTLs.forEach(tl => groupHTML += `<option value="${tl}">${tl}</option>`);
-                groupHTML += '</optgroup>';
-            }
-            if (otherTLs.length > 0) {
-                groupHTML += '<optgroup label="Other Team Leads">';
-                otherTLs.forEach(tl => groupHTML += `<option value="${tl}">${tl}</option>`);
-                groupHTML += '</optgroup>';
-            }
-
-            if (tlSelect) {
-                tlSelect.innerHTML += groupHTML;
-                tlSelect.value = currentTLVal;
-            }
-            if (rosterTLSelect) {
-                rosterTLSelect.innerHTML += groupHTML;
-                rosterTLSelect.value = currentRosterTLVal;
-            }
-            if (newAgentTLSelect) {
-                newAgentTLSelect.innerHTML += groupHTML;
-                newAgentTLSelect.value = currentNewAgentTLVal;
-            }
-        }
-
-        function calculateMonthsSpanned(startDateStr, endDateStr) {
-            if (!startDateStr || !endDateStr) return 1;
-            const start = new Date(startDateStr);
-            const end = new Date(endDateStr);
-            if (isNaN(start) || isNaN(end) || start > end) return 1;
-            return (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
-        }
-
+        // --- DASHBOARD RENDER & FILTERING ---
         function renderDashboard() {
-            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+            const teamFilter = document.getElementById('teamFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+            const monthFilter = document.getElementById('monthFilter').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
 
-            // 1. SUPPORT PERFORMANCE TAB LOGIC
-            const teamVal = document.getElementById('teamFilter').value;
-            const yearVal = document.getElementById('yearFilter').value;
-            const monthVal = document.getElementById('monthFilter').value;
-            const startVal = document.getElementById('startDate').value;
-            const endVal = document.getElementById('endDate').value;
-
-            const filteredSupportData = submissions.filter(s => {
-                const matchTeam = (teamVal === 'ALL') || (s.team === teamVal);
-                const matchYear = (yearVal === 'ALL') || (s.year === yearVal);
-
-                let matchMonth = true;
-                if (monthVal !== 'ALL') {
-                    if (s.dateISO) {
-                        matchMonth = (s.dateISO.split('-')[1] === monthVal);
-                    } else if (s.timestamp) {
-                        matchMonth = (String(new Date(s.timestamp).getMonth() + 1).padStart(2, '0') === monthVal);
-                    }
-                }
-
-                let matchDateRange = true;
-                if (s.dateISO) {
-                    if (startVal && s.dateISO < startVal) matchDateRange = false;
-                    if (endVal && s.dateISO > endVal) matchDateRange = false;
-                }
-
-                return matchTeam && matchYear && matchMonth && matchDateRange;
+            // Filter Submissions
+            let filteredFeedback = feedback.filter(item => {
+                const itemDate = new Date(item.timestamp);
+                if (teamFilter !== 'ALL' && item.team !== teamFilter) return false;
+                if (yearFilter !== 'ALL' && itemDate.getFullYear().toString() !== yearFilter) return false;
+                if (monthFilter !== 'ALL' && (itemDate.getMonth() + 1).toString().padStart(2, '0') !== monthFilter) return false;
+                if (startDate && itemDate < new Date(startDate)) return false;
+                if (endDate && itemDate > new Date(endDate + 'T23:59:59')) return false;
+                return true;
             });
 
+            renderSupportSummary(filteredFeedback);
+            renderDetailedAuditLog(filteredFeedback);
+            renderAgentCredits();
+        }
+
+        function renderSupportSummary(feedbackList) {
             const summaryBody = document.getElementById('summaryBody');
             summaryBody.innerHTML = '';
+
             const stats = {};
 
-            filteredSupportData.forEach(item => {
+            feedbackList.forEach(item => {
                 if (!stats[item.supportName]) {
-                    stats[item.supportName] = { team: item.team, count: 0, sum: 0 };
+                    stats[item.supportName] = { team: item.team, count: 0, totalRating: 0, comments: [] };
                 }
-                stats[item.supportName].count += 1;
-                stats[item.supportName].sum += item.rating;
+                stats[item.supportName].count++;
+                stats[item.supportName].totalRating += parseFloat(item.rating || 0);
+                if (item.comments) {
+                    stats[item.supportName].comments.push({
+                        agent: item.agentName,
+                        rating: item.rating,
+                        comment: item.comments,
+                        date: new Date(item.timestamp).toLocaleString()
+                    });
+                }
             });
 
             if (Object.keys(stats).length === 0) {
-                summaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No feedback records found for selected filters.</td></tr>`;
-            } else {
-                for (const [name, data] of Object.entries(stats)) {
-                    const avg = (data.sum / data.count).toFixed(2);
-                    const escapedName = name.replace(/'/g, "\\'");
-                    summaryBody.innerHTML += `
-                        <tr>
-                            <td class="nowrap"><span class="clickable-link" onclick="showAnonymousSupportFeedback('${escapedName}')">${name}</span></td>
-                            <td>${data.team}</td>
-                            <td class="text-center">${data.count}</td>
-                            <td><strong>${avg} / 5.00</strong></td>
-                        </tr>
-                    `;
-                }
+                summaryBody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: var(--text-muted);">No records found.</td></tr>`;
+                return;
             }
 
+            Object.keys(stats).forEach(name => {
+                const avg = (stats[name].totalRating / stats[name].count).toFixed(2);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="clickable-link" onclick='openCommentsModal("${name.replace(/'/g, "\\'")}")'>${name}</td>
+                    <td>${stats[name].team}</td>
+                    <td class="text-center">${stats[name].count}</td>
+                    <td><strong>${avg} ⭐</strong></td>
+                `;
+                summaryBody.appendChild(tr);
+            });
+        }
+
+        function renderDetailedAuditLog(feedbackList) {
             const detailsBody = document.getElementById('detailsBody');
             detailsBody.innerHTML = '';
 
-            if (filteredSupportData.length === 0) {
-                detailsBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No entries in the log matching current filters.</td></tr>`;
-            } else {
-                filteredSupportData.forEach((item, index) => {
-                    const agentName = item.agentUser || item.agentName || 'N/A';
-                    const commentsText = item.comments || 'N/A';
-                    const isTestEntry = agentName.toLowerCase().includes('test') || commentsText.toLowerCase().includes('test');
-                    const actionBtn = isTestEntry 
-                        ? `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete Test</button>` 
-                        : `<button class="btn-delete" onclick="deleteFeedback(${index})">Delete</button>`;
-
-                    const escapedAgentName = agentName.replace(/'/g, "\\'");
-                    detailsBody.innerHTML += `
-                        <tr>
-                            <td class="nowrap">${item.timestamp || item.dateISO || 'N/A'}</td>
-                            <td class="nowrap"><span class="clickable-link" onclick="showAgentComments('${escapedAgentName}')">${agentName}</span></td>
-                            <td class="nowrap">${item.supportName}</td>
-                            <td>${item.team}</td>
-                            <td><strong>${item.rating} / 5</strong></td>
-                            <td>${commentsText}</td>
-                            <td>${actionBtn}</td>
-                        </tr>
-                    `;
-                });
+            if (feedbackList.length === 0) {
+                detailsBody.innerHTML = `<tr><td colspan="7" class="text-center" style="color: var(--text-muted);">No detailed logs available.</td></tr>`;
+                return;
             }
 
-            // 2. AGENT SURVEY CREDITS TAB LOGIC
-            const creditYear = document.getElementById('creditYearFilter').value;
-            const creditMonth = document.getElementById('creditMonthFilter').value;
-            const creditStart = document.getElementById('creditStartDate').value;
-            const creditEnd = document.getElementById('creditEndDate').value;
-            const searchVal = document.getElementById('agentSearchInput').value.toLowerCase().trim();
-            const tlVal = document.getElementById('tlFilter').value;
-            const creditCatVal = document.getElementById('creditCategoryFilter').value;
-
-            let maxPeriodAllowance = BASE_MONTHLY_CREDITS;
-            if (creditStart && creditEnd) {
-                const monthsCount = calculateMonthsSpanned(creditStart, creditEnd);
-                maxPeriodAllowance = BASE_MONTHLY_CREDITS * monthsCount;
-            } else if (creditMonth === 'ALL') {
-                maxPeriodAllowance = BASE_MONTHLY_CREDITS * 12;
-            }
-
-            const periodLabel = (creditMonth !== 'ALL') ? `(4 Max / Month)` : `(${maxPeriodAllowance} Max / Total Period)`;
-            document.getElementById('creditSectionHeader').textContent = `Agent Survey Credit Allowance ${periodLabel}`;
-
-            const agentCreditBody = document.getElementById('agentCreditBody');
-            agentCreditBody.innerHTML = '';
-
-            let filteredAgents = agents.filter(agent => {
-                const matchSearch = !searchVal || agent.name.toLowerCase().includes(searchVal);
-                const matchTL = (tlVal === 'ALL') || (agent.supervisor === tlVal);
-                return matchSearch && matchTL;
+            feedbackList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach((item, index) => {
+                const dateStr = new Date(item.timestamp).toLocaleString();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="nowrap">${dateStr}</td>
+                    <td class="nowrap">${item.agentName || 'N/A'}</td>
+                    <td class="nowrap">${item.supportName}</td>
+                    <td>${item.team}</td>
+                    <td>${item.rating} ⭐</td>
+                    <td>${item.comments || '<i style="color: var(--text-muted);">None</i>'}</td>
+                    <td><button class="btn-delete" onclick="deleteSingleFeedback('${item.timestamp}')">Delete</button></td>
+                `;
+                detailsBody.appendChild(tr);
             });
+        }
+
+        function renderAgentCredits() {
+            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+
+            const search = (document.getElementById('agentSearchInput').value || '').toLowerCase();
+            const tlFilter = document.getElementById('tlFilter').value;
+            const categoryFilter = document.getElementById('creditCategoryFilter').value;
+            const yearFilter = document.getElementById('creditYearFilter').value;
+            const monthFilter = document.getElementById('creditMonthFilter').value;
+            const startDate = document.getElementById('creditStartDate').value;
+            const endDate = document.getElementById('creditEndDate').value;
+
+            const tbody = document.getElementById('agentCreditBody');
+            tbody.innerHTML = '';
+
+            let filteredAgents = agents.filter(a => a.name.toLowerCase().includes(search));
+            if (tlFilter !== 'ALL') filteredAgents = filteredAgents.filter(a => a.tl === tlFilter);
 
             if (filteredAgents.length === 0) {
-                agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents matching criteria.</td></tr>`;
-            } else {
-                filteredAgents.forEach(agent => {
-                    const usedCredits = submissions.filter(s => {
-                        const agentMatch = (s.agentUser || s.agentName || '').toLowerCase() === agent.name.toLowerCase();
-                        let dateObj = s.dateISO ? new Date(s.dateISO) : (s.timestamp ? new Date(s.timestamp) : new Date());
-                        const sMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
-                        const sYear = String(dateObj.getFullYear());
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: var(--text-muted);">No agents found.</td></tr>`;
+                return;
+            }
 
-                        const matchYear = (creditYear === 'ALL') || (sYear === creditYear);
-                        const matchMonth = (creditMonth === 'ALL') || (sMonth === creditMonth);
-
-                        let matchDateRange = true;
-                        if (s.dateISO) {
-                            if (creditStart && s.dateISO < creditStart) matchDateRange = false;
-                            if (creditEnd && s.dateISO > creditEnd) matchDateRange = false;
-                        }
-
-                        return agentMatch && matchYear && matchMonth && matchDateRange;
-                    }).length;
-
-                    const creditsLeft = Math.max(0, maxPeriodAllowance - usedCredits);
-
-                    if (creditCatVal === 'LEFT' && creditsLeft === 0) return;
-                    if (creditCatVal === 'MAX' && creditsLeft > 0) return;
-                    if (['1', '2', '3', '4'].includes(creditCatVal) && creditsLeft !== parseInt(creditCatVal)) return;
-
-                    const statusBadge = creditsLeft > 0
-                        ? `<span class="badge badge-success">${creditsLeft} Credit(s) Left</span>`
-                        : `<span class="badge badge-danger">Max Credits Used</span>`;
-
-                    const escapedName = agent.name.replace(/'/g, "\\'");
-                    agentCreditBody.innerHTML += `
-                        <tr>
-                            <td><span class="clickable-link" onclick="showAgentComments('${escapedName}')">${agent.name}</span></td>
-                            <td>${agent.supervisor || 'Unassigned'}</td>
-                            <td>${agent.location || 'N/A'}</td>
-                            <td class="text-center">${usedCredits} / ${maxPeriodAllowance}</td>
-                            <td class="text-center"><strong>${creditsLeft}</strong></td>
-                            <td class="text-center">${statusBadge}</td>
-                        </tr>
-                    `;
+            filteredAgents.forEach(agent => {
+                const agentSubmissions = feedback.filter(f => {
+                    if (f.agentName !== agent.name) return false;
+                    const fDate = new Date(f.timestamp);
+                    if (yearFilter !== 'ALL' && fDate.getFullYear().toString() !== yearFilter) return false;
+                    if (monthFilter !== 'ALL' && (fDate.getMonth() + 1).toString().padStart(2, '0') !== monthFilter) return false;
+                    if (startDate && fDate < new Date(startDate)) return false;
+                    if (endDate && fDate > new Date(endDate + 'T23:59:59')) return false;
+                    return true;
                 });
 
-                if (agentCreditBody.innerHTML === '') {
-                    agentCreditBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No agents match the selected credit category filter.</td></tr>`;
-                }
-            }
+                const used = agentSubmissions.length;
+                const remaining = Math.max(0, BASE_MONTHLY_CREDITS - used);
+
+                if (categoryFilter === 'LEFT' && remaining <= 0) return;
+                if (categoryFilter === 'MAX' && remaining > 0) return;
+                if (['1','2','3','4'].includes(categoryFilter) && remaining !== parseInt(categoryFilter)) return;
+
+                const statusBadge = remaining > 0 
+                    ? `<span class="badge badge-success">${remaining} Left</span>` 
+                    : `<span class="badge badge-danger">Maxed Out</span>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="clickable-link" onclick='openAgentHistoryModal("${agent.name.replace(/'/g, "\\'")}")'>${agent.name}</td>
+                    <td>${agent.tl || 'N/A'}</td>
+                    <td>${agent.location || 'N/A'}</td>
+                    <td class="text-center">${used}</td>
+                    <td class="text-center"><strong>${remaining}</strong></td>
+                    <td class="text-center">${statusBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
-        function showAgentComments(agentName) {
-            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            const agents = JSON.parse(localStorage.getItem('agentRoster')) || [];
+        // --- MODALS & ACTIONS ---
+        function openCommentsModal(supportName) {
+            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+            const modal = document.getElementById('commentsModal');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const list = document.getElementById('modalCommentsList');
 
-            const agentInfo = agents.find(a => a.name.toLowerCase() === agentName.toLowerCase());
-            const agentComments = submissions.filter(s => (s.agentUser || s.agentName || '').toLowerCase() === agentName.toLowerCase());
+            const filtered = feedback.filter(f => f.supportName === supportName && f.comments);
 
-            document.getElementById('modalTitle').textContent = `Agent Submissions: ${agentName}`;
-            document.getElementById('modalSubtitle').textContent = `Team Lead: ${agentInfo ? agentInfo.supervisor : 'Unassigned'} | Location: ${agentInfo ? agentInfo.location : 'N/A'}`;
+            title.textContent = `Feedback for ${supportName}`;
+            subtitle.textContent = `Total Comments: ${filtered.length}`;
+            list.innerHTML = '';
 
-            const commentsList = document.getElementById('modalCommentsList');
-            commentsList.innerHTML = '';
-
-            if (agentComments.length === 0) {
-                commentsList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No feedback or comments found for this agent in the current system.</p>`;
+            if (filtered.length === 0) {
+                list.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">No comments provided for this support member.</p>`;
             } else {
-                agentComments.forEach(c => {
-                    commentsList.innerHTML += `
-                        <div class="comment-item">
-                            <div style="font-weight:700; color: var(--primary-dark); margin-bottom: 3px;">
-                                Rating: ${c.rating}/5 | Support: ${c.supportName} (${c.team})
-                            </div>
-                            <div style="color: var(--text-main); font-style: italic; margin-bottom: 4px;">
-                                "${c.comments || 'No written comment provided.'}"
-                            </div>
-                            <div style="font-size: 10px; color: var(--text-muted);">
-                                Date: ${c.timestamp || c.dateISO || 'N/A'}
-                            </div>
-                        </div>
+                filtered.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'comment-item';
+                    div.innerHTML = `
+                        <div><strong>Agent:</strong> ${item.agentName || 'Anonymous'} | <strong>Rating:</strong> ${item.rating} ⭐</div>
+                        <div style="margin-top: 4px;">"${item.comments}"</div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${new Date(item.timestamp).toLocaleString()}</div>
                     `;
+                    list.appendChild(div);
                 });
             }
 
-            document.getElementById('commentsModal').classList.remove('hidden');
+            modal.classList.remove('hidden');
         }
 
-        function showAnonymousSupportFeedback(supportName) {
-            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            const supportFeedbacks = submissions.filter(s => s.supportName.toLowerCase() === supportName.toLowerCase());
+        function openAgentHistoryModal(agentName) {
+            const feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+            const modal = document.getElementById('commentsModal');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const list = document.getElementById('modalCommentsList');
 
-            document.getElementById('modalTitle').textContent = `Anonymous Feedback: ${supportName}`;
-            document.getElementById('modalSubtitle').textContent = `Showing all comments for ${supportName} (Agent details hidden to maintain anonymity)`;
+            const filtered = feedback.filter(f => f.agentName === agentName);
 
-            const commentsList = document.getElementById('modalCommentsList');
-            commentsList.innerHTML = '';
+            title.textContent = `Submission History for ${agentName}`;
+            subtitle.textContent = `Total Submissions: ${filtered.length}`;
+            list.innerHTML = '';
 
-            if (supportFeedbacks.length === 0) {
-                commentsList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No comments available for this support member.</p>`;
+            if (filtered.length === 0) {
+                list.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">No submission activity logged for this agent.</p>`;
             } else {
-                supportFeedbacks.forEach(c => {
-                    commentsList.innerHTML += `
-                        <div class="comment-item">
-                            <div style="color: var(--text-main); font-style: italic; font-size: 13px; margin-bottom: 6px;">
-                                "${c.comments || 'No written comment provided.'}"
-                            </div>
-                            <div style="font-size: 10px; color: var(--text-muted);">
-                                Submitted: ${c.timestamp || c.dateISO || 'N/A'}
-                            </div>
-                        </div>
+                filtered.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'comment-item';
+                    div.innerHTML = `
+                        <div><strong>Support Name:</strong> ${item.supportName} | <strong>Rating:</strong> ${item.rating} ⭐</div>
+                        <div style="margin-top: 4px;"><strong>Comments:</strong> ${item.comments || 'N/A'}</div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${new Date(item.timestamp).toLocaleString()}</div>
                     `;
+                    list.appendChild(div);
                 });
             }
 
-            document.getElementById('commentsModal').classList.remove('hidden');
+            modal.classList.remove('hidden');
         }
 
         function closeModal() {
             document.getElementById('commentsModal').classList.add('hidden');
+        }
+
+        function deleteSingleFeedback(timestamp) {
+            if (!confirm('Are you sure you want to delete this log entry?')) return;
+            let feedback = JSON.parse(localStorage.getItem('verifoneFeedback')) || [];
+            feedback = feedback.filter(f => f.timestamp !== timestamp);
+            localStorage.setItem('verifoneFeedback', JSON.stringify(feedback));
+            renderDashboard();
+        }
+
+        function clearAllTestFeedback() {
+            if (!confirm('⚠️ WARNING: This will permanently delete ALL feedback submission logs! Continue?')) return;
+            localStorage.removeItem('verifoneFeedback');
+            renderDashboard();
         }
     </script>
 </body>
