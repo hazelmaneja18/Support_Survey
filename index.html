@@ -222,6 +222,12 @@
             font-weight: 700;
             color: var(--accent-teal);
         }
+
+        .limit-notice-warning {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
     </style>
 </head>
 <body>
@@ -291,6 +297,8 @@
                         <option value="Tucson">Tucson Team</option>
                     </select>
                 </div>
+
+                <p id="supportLimitNotice" class="hidden" style="font-size: 12px; margin-top: 8px; padding: 8px 10px; border-radius: 6px;"></p>
             </div>
 
             <div class="form-group">
@@ -530,6 +538,7 @@
             }
 
             checkAgentCredits();
+            checkSupportLimit();
         }
 
         function handleSupportChange() {
@@ -544,6 +553,8 @@
                 customBox.classList.add('hidden');
                 customInput.required = false;
             }
+
+            checkSupportLimit();
         }
 
         function getAgentRemainingCredits(agentName) {
@@ -551,6 +562,69 @@
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
             const agentSubmissions = submissions.filter(s => s.agentUser.toLowerCase() === agentName.toLowerCase());
             return Math.max(0, INITIAL_CREDITS - agentSubmissions.length);
+        }
+
+        // Prevents the same agent from rating the same support person more
+        // than MAX_SUBMISSIONS_PER_SUPPORT times.
+        const MAX_SUBMISSIONS_PER_SUPPORT = 2;
+        let creditsExhausted = false;
+        let supportLimitReached = false;
+
+        function updateSubmitButtonState() {
+            document.getElementById('submitBtn').disabled = creditsExhausted || supportLimitReached;
+        }
+
+        function getSelectedAgentName() {
+            let val = document.getElementById('agentUser').value;
+            if (val === '__CUSTOM_AGENT__') {
+                val = document.getElementById('customAgentInput').value.trim();
+            }
+            return val;
+        }
+
+        function getSelectedSupportName() {
+            let val = document.getElementById('supportPerson').value;
+            if (val === '__CUSTOM_SUPPORT__') {
+                val = document.getElementById('customSupportInput').value.trim();
+            }
+            return val;
+        }
+
+        function getPairSubmissionCount(agentName, supportName) {
+            if (!agentName || !supportName) return 0;
+            const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
+            return submissions.filter(s =>
+                (s.agentUser || '').toLowerCase() === agentName.toLowerCase() &&
+                (s.supportName || '').toLowerCase() === supportName.toLowerCase()
+            ).length;
+        }
+
+        function checkSupportLimit() {
+            const agentName = getSelectedAgentName();
+            const supportName = getSelectedSupportName();
+            const notice = document.getElementById('supportLimitNotice');
+
+            if (!agentName || !supportName) {
+                notice.classList.add('hidden');
+                supportLimitReached = false;
+                updateSubmitButtonState();
+                return;
+            }
+
+            const count = getPairSubmissionCount(agentName, supportName);
+
+            if (count >= MAX_SUBMISSIONS_PER_SUPPORT) {
+                notice.textContent = `Looks like you've already shared feedback for ${supportName} ${MAX_SUBMISSIONS_PER_SUPPORT} times. To keep things fair for everyone, please pick a different support person for this submission.`;
+                notice.classList.remove('hidden');
+                notice.classList.add('limit-notice-warning');
+                supportLimitReached = true;
+            } else {
+                notice.classList.add('hidden');
+                notice.classList.remove('limit-notice-warning');
+                supportLimitReached = false;
+            }
+
+            updateSubmitButtonState();
         }
 
         function checkAgentCredits() {
@@ -562,11 +636,11 @@
             }
 
             const badge = document.getElementById('creditBadge');
-            const submitBtn = document.getElementById('submitBtn');
 
             if (!agentName) {
                 badge.classList.add('hidden');
-                submitBtn.disabled = false;
+                creditsExhausted = false;
+                updateSubmitButtonState();
                 return;
             }
 
@@ -576,18 +650,25 @@
 
             if (remaining > 2) {
                 badge.classList.add('badge-success');
-                submitBtn.disabled = false;
+                creditsExhausted = false;
             } else if (remaining > 0) {
                 badge.classList.add('badge-warning');
-                submitBtn.disabled = false;
+                creditsExhausted = false;
             } else {
                 badge.classList.add('badge-danger');
                 badge.textContent = "0 Credits Left (Limit Reached)";
-                submitBtn.disabled = true;
+                creditsExhausted = true;
             }
+
+            updateSubmitButtonState();
         }
 
-        document.getElementById('customAgentInput').addEventListener('input', checkAgentCredits);
+        document.getElementById('customAgentInput').addEventListener('input', function() {
+            checkAgentCredits();
+            checkSupportLimit();
+        });
+
+        document.getElementById('customSupportInput').addEventListener('input', checkSupportLimit);
 
         loadAgentDropdown();
         loadSupportDropdown();
@@ -617,6 +698,12 @@
                 const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
                 const personObj = roster.find(m => m.name === selectedSupport);
                 if (personObj) supportTeam = personObj.team;
+            }
+
+            const pairCount = getPairSubmissionCount(selectedAgent, selectedSupport);
+            if (pairCount >= MAX_SUBMISSIONS_PER_SUPPORT) {
+                alert(`You've already shared feedback for ${selectedSupport} ${MAX_SUBMISSIONS_PER_SUPPORT} times. Please choose a different support person to submit new feedback.`);
+                return;
             }
 
             const now = new Date();
@@ -657,7 +744,9 @@
             this.reset();
             document.getElementById('customAgentContainer').classList.add('hidden');
             document.getElementById('customSupportContainer').classList.add('hidden');
+            document.getElementById('supportLimitNotice').classList.add('hidden');
             checkAgentCredits();
+            checkSupportLimit();
         });
     </script>
 </body>
