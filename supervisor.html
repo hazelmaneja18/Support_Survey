@@ -1702,8 +1702,7 @@
                     });
                 }
 
-                body += `\n\nThank you,\n`;
-                body += `Verifone Supervisor Performance Reporting`;
+        
 
             } else {
                 const avgText = isNaN(data.avgRating) ? 'N/A' : `${data.avgRating.toFixed(2)} / 5.0`;
@@ -1718,7 +1717,7 @@
                 body += `----------------------------------------\n`;
                 body += `Average Rating Given: ${avgText}\n`;
                 body += `Total Submissions: ${data.totalSubmissions}\n`;
-                body += `Rating Breakdown: 5★ x${breakdown[5]}, 4★ x${breakdown[4]}, 3★ x${breakdown[3]}, 2★ x${breakdown[2]}, 1★ x${breakdown[1]}\n\n`;
+                body += `Rating Breakdown: 5 x${breakdown[5]}, 4 x${breakdown[4]}, 3 x${breakdown[3]}, 2 x${breakdown[2]}, 1 x${breakdown[1]}\n\n`;
 
                 body += `SUBMISSION DETAILS\n`;
                 body += `----------------------------------------\n`;
