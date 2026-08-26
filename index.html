@@ -206,6 +206,22 @@
             cursor: not-allowed;
             transform: none;
         }
+
+        .custom-input-box {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        optgroup {
+            font-weight: 700;
+            color: var(--accent-teal);
+        }
     </style>
 </head>
 <body>
@@ -238,21 +254,43 @@
         </div>
 
         <form id="ratingForm">
+            <!-- AGENT NAME SECTION -->
             <div class="form-group">
                 <label for="agentUser">
                     <span>Agent Name:</span>
                     <span id="creditBadge" class="credit-badge hidden"></span>
                 </label>
-                <select id="agentUser" required onchange="checkAgentCredits()">
+                <select id="agentUser" required onchange="handleAgentChange()">
                     <option value="">-- Select Your Name --</option>
+                    <optgroup label="Manila" id="agent-opt-manila"></optgroup>
+                    <optgroup label="Tucson" id="agent-opt-tucson"></optgroup>
+                    <optgroup label="Bangalore" id="agent-opt-bangalore"></optgroup>
+                    <optgroup label="MIS - Canada" id="agent-opt-canada"></optgroup>
+                    <option value="__CUSTOM_AGENT__">+ Type Custom Agent Name...</option>
                 </select>
+
+                <div id="customAgentContainer" class="custom-input-box hidden">
+                    <input type="text" id="customAgentInput" placeholder="Enter full agent name">
+                </div>
             </div>
 
+            <!-- SUPPORT PERSON SECTION -->
             <div class="form-group">
                 <label for="supportPerson">Support Person Assisting You:</label>
-                <select id="supportPerson" required>
+                <select id="supportPerson" required onchange="handleSupportChange()">
                     <option value="">-- Select Support Person --</option>
+                    <optgroup label="Manila Support" id="support-opt-manila"></optgroup>
+                    <optgroup label="Tucson Support" id="support-opt-tucson"></optgroup>
+                    <option value="__CUSTOM_SUPPORT__">+ Type Custom Support Name...</option>
                 </select>
+
+                <div id="customSupportContainer" class="custom-input-box hidden">
+                    <input type="text" id="customSupportInput" placeholder="Enter support person name">
+                    <select id="customSupportTeam">
+                        <option value="Manila">Manila Team</option>
+                        <option value="Tucson">Tucson Team</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">
@@ -279,7 +317,6 @@
     <script>
         const INITIAL_CREDITS = 4;
 
-        // Master Agent List with Supervisor and Location mappings
         const defaultAgents = [
             { name: "AJ Dela Cruz", supervisor: "Hazel Maneja", location: "MNL - Manila" },
             { name: "Albert Anaya", supervisor: "Kristin Manning", location: "TUS - Tucson" },
@@ -425,7 +462,6 @@
             { name: "Gemmalyn Silvestre", team: "Manila" }
         ];
 
-        // Initialize localStorage rosters
         if (!localStorage.getItem('agentRoster')) {
             localStorage.setItem('agentRoster', JSON.stringify(defaultAgents));
         }
@@ -436,45 +472,95 @@
 
         function loadAgentDropdown() {
             const agents = JSON.parse(localStorage.getItem('agentRoster')) || defaultAgents;
-            const select = document.getElementById('agentUser');
-            select.innerHTML = '<option value="">-- Select Your Name --</option>';
 
-            // Sort alphabetically
+            const mnlGroup = document.getElementById('agent-opt-manila');
+            const tucGroup = document.getElementById('agent-opt-tucson');
+            const blrGroup = document.getElementById('agent-opt-bangalore');
+            const canGroup = document.getElementById('agent-opt-canada');
+
+            mnlGroup.innerHTML = '';
+            tucGroup.innerHTML = '';
+            blrGroup.innerHTML = '';
+            canGroup.innerHTML = '';
+
             agents.sort((a, b) => a.name.localeCompare(b.name)).forEach(agent => {
                 const opt = document.createElement('option');
                 opt.value = agent.name;
-                opt.textContent = `${agent.name} (${agent.location})`;
-                select.appendChild(opt);
+                opt.textContent = agent.name;
+
+                const loc = (agent.location || '').toLowerCase();
+                if (loc.includes('manila') || loc.includes('mnl')) mnlGroup.appendChild(opt);
+                else if (loc.includes('tucson') || loc.includes('tus')) tucGroup.appendChild(opt);
+                else if (loc.includes('bangalore') || loc.includes('blr')) blrGroup.appendChild(opt);
+                else if (loc.includes('canada') || loc.includes('mis')) canGroup.appendChild(opt);
+                else mnlGroup.appendChild(opt);
             });
         }
 
         function loadSupportDropdown() {
             const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
-            const select = document.getElementById('supportPerson');
-            select.innerHTML = '<option value="">-- Select Support Person --</option>';
 
-            const teams = ['Tucson', 'Manila'];
-            teams.forEach(team => {
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = `${team} Support Team`;
-                roster.filter(member => member.team === team).forEach(member => {
-                    const opt = document.createElement('option');
-                    opt.value = member.name;
-                    opt.textContent = member.name;
-                    optgroup.appendChild(opt);
-                });
-                select.appendChild(optgroup);
+            const mnlGroup = document.getElementById('support-opt-manila');
+            const tucGroup = document.getElementById('support-opt-tucson');
+
+            mnlGroup.innerHTML = '';
+            tucGroup.innerHTML = '';
+
+            roster.forEach(member => {
+                const opt = document.createElement('option');
+                opt.value = member.name;
+                opt.textContent = member.name;
+
+                if (member.team === 'Manila') mnlGroup.appendChild(opt);
+                else tucGroup.appendChild(opt);
             });
         }
 
+        function handleAgentChange() {
+            const selectVal = document.getElementById('agentUser').value;
+            const customBox = document.getElementById('customAgentContainer');
+            const customInput = document.getElementById('customAgentInput');
+
+            if (selectVal === '__CUSTOM_AGENT__') {
+                customBox.classList.remove('hidden');
+                customInput.required = true;
+            } else {
+                customBox.classList.add('hidden');
+                customInput.required = false;
+            }
+
+            checkAgentCredits();
+        }
+
+        function handleSupportChange() {
+            const selectVal = document.getElementById('supportPerson').value;
+            customBox = document.getElementById('customSupportContainer');
+            const customInput = document.getElementById('customSupportInput');
+
+            if (selectVal === '__CUSTOM_SUPPORT__') {
+                customBox.classList.remove('hidden');
+                customInput.required = true;
+            } else {
+                customBox.classList.add('hidden');
+                customInput.required = false;
+            }
+        }
+
         function getAgentRemainingCredits(agentName) {
+            if (!agentName) return INITIAL_CREDITS;
             const submissions = JSON.parse(localStorage.getItem('supportRatings')) || [];
-            const agentSubmissions = submissions.filter(s => s.agentUser === agentName);
+            const agentSubmissions = submissions.filter(s => s.agentUser.toLowerCase() === agentName.toLowerCase());
             return Math.max(0, INITIAL_CREDITS - agentSubmissions.length);
         }
 
         function checkAgentCredits() {
-            const agentName = document.getElementById('agentUser').value;
+            let selectVal = document.getElementById('agentUser').value;
+            let agentName = selectVal;
+
+            if (selectVal === '__CUSTOM_AGENT__') {
+                agentName = document.getElementById('customAgentInput').value.trim();
+            }
+
             const badge = document.getElementById('creditBadge');
             const submitBtn = document.getElementById('submitBtn');
 
@@ -501,13 +587,19 @@
             }
         }
 
+        document.getElementById('customAgentInput').addEventListener('input', checkAgentCredits);
+
         loadAgentDropdown();
         loadSupportDropdown();
 
         document.getElementById('ratingForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const selectedAgent = document.getElementById('agentUser').value;
+            let selectedAgent = document.getElementById('agentUser').value;
+            if (selectedAgent === '__CUSTOM_AGENT__') {
+                selectedAgent = document.getElementById('customAgentInput').value.trim();
+            }
+
             const creditsLeft = getAgentRemainingCredits(selectedAgent);
 
             if (creditsLeft <= 0) {
@@ -515,15 +607,22 @@
                 return;
             }
 
-            const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
-            const selectedName = document.getElementById('supportPerson').value;
-            const personObj = roster.find(m => m.name === selectedName);
+            let selectedSupport = document.getElementById('supportPerson').value;
+            let supportTeam = 'Unknown';
+
+            if (selectedSupport === '__CUSTOM_SUPPORT__') {
+                selectedSupport = document.getElementById('customSupportInput').value.trim();
+                supportTeam = document.getElementById('customSupportTeam').value;
+            } else {
+                const roster = JSON.parse(localStorage.getItem('supportRoster')) || defaultRoster;
+                const personObj = roster.find(m => m.name === selectedSupport);
+                if (personObj) supportTeam = personObj.team;
+            }
 
             const now = new Date();
             const dateISO = now.toISOString().split('T')[0];
             const yearStr = String(now.getFullYear());
             
-            // Calculate ISO week number
             const tempDate = new Date(now.valueOf());
             const dayNum = (now.getDay() + 6) % 7;
             tempDate.setDate(tempDate.getDate() - dayNum + 3);
@@ -543,9 +642,9 @@
                 year: yearStr,
                 week: String(weekNum),
                 agentUser: selectedAgent,
-                caseNumber: "N/A", // Defaulted since case number is removed
-                supportName: selectedName,
-                team: personObj ? personObj.team : 'Unknown',
+                caseNumber: "N/A",
+                supportName: selectedSupport,
+                team: supportTeam,
                 rating: parseInt(document.getElementById('rating').value),
                 comments: document.getElementById('notes').value.trim()
             };
@@ -556,6 +655,8 @@
 
             alert(`Thank you! Your feedback has been recorded. You have ${creditsLeft - 1} credit(s) remaining.`);
             this.reset();
+            document.getElementById('customAgentContainer').classList.add('hidden');
+            document.getElementById('customSupportContainer').classList.add('hidden');
             checkAgentCredits();
         });
     </script>
