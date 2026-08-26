@@ -1573,8 +1573,10 @@
             currentModalExport = {
                 type: 'support',
                 name: supportName,
+                team: allForSupport.length ? allForSupport[0].team : 'N/A',
                 avgRating: avgRating,
                 totalSubmissions: allForSupport.length,
+                allSubmissions: allForSupport,
                 comments: withComments
             };
 
@@ -1628,6 +1630,39 @@
             currentModalExport = null;
         }
 
+        // Counts how many 5/4/3/2/1-star submissions are in a list of feedback entries.
+        function getRatingBreakdown(entries) {
+            const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+            entries.forEach(item => {
+                const r = Math.round(parseFloat(item.rating));
+                if (counts[r] !== undefined) counts[r]++;
+            });
+            return counts;
+        }
+
+        // Generates a plain-language, tier-based summary of what the rating
+        // trend means and what the opportunity is going forward.
+        function generateOpportunitySummary(avgRating, totalSubmissions) {
+            const num = parseFloat(avgRating);
+
+            if (isNaN(num) || totalSubmissions === 0) {
+                return "There isn't enough feedback yet to identify a trend. Encouraging a few more agents to submit ratings will help build a clearer picture.";
+            }
+            if (num >= 4.5) {
+                return "This is outstanding, consistent performance. The high ratings suggest reliable, high-quality support. Consider recognizing this individually and using their approach as a reference point for onboarding or coaching other team members.";
+            }
+            if (num >= 3.5) {
+                return "Overall performance is solid and dependable. To move from good to great, look at any lower-rated submissions below for a common, fixable pattern.";
+            }
+            if (num >= 2.5) {
+                return "Performance is currently in the average range, which represents a real opportunity for growth. A short, specific coaching conversation built around the comments below could meaningfully move the needle.";
+            }
+            if (num >= 1.5) {
+                return "The ratings point to recurring friction that is affecting the experience. We recommend a focused 1:1 to walk through the feedback together and agree on two or three concrete improvement actions.";
+            }
+            return "This needs prompt attention. The pattern of low ratings suggests a service quality issue that should be addressed soon, ideally with a direct coaching conversation this week.";
+        }
+
         // Builds a mailto: link summarizing the currently open modal
         // (support feedback or agent submission history) and opens the
         // person's default email client with it pre-filled.
@@ -1638,35 +1673,62 @@
 
             if (data.type === 'support') {
                 const avgText = isNaN(data.avgRating) ? 'N/A' : `${data.avgRating.toFixed(2)} / 5.0`;
-                subject = `Support Feedback Summary - ${data.name}`;
-                body = `Support Performance Feedback Summary\n`;
-                body += `--------------------------------------\n`;
-                body += `Support Person: ${data.name}\n`;
-                body += `Overall Average Rating: ${avgText}\n`;
-                body += `Total Submissions: ${data.totalSubmissions}\n\n`;
-                body += `Comments:\n`;
-                if (data.comments.length === 0) {
-                    body += `(No written comments submitted)\n`;
+                const breakdown = getRatingBreakdown(data.allSubmissions);
+                const opportunity = generateOpportunitySummary(data.avgRating, data.totalSubmissions);
+
+                subject = `Support Performance Feedback Summary - ${data.name}`;
+
+                body = `Hi Team,\n\n`;
+                body += `Please find below the performance feedback summary for ${data.name} (${data.team} Support), covering ${data.totalSubmissions} submission(s) from agents.\n\n`;
+
+                body += `OVERALL SNAPSHOT\n`;
+                body += `----------------------------------------\n`;
+                body += `Average Rating: ${avgText}\n`;
+                body += `Total Submissions: ${data.totalSubmissions}\n`;
+                body += `Rating Breakdown: 5★ x${breakdown[5]}, 4★ x${breakdown[4]}, 3★ x${breakdown[3]}, 2★ x${breakdown[2]}, 1★ x${breakdown[1]}\n\n`;
+
+                body += `OPPORTUNITY & SUMMARY\n`;
+                body += `----------------------------------------\n`;
+                body += `${opportunity}\n\n`;
+
+                body += `DETAILED FEEDBACK\n`;
+                body += `----------------------------------------\n`;
+                if (data.allSubmissions.length === 0) {
+                    body += `(No submissions recorded)\n`;
                 } else {
-                    data.comments.forEach((item, i) => {
-                        body += `\n${i + 1}. "${item.comments}"\n`;
-                        body += `   - Submitted by: ${item.agentName || 'Anonymous'} on ${item.timestamp || ''}\n`;
+                    data.allSubmissions.forEach((item, i) => {
+                        body += `\n${i + 1}. Agent: ${item.agentName || 'Anonymous'}  |  Rating: ${item.rating} / 5  |  Date: ${item.timestamp || ''}\n`;
+                        body += `   Comment: ${item.comments ? `"${item.comments}"` : '(No written comment)'}\n`;
                     });
                 }
+
+                body += `\n\nThank you,\n`;
+                body += `Verifone Supervisor Performance Reporting`;
+
             } else {
                 const avgText = isNaN(data.avgRating) ? 'N/A' : `${data.avgRating.toFixed(2)} / 5.0`;
+                const breakdown = getRatingBreakdown(data.entries);
+
                 subject = `Agent Submission History - ${data.name}`;
-                body = `Agent Survey Submission History\n`;
-                body += `--------------------------------------\n`;
-                body += `Agent: ${data.name}\n`;
+
+                body = `Hi Team,\n\n`;
+                body += `Please find below the survey submission history for ${data.name}, covering ${data.totalSubmissions} submission(s).\n\n`;
+
+                body += `OVERALL SNAPSHOT\n`;
+                body += `----------------------------------------\n`;
                 body += `Average Rating Given: ${avgText}\n`;
-                body += `Total Submissions: ${data.totalSubmissions}\n\n`;
-                body += `Details:\n`;
+                body += `Total Submissions: ${data.totalSubmissions}\n`;
+                body += `Rating Breakdown: 5★ x${breakdown[5]}, 4★ x${breakdown[4]}, 3★ x${breakdown[3]}, 2★ x${breakdown[2]}, 1★ x${breakdown[1]}\n\n`;
+
+                body += `SUBMISSION DETAILS\n`;
+                body += `----------------------------------------\n`;
                 data.entries.forEach((item, i) => {
-                    body += `\n${i + 1}. Support: ${item.supportName} | Rating: ${item.rating} / 5\n`;
-                    body += `   Comments: ${item.comments || 'N/A'}\n`;
-                    body += `   Date: ${item.timestamp || ''}\n`;
+                    body += `\n${i + 1}. Support: ${item.supportName}  |  Rating: ${item.rating} / 5  |  Date: ${item.timestamp || ''}\n`;
+                    body += `   Comment: ${item.comments ? `"${item.comments}"` : '(No written comment)'}\n`;
                 });
+
+                body += `\n\nThank you,\n`;
+                body += `Verifone Supervisor Performance Reporting`;
             }
 
             const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
