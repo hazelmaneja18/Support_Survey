@@ -346,21 +346,21 @@
     </div>
 
     <!-- ===================== FIREBASE ===================== -->
+    <!-- firebase-config.js defines window.FIREBASE_CONFIG. It is NOT committed
+         to source control (see .gitignore) - in production it is generated at
+         deploy time from GitHub Actions secrets. This file MUST use the exact
+         same Firebase project as supervisor.html so both pages read/write the
+         same database. For local testing, copy firebase-config.example.js to
+         firebase-config.js and fill in real values. -->
+    <script src="firebase-config.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script>
-        // TODO: Replace with YOUR Firebase project's config (Firebase Console ->
-        // Project Settings -> General -> Your apps -> SDK setup and config).
-        // This MUST be the exact same config used in supervisor.html so both
-        // pages read/write the same database.
-        const firebaseConfig = {
-            apiKey: "AIzaSyB6QK3ufQdl0RzqcPDJvXrfS1cNLg9u16I",
-            authDomain: "survey-tool-602a0.firebaseapp.com",
-            projectId: "survey-tool-602a0",
-            storageBucket: "survey-tool-602a0.firebasestorage.app",
-            messagingSenderId: "1098601604155",
-            appId: "1:1098601604155:web:f0b98128b558b8b773a81e"
-        };
+        if (!window.FIREBASE_CONFIG) {
+            alert('Configuration missing: firebase-config.js was not found or did not load. Contact your administrator.');
+            throw new Error('FIREBASE_CONFIG is not defined. See firebase-config.example.js.');
+        }
+        const firebaseConfig = window.FIREBASE_CONFIG;
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -373,150 +373,9 @@
     <script>
         const INITIAL_CREDITS = 4;
 
-        const defaultAgents = [
-            { name: "AJ Dela Cruz", supervisor: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Albert Anaya", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "Alexander Bischoff", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "Alexander Hassel", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Alexander Manzutto", supervisor: "NLETUS", location: "TUS - Tucson" },
-            { name: "Alfredo Ceno", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Amado Villela", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Andres Fimbres", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Anila Jast", supervisor: "Kristin Manning", location: "MIS - Canada" },
-            { name: "Anupama Chakrabhavi Manjunath", supervisor: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Arlenne Labagala", supervisor: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Ashley Busch Maynard", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Bench Manuel", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "Boh Daclis", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "Braven Ocampo", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "Brian Fisher", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Bryan Capili", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Carlos Sancez", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Christian Mark Patdu", supervisor: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Christian Quimno", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Christina Caicedo", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Cici Carrell", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Cresencio Nacua", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Cyler David", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Damon McBride", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Daniel Arago", supervisor: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Davareo Hill", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "David Hilton", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Dean Clemente", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Dinesh Kumavat", supervisor: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Donald Sayers", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "Eljul Maligalig", supervisor: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Erika Fletcher", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Felisha Sy", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "Gemmalyn Silvestre", supervisor: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "George Munoz", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Gerardo Morales", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "Glory Barbacena", supervisor: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Gregorio Villalobos", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Gustavo Verdugo", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Harold Reyes", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Harold Rodilas", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Hazel Bongalos", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "James Hodgin", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "James Querubin", supervisor: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "James Warder", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "Jan Cedric Tarroza", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Jan Karlo Bamba", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Jan Neri", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "Japteg Singh", supervisor: "Kristin Manning", location: "MIS - Canada" },
-            { name: "Jasmine Comia", supervisor: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Jayson Derick Camero", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Jazmine Chase", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Jeraldyn Relata", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Jerrold Ramirez", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Jerry Perez", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Jesse McQueary", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "Joan Favela", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "John Drew", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "John Guzman", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "Jonathan Morley", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Joneil Obus", supervisor: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Joshua Clement Fernandez", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Joshua Galante", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Judah Carrillo", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Judy Tolentino", supervisor: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Justin Lawrence Castro", supervisor: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Justine Bagalihog", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "Justine Santa Cruz", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "Kaligh Gradall", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Katia Ballesteros", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Kevin Christopher", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Kimber Dawson", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "Kimberly Torres", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Kristian Ong", supervisor: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Kurt Martin Block", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Kyle Mcginn", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Lowella Alacida", supervisor: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Luis Armenta", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Madel Negrete", supervisor: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Mani Ratnam", supervisor: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Mark Angelus Biscarra", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Max Kushner", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Melvin Lagrosa", supervisor: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Mical-alexandra Warren", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Michael Beaman", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Micheal Morales", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Mickey Gonzales", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Mohammed Tariq", supervisor: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Nicolas Varona", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Omar Dominguez", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Paul Bandilla", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Pranav Ranjan", supervisor: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Rachelle Rubio", supervisor: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Raven Guasis", supervisor: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Raymart John Cabudil", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Rebecca Guthery", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Remond Licayan", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Renard Relova", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Renisha McCrimmon", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Reshma Bhanu", supervisor: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Rex Riell", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Rey Caicedo", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Ricardo Andrade", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Robert Hasson", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "Roi Lumtao", supervisor: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Ryan Chavez Higel", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Salvador Rubio Jr", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "Samuel Shocknesse", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Savannah Caicedo", supervisor: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Sheenam Dhiman", supervisor: "Kristin Manning", location: "MIS - Canada" },
-            { name: "Shurray Barnes", supervisor: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Sidrick Mondalo", supervisor: "Franco Molina", location: "MNL - Manila" },
-            { name: "Spencer Cockrell", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Stephanie Webb", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Supriya Shetty", supervisor: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Vanessa Aguda", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Welene Escarez", supervisor: "Paul Batol", location: "MNL - Manila" },
-            { name: "Wendy Franco", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "William Burns", supervisor: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "William Gendreau", supervisor: "Kristin Manning", location: "TUS - Tucson" },
-            { name: "William Potts", supervisor: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Zachary Payabyab", supervisor: "Hazel Maneja", location: "MNL - Manila" }
-        ];
-
-        const defaultRoster = [
-            { name: "Donald Sayers", team: "Tucson" },
-            { name: "Gerardo Morales", team: "Tucson" },
-            { name: "James Warder", team: "Tucson" },
-            { name: "Jesse McQueary", team: "Tucson" },
-            { name: "Justine Santa Cruz", team: "Tucson" },
-            { name: "Kimber Dawson", team: "Tucson" },
-            { name: "Robert Hasson", team: "Tucson" },
-            { name: "Wendy Franco", team: "Tucson" },
-            { name: "Judy Tolentino", team: "Manila" },
-            { name: "Aj Dela Cruz", team: "Manila" },
-            { name: "Melvin Lagrosa", team: "Manila" },
-            { name: "Kristian Ong", team: "Manila" },
-            { name: "Zachary Payabyab", team: "Manila" },
-            { name: "Christian Mark Patdu", team: "Manila" },
-            { name: "Glory Barbacena", team: "Manila" },
-            { name: "Gemmalyn Silvestre", team: "Manila" }
-        ];
+        // No agent/support names are hardcoded here anymore - everything
+        // comes from Firestore, managed by a supervisor in supervisor.html
+        // (added one at a time, or bulk-loaded via the Excel import).
 
         // ---------------------------------------------------------------
         // Live, in-memory mirrors of the Firestore collections. These are
@@ -552,9 +411,8 @@
         }
 
         function loadAgentDropdown() {
-            const agents = agentsCache.length
-                ? agentsCache
-                : defaultAgents.map(a => ({ name: a.name, tl: a.supervisor, location: a.location }));
+            const agents = agentsCache;
+            const select = document.getElementById('agentUser');
 
             const mnlGroup = document.getElementById('agent-opt-manila');
             const tucGroup = document.getElementById('agent-opt-tucson');
@@ -562,12 +420,27 @@
             const canGroup = document.getElementById('agent-opt-canada');
 
             // Preserve whatever the user has currently selected across live re-renders.
-            const currentVal = document.getElementById('agentUser').value;
+            const currentVal = select.value;
 
             mnlGroup.innerHTML = '';
             tucGroup.innerHTML = '';
             blrGroup.innerHTML = '';
             canGroup.innerHTML = '';
+
+            // If the supervisor hasn't loaded any agents into Firestore yet,
+            // show a clear, disabled placeholder instead of an empty list.
+            let emptyNotice = document.getElementById('agentEmptyNotice');
+            if (agents.length === 0) {
+                if (!emptyNotice) {
+                    emptyNotice = document.createElement('option');
+                    emptyNotice.id = 'agentEmptyNotice';
+                    emptyNotice.disabled = true;
+                    emptyNotice.textContent = '-- No agents configured yet, contact your supervisor --';
+                    select.appendChild(emptyNotice);
+                }
+            } else if (emptyNotice) {
+                emptyNotice.remove();
+            }
 
             [...agents].sort((a, b) => a.name.localeCompare(b.name)).forEach(agent => {
                 const opt = document.createElement('option');
@@ -582,19 +455,33 @@
                 else mnlGroup.appendChild(opt);
             });
 
-            if (currentVal) document.getElementById('agentUser').value = currentVal;
+            if (currentVal) select.value = currentVal;
         }
 
         function loadSupportDropdown() {
-            const roster = supportCache.length ? supportCache : defaultRoster;
+            const roster = supportCache;
+            const select = document.getElementById('supportPerson');
 
             const mnlGroup = document.getElementById('support-opt-manila');
             const tucGroup = document.getElementById('support-opt-tucson');
 
-            const currentVal = document.getElementById('supportPerson').value;
+            const currentVal = select.value;
 
             mnlGroup.innerHTML = '';
             tucGroup.innerHTML = '';
+
+            let emptyNotice = document.getElementById('supportEmptyNotice');
+            if (roster.length === 0) {
+                if (!emptyNotice) {
+                    emptyNotice = document.createElement('option');
+                    emptyNotice.id = 'supportEmptyNotice';
+                    emptyNotice.disabled = true;
+                    emptyNotice.textContent = '-- No support staff configured yet, contact your supervisor --';
+                    select.appendChild(emptyNotice);
+                }
+            } else if (emptyNotice) {
+                emptyNotice.remove();
+            }
 
             roster.forEach(member => {
                 const opt = document.createElement('option');
@@ -605,7 +492,7 @@
                 else tucGroup.appendChild(opt);
             });
 
-            if (currentVal) document.getElementById('supportPerson').value = currentVal;
+            if (currentVal) select.value = currentVal;
         }
 
         function handleAgentChange() {
@@ -826,8 +713,7 @@
                 selectedSupport = document.getElementById('customSupportInput').value.trim();
                 supportTeam = document.getElementById('customSupportTeam').value;
             } else {
-                const roster = supportCache.length ? supportCache : defaultRoster;
-                const personObj = roster.find(m => m.name === selectedSupport);
+                const personObj = supportCache.find(m => m.name === selectedSupport);
                 if (personObj) supportTeam = personObj.team;
             }
 

@@ -324,8 +324,8 @@
             flex: 1;
             background: transparent;
             border: none;
-            padding: 6px 4px;
-            font-size: 11px;
+            padding: 6px 2px;
+            font-size: 10px;
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
@@ -555,6 +555,7 @@
                 <button class="tab-btn active" id="tabSupportBtn" onclick="switchRosterTab('support')">Support</button>
                 <button class="tab-btn" id="tabAgentBtn" onclick="switchRosterTab('agent')">Agents</button>
                 <button class="tab-btn" id="tabTLBtn" onclick="switchRosterTab('tl')">Team Leads</button>
+                <button class="tab-btn" id="tabEmailsBtn" onclick="switchRosterTab('emails')">Emails</button>
             </div>
 
             <div id="supportRosterSection">
@@ -567,6 +568,7 @@
                         <option value="Tucson">Tucson</option>
                         <option value="Manila">Manila</option>
                     </select>
+                    <input type="email" id="newSupportEmail" placeholder="Email Address (optional)">
                     <button class="btn btn-sm" style="width: 100%;" onclick="addSupportMember()">+ Add Support Member</button>
                 </div>
 
@@ -597,8 +599,15 @@
                         <option value="BLR - Bangalore">BLR - Bangalore</option>
                         <option value="MIS - Canada">MIS - Canada</option>
                     </select>
+                    <input type="email" id="newAgentEmail" placeholder="Email Address (optional)">
                     <button class="btn btn-sm" style="width: 100%;" onclick="addAgentMember()">+ Add Agent</button>
                 </div>
+
+                <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
+
+                <input type="file" id="agentImportFileInput" accept=".xlsx,.xls" class="hidden" onchange="handleAgentImportFile(event)">
+                <button class="btn btn-sm" style="width: 100%; background: #1d4ed8;" onclick="document.getElementById('agentImportFileInput').click()">📥 Import Agents from Excel</button>
+                <p style="font-size: 10px; color: var(--text-muted); margin: 6px 0 0 0;">Expects columns "Agent Name" and "Supervisor". You'll review changes before anything is saved.</p>
 
                 <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
 
@@ -636,6 +645,28 @@
                     Team Lead List
                 </h4>
                 <div style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;" id="tlListContainer"></div>
+            </div>
+
+            <div id="emailsSection" class="hidden">
+                <h3 style="font-size: 15px; margin-bottom: 6px;">Email Addresses</h3>
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Used by the "📧 Email Summary" buttons to auto-fill the "To" field. Covers both Support and Agent rosters.</p>
+
+                <button class="btn btn-sm" style="width: 100%; background: #1d4ed8; margin-bottom: 6px;" onclick="applyKnownEmailList()">📥 Apply Provided Email List</button>
+                <p style="font-size: 10px; color: var(--text-muted); margin: 0 0 12px 0;">Matches names you've already given me against the rosters below and fills in their emails. Safe to click more than once.</p>
+
+                <hr style="border: none; border-top: 1px solid var(--card-border); margin: 12px 0;">
+
+                <input type="text" id="searchEmailsRoster" placeholder="🔍 Search Name..." onkeyup="renderEmailsManagement()" style="margin-bottom: 8px;">
+                <select id="emailsMissingFilter" onchange="renderEmailsManagement()" style="margin-bottom: 8px;">
+                    <option value="ALL">Show All</option>
+                    <option value="MISSING">Missing Email Only</option>
+                    <option value="SET">Has Email Only</option>
+                </select>
+
+                <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                    People (<span id="emailsCount">0</span>)
+                </h4>
+                <div class="roster-list" id="emailsList" style="max-height: 420px;"></div>
             </div>
 
             <hr style="border: none; border-top: 1px solid var(--card-border); margin: 20px 0 15px 0;">
@@ -881,6 +912,10 @@
                 </div>
                 <button class="btn-email" id="modalEmailBtn" onclick="emailModalFeedback()">📧 Email Summary</button>
             </div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 10px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">To:</label>
+                <input type="email" id="modalEmailToInput" placeholder="No email on file — type one or add it in the Emails tab" style="flex: 1; font-size: 12px;">
+            </div>
             <hr style="border: none; border-top: 1px solid var(--card-border); margin: 15px 0;">
             <div id="modalCommentsList"></div>
         </div>
@@ -908,6 +943,10 @@
                         <option value="MIS - Canada">MIS - Canada</option>
                     </select>
                 </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Email Address</label>
+                    <input type="email" id="editAgentEmailInput" placeholder="name@verifone.com">
+                </div>
                 <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveAgentEdit()">Save Changes</button>
             </div>
         </div>
@@ -928,6 +967,10 @@
                         <option value="Tucson">Tucson</option>
                         <option value="Manila">Manila</option>
                     </select>
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Email Address</label>
+                    <input type="email" id="editSupportEmailInput" placeholder="name@verifone.com">
                 </div>
                 <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Renaming will also update any past feedback submissions already recorded under this member's previous name.</p>
                 <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveSupportEdit()">Save Changes</button>
@@ -959,24 +1002,48 @@
         </div>
     </div>
 
-    <!-- ===================== EXCEL EXPORT (SheetJS) ===================== -->
+    <div id="importPreviewModal" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 760px;">
+            <button class="modal-close" onclick="closeImportModal()">✕</button>
+            <h3 style="color: var(--primary-dark); margin-bottom: 4px;">Review Agent Import</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;" id="importSummaryLine"></p>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Nothing is saved until you click "Confirm Import" below. New agents need a location — pick one for each row marked "New".</p>
+            <div style="max-height: 50vh; overflow-y: auto; border: 1px solid var(--card-border); border-radius: 8px;">
+                <table style="margin-top: 0;">
+                    <thead>
+                        <tr>
+                            <th>Agent Name</th>
+                            <th>Supervisor</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="importPreviewBody"></tbody>
+                </table>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 15px;">
+                <button class="btn" style="flex: 1; background: var(--input-border); color: var(--text-main);" onclick="closeImportModal()">Cancel</button>
+                <button class="btn" style="flex: 1;" onclick="confirmAgentImport()">Confirm Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== EXCEL IMPORT/EXPORT (SheetJS) ===================== -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- ===================== FIREBASE ===================== -->
+    <!-- firebase-config.js defines window.FIREBASE_CONFIG and window.SUPERVISOR_PASSWORD.
+         It is NOT committed to source control (see .gitignore) - in production it is
+         generated at deploy time from GitHub Actions secrets. For local testing, copy
+         firebase-config.example.js to firebase-config.js and fill in real values. -->
+    <script src="firebase-config.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script>
-        // TODO: Replace with YOUR Firebase project's config (Firebase Console ->
-        // Project Settings -> General -> Your apps -> SDK setup and config).
-        // This MUST be the exact same config used in index.html so both pages
-        // read/write the same database.
-        const firebaseConfig = {
-            apiKey: "AIzaSyB6QK3ufQdl0RzqcPDJvXrfS1cNLg9u16I",
-            authDomain: "survey-tool-602a0.firebaseapp.com",
-            projectId: "survey-tool-602a0",
-            storageBucket: "survey-tool-602a0.firebasestorage.app",
-            messagingSenderId: "1098601604155",
-            appId: "1:1098601604155:web:f0b98128b558b8b773a81e"
-        };
+        if (!window.FIREBASE_CONFIG) {
+            alert('Configuration missing: firebase-config.js was not found or did not load. Copy firebase-config.example.js to firebase-config.js and fill in your Firebase project values.');
+            throw new Error('FIREBASE_CONFIG is not defined. See firebase-config.example.js.');
+        }
+        const firebaseConfig = window.FIREBASE_CONFIG;
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -988,151 +1055,24 @@
     <!-- ======================================================= -->
 
     <script>
-        const AUTH_PASS = "Verifone123";
+        // The supervisor password now comes from firebase-config.js
+        // (window.SUPERVISOR_PASSWORD), so it is never hardcoded in this
+        // file and never committed to source control. A fallback is kept
+        // only so the page doesn't hard-fail if the config file forgets it.
+        const AUTH_PASS = window.SUPERVISOR_PASSWORD || "changeme";
+        if (!window.SUPERVISOR_PASSWORD) {
+            console.warn('SUPERVISOR_PASSWORD is not set in firebase-config.js - using an insecure fallback.');
+        }
         const BASE_MONTHLY_CREDITS = 4;
 
-        // Team Leads List
-        const DEFAULT_TEAM_LEADS = [
-            { name: "Andrew Marsh", site: "TUS - Tucson" },
-            { name: "Edwin Cuesta", site: "MNL - Manila" },
-            { name: "Franco Molina", site: "MNL - Manila" },
-            { name: "Hazel Maneja", site: "MNL - Manila" },
-            { name: "Kristin Manning", site: "MIS - Canada" },
-            { name: "Kyle Brandon Sioson", site: "MNL - Manila" },
-            { name: "Nathan Malis", site: "TUS - Tucson" },
-            { name: "Nicole Garcia", site: "TUS - Tucson" },
-            { name: "Paul Batol", site: "MNL - Manila" },
-            { name: "Robert Hayes", site: "TUS - Tucson" },
-            { name: "Vineed Alexander", site: "BLR - Bangalore" }
-        ];
-
-        // Default Support Roster (Tucson / Manila support personnel)
-        const DEFAULT_SUPPORT_ROSTER = [
-            { name: "Donald Sayers", team: "Tucson" },
-            { name: "Gerardo Morales", team: "Tucson" },
-            { name: "James Warder", team: "Tucson" },
-            { name: "Jesse McQueary", team: "Tucson" },
-            { name: "Justine Santa Cruz", team: "Tucson" },
-            { name: "Kimber Dawson", team: "Tucson" },
-            { name: "Robert Hasson", team: "Tucson" },
-            { name: "Wendy Franco", team: "Tucson" },
-            { name: "Judy Tolentino", team: "Manila" },
-            { name: "Aj Dela Cruz", team: "Manila" },
-            { name: "Melvin Lagrosa", team: "Manila" },
-            { name: "Kristian Ong", team: "Manila" },
-            { name: "Zachary Payabyab", team: "Manila" },
-            { name: "Christian Mark Patdu", team: "Manila" },
-            { name: "Glory Barbacena", team: "Manila" },
-            { name: "Gemmalyn Silvestre", team: "Manila" }
-        ];
-
-        // Complete Agent Roster Mapped with Team Leads and Locations
-        const DEFAULT_AGENTS = [
-            { name: "Alexander Hassel", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Alfredo Ceno", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Amado Villela", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Andres Fimbres", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Anila Jast", tl: "Kristin Manning", location: "MIS - Canada" },
-            { name: "Anupama Chakrabhavi Manjunath", tl: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Arlenne Labagala", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Ashley Busch Maynard", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Bench Manuel", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "Boh Daclis", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "Braven Ocampo", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "Brian Fisher", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Bryan Capili", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Carlos Sancez", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Christian Mark Patdu", tl: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Christian Quimno", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Christina Caicedo", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Cici Carrell", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Cresencio Nacua", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Cyler David", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Damon McBride", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Daniel Arago", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Davareo Hill", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "David Hilton", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Dean Clemente", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Dinesh Kumavat", tl: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Eljul Maligalig", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Erika Fletcher", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Felisha Sy", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "George Munoz", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Gregorio Villalobos", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Gustavo Verdugo", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Harold Reyes", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Harold Rodilas", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Hazel Bongalos", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "James Hodgin", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "James Querubin", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Jan Cedric Tarroza", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Jan Karlo Bamba", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Jan Neri", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "Japteg Singh", tl: "Kristin Manning", location: "MIS - Canada" },
-            { name: "Jasmine Comia", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Jayson Derick Camero", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Jazmine Chase", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Jeraldyn Relata", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Jerrold Ramirez", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Jerry Perez", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Joan Favela", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "John Drew", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "John Guzman", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "Jonathan Morley", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Joneil Obus", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Joshua Clement Fernandez", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Joshua Galante", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Judah Carrillo", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Justin Lawrence Castro", tl: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Justine Bagalihog", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "Kaligh Gradall", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Katia Ballesteros", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Kevin Christopher", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Kimberly Torres", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Kurt Martin Block", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Kyle Mcginn", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Lowella Alacida", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Luis Armenta", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Madel Negrete", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Mani Ratnam", tl: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Mark Angelus Biscarra", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Max Kushner", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Mical-alexandra Warren", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Michael Beaman", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Micheal Morales", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Mickey Gonzales", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Mohammed Tariq", tl: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Nicolas Varona", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Omar Dominguez", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Paul Bandilla", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Pranav Ranjan", tl: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Rachelle Rubio", tl: "Kyle Brandon Sioson", location: "MNL - Manila" },
-            { name: "Raven Guasis", tl: "Hazel Maneja", location: "MNL - Manila" },
-            { name: "Raymart John Cabudil", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Rebecca Guthery", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Remond Licayan", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Renard Relova", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Renisha McCrimmon", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Reshma Bhanu", tl: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Rex Riell", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Rey Caicedo", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Ricardo Andrade", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Roi Lumtao", tl: "Edwin Cuesta", location: "MNL - Manila" },
-            { name: "Ryan Chavez Higel", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Salvador Rubio Jr", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "Samuel Shocknesse", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Savannah Caicedo", tl: "Nathan Malis", location: "TUS - Tucson" },
-            { name: "Sheenam Dhiman", tl: "Kristin Manning", location: "MIS - Canada" },
-            { name: "Shurray Barnes", tl: "Robert Hayes", location: "TUS - Tucson" },
-            { name: "Sidrick Mondalo", tl: "Franco Molina", location: "MNL - Manila" },
-            { name: "Spencer Cockrell", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "Stephanie Webb", tl: "Nicole Garcia", location: "TUS - Tucson" },
-            { name: "Supriya Shetty", tl: "Vineed Alexander", location: "BLR - Bangalore" },
-            { name: "Vanessa Aguda", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "Welene Escarez", tl: "Paul Batol", location: "MNL - Manila" },
-            { name: "William Burns", tl: "Andrew Marsh", location: "TUS - Tucson" },
-            { name: "William Potts", tl: "Nicole Garcia", location: "TUS - Tucson" }
-        ];
+        // ---------------------------------------------------------------
+        // No roster data is hardcoded here anymore. Team Leads, Support
+        // staff and Agents all live only in Firestore, managed through
+        // this page's Add / Edit / Remove controls or the Excel import
+        // below. A brand-new Firebase project simply starts with empty
+        // rosters - use "+ Add Team Lead" / "+ Add Support Member" or
+        // "📥 Import Agents from Excel" to populate it.
+        // ---------------------------------------------------------------
 
         // ---------------------------------------------------------------
         // Live, in-memory mirrors of the Firestore collections. These are
@@ -1161,42 +1101,7 @@
             initTheme();
             if (!listenersAttached) {
                 listenersAttached = true;
-                seedDefaultsIfEmpty()
-                    .catch(err => console.error('Seeding default data failed:', err))
-                    .finally(() => attachRealtimeListeners());
-            }
-        }
-
-        // One-time seed: only writes defaults into a collection if that
-        // collection is completely empty (i.e. a brand-new Firebase
-        // project). Existing data - including anything a supervisor has
-        // added or edited - is never overwritten.
-        async function seedDefaultsIfEmpty() {
-            const tlSnap = await db.collection(TL_COLLECTION).limit(1).get();
-            if (tlSnap.empty) {
-                const batch = db.batch();
-                DEFAULT_TEAM_LEADS.forEach(tl => {
-                    batch.set(db.collection(TL_COLLECTION).doc(tl.name), tl);
-                });
-                await batch.commit();
-            }
-
-            const supportSnap = await db.collection(SUPPORT_COLLECTION).limit(1).get();
-            if (supportSnap.empty) {
-                const batch2 = db.batch();
-                DEFAULT_SUPPORT_ROSTER.forEach(m => {
-                    batch2.set(db.collection(SUPPORT_COLLECTION).doc(m.name), m);
-                });
-                await batch2.commit();
-            }
-
-            const agentSnap = await db.collection(AGENT_COLLECTION).limit(1).get();
-            if (agentSnap.empty) {
-                const batch3 = db.batch();
-                DEFAULT_AGENTS.forEach(a => {
-                    batch3.set(db.collection(AGENT_COLLECTION).doc(a.name), a);
-                });
-                await batch3.commit();
+                attachRealtimeListeners();
             }
         }
 
@@ -1210,11 +1115,13 @@
             db.collection(SUPPORT_COLLECTION).onSnapshot(snap => {
                 supportCache = snap.docs.map(d => d.data());
                 renderRosterManagement();
+                renderEmailsManagement();
             }, err => console.error('supportRoster listener error:', err));
 
             db.collection(AGENT_COLLECTION).onSnapshot(snap => {
                 agentsCache = snap.docs.map(d => d.data());
                 renderAgentRosterManagement();
+                renderEmailsManagement();
                 renderDashboard();
             }, err => console.error('agentRoster listener error:', err));
 
@@ -1273,18 +1180,22 @@
             const supportSec = document.getElementById('supportRosterSection');
             const agentSec = document.getElementById('agentRosterSection');
             const tlSec = document.getElementById('tlRosterSection');
+            const emailsSec = document.getElementById('emailsSection');
 
             const supportBtn = document.getElementById('tabSupportBtn');
             const agentBtn = document.getElementById('tabAgentBtn');
             const tlBtn = document.getElementById('tabTLBtn');
+            const emailsBtn = document.getElementById('tabEmailsBtn');
 
             supportSec.classList.add('hidden');
             agentSec.classList.add('hidden');
             tlSec.classList.add('hidden');
+            emailsSec.classList.add('hidden');
 
             supportBtn.classList.remove('active');
             agentBtn.classList.remove('active');
             tlBtn.classList.remove('active');
+            emailsBtn.classList.remove('active');
 
             if (type === 'support') {
                 supportSec.classList.remove('hidden');
@@ -1295,6 +1206,10 @@
             } else if (type === 'tl') {
                 tlSec.classList.remove('hidden');
                 tlBtn.classList.add('active');
+            } else if (type === 'emails') {
+                emailsSec.classList.remove('hidden');
+                emailsBtn.classList.add('active');
+                renderEmailsManagement();
             }
         }
 
@@ -1326,6 +1241,11 @@
             const container = document.getElementById('tlListContainer');
             const tls = teamLeadsCache;
             container.innerHTML = '';
+
+            if (tls.length === 0) {
+                container.innerHTML = `<p style="font-size: 12px; color: var(--text-muted); padding: 8px 2px;">No Team Leads yet. Add one above, or import agents from Excel and any new supervisor names will be added automatically.</p>`;
+                return;
+            }
 
             tls.forEach((tl) => {
                 const item = document.createElement('div');
@@ -1442,11 +1362,24 @@
 
             document.getElementById('rosterCount').textContent = filtered.length;
 
+            if (filtered.length === 0) {
+                listContainer.innerHTML = roster.length === 0
+                    ? `<p style="font-size: 12px; color: var(--text-muted); padding: 8px 2px;">No support members yet. Add one above to get started.</p>`
+                    : `<p style="font-size: 12px; color: var(--text-muted); padding: 8px 2px;">No matches for that search.</p>`;
+                return;
+            }
+
             filtered.forEach((member) => {
                 const item = document.createElement('div');
                 item.className = 'roster-item';
+                const emailLine = member.email
+                    ? `<div style="font-size: 10px; color: var(--text-muted);">${member.email}</div>`
+                    : `<div style="font-size: 10px; color: var(--danger-red);">No email on file</div>`;
                 item.innerHTML = `
-                    <span><strong>${member.name}</strong> (${member.team})</span>
+                    <div>
+                        <strong>${member.name}</strong> (${member.team})
+                        ${emailLine}
+                    </div>
                     <div class="roster-item-actions">
                         <button class="btn-edit" onclick='openEditSupportModal("${member.name.replace(/'/g, "\\'")}")'>Edit</button>
                         <button class="btn-delete" onclick='deleteSupportMember("${member.name.replace(/'/g, "\\'")}")'>Remove</button>
@@ -1459,8 +1392,10 @@
         function addSupportMember() {
             const nameInput = document.getElementById('newName');
             const teamSelect = document.getElementById('newTeam');
+            const emailInput = document.getElementById('newSupportEmail');
             const name = nameInput.value.trim();
             const team = teamSelect.value;
+            const email = emailInput.value.trim();
 
             if (!name) return alert('Please enter a support member name.');
 
@@ -1468,8 +1403,8 @@
                 return alert('Support member already exists.');
             }
 
-            db.collection(SUPPORT_COLLECTION).doc(name).set({ name, team })
-                .then(() => { nameInput.value = ''; })
+            db.collection(SUPPORT_COLLECTION).doc(name).set({ name, team, email })
+                .then(() => { nameInput.value = ''; emailInput.value = ''; })
                 .catch(err => alert('Could not save support member: ' + err.message));
         }
 
@@ -1479,7 +1414,7 @@
                 .catch(err => alert('Could not remove support member: ' + err.message));
         }
 
-        // --- SUPPORT EDIT (rename / change team, with feedback backfill) ---
+        // --- SUPPORT EDIT (rename / change team / email, with feedback backfill) ---
         let editingSupportOriginalName = null;
 
         function openEditSupportModal(name) {
@@ -1489,6 +1424,7 @@
             editingSupportOriginalName = member.name;
             document.getElementById('editSupportNameInput').value = member.name;
             document.getElementById('editSupportTeamSelect').value = member.team;
+            document.getElementById('editSupportEmailInput').value = member.email || '';
             document.getElementById('editSupportModal').classList.remove('hidden');
         }
 
@@ -1502,15 +1438,16 @@
 
             const newName = document.getElementById('editSupportNameInput').value.trim();
             const newTeam = document.getElementById('editSupportTeamSelect').value;
+            const newEmail = document.getElementById('editSupportEmailInput').value.trim();
             const oldName = editingSupportOriginalName;
 
             if (!newName) return alert('Name cannot be empty.');
 
-            // Name unchanged - just update the team on the same doc, and
-            // also refresh the "team" field on any past feedback rows so
-            // team-based filters/summary stay in sync.
+            // Name unchanged - just update the team/email on the same doc,
+            // and also refresh the "team" field on any past feedback rows
+            // so team-based filters/summary stay in sync.
             if (newName === oldName) {
-                db.collection(SUPPORT_COLLECTION).doc(newName).set({ name: newName, team: newTeam })
+                db.collection(SUPPORT_COLLECTION).doc(newName).set({ name: newName, team: newTeam, email: newEmail })
                     .then(() => backfillFeedbackField('supportName', oldName, newName, { team: newTeam }))
                     .then(() => closeEditSupportModal())
                     .catch(err => alert('Could not update support member: ' + err.message));
@@ -1524,7 +1461,7 @@
                 return alert('A support member with that name already exists.');
             }
 
-            db.collection(SUPPORT_COLLECTION).doc(newName).set({ name: newName, team: newTeam })
+            db.collection(SUPPORT_COLLECTION).doc(newName).set({ name: newName, team: newTeam, email: newEmail })
                 .then(() => db.collection(SUPPORT_COLLECTION).doc(oldName).delete())
                 .then(() => backfillFeedbackField('supportName', oldName, newName, { team: newTeam }))
                 .then(() => closeEditSupportModal())
@@ -1547,13 +1484,24 @@
 
             document.getElementById('agentCount').textContent = filtered.length;
 
+            if (filtered.length === 0) {
+                listContainer.innerHTML = agents.length === 0
+                    ? `<p style="font-size: 12px; color: var(--text-muted); padding: 8px 2px;">No agents yet. Add one above, or use "📥 Import Agents from Excel" to load your whole roster at once.</p>`
+                    : `<p style="font-size: 12px; color: var(--text-muted); padding: 8px 2px;">No matches for that search/filter.</p>`;
+                return;
+            }
+
             filtered.forEach((agent) => {
                 const item = document.createElement('div');
                 item.className = 'roster-item';
+                const emailLine = agent.email
+                    ? `<div style="font-size: 10px; color: var(--text-muted);">${agent.email}</div>`
+                    : `<div style="font-size: 10px; color: var(--danger-red);">No email on file</div>`;
                 item.innerHTML = `
                     <div>
                         <strong>${agent.name}</strong>
                         <div style="font-size: 10px; color: var(--text-muted);">TL: ${agent.tl || 'N/A'} | ${agent.location || 'N/A'}</div>
+                        ${emailLine}
                     </div>
                     <div class="roster-item-actions">
                         <button class="btn-edit" onclick='openEditAgentModal("${agent.name.replace(/'/g, "\\'")}")'>Edit</button>
@@ -1564,7 +1512,7 @@
             });
         }
 
-        // --- AGENT EDIT (Name / TL / Location, with feedback backfill) ---
+        // --- AGENT EDIT (Name / TL / Location / Email, with feedback backfill) ---
         let editingAgentOriginalName = null;
 
         function openEditAgentModal(name) {
@@ -1583,6 +1531,7 @@
             });
 
             document.getElementById('editAgentLocationSelect').value = agent.location || 'MNL - Manila';
+            document.getElementById('editAgentEmailInput').value = agent.email || '';
             document.getElementById('editAgentModal').classList.remove('hidden');
         }
 
@@ -1597,15 +1546,16 @@
             const newName = document.getElementById('editAgentNameDisplay').value.trim();
             const tl = document.getElementById('editAgentTLSelect').value;
             const location = document.getElementById('editAgentLocationSelect').value;
+            const email = document.getElementById('editAgentEmailInput').value.trim();
             const oldName = editingAgentOriginalName;
 
             if (!newName) return alert('Agent name cannot be empty.');
 
-            // Name unchanged, just update TL / location on the same doc.
-            // TL/location aren't stored on feedback rows, so no backfill
-            // is needed here.
+            // Name unchanged, just update TL / location / email on the
+            // same doc. None of these are stored on feedback rows, so no
+            // backfill is needed here.
             if (newName === oldName) {
-                db.collection(AGENT_COLLECTION).doc(oldName).update({ tl, location })
+                db.collection(AGENT_COLLECTION).doc(oldName).update({ tl, location, email })
                     .then(() => closeEditAgentModal())
                     .catch(err => alert('Could not update agent: ' + err.message));
                 return;
@@ -1618,7 +1568,7 @@
                 return alert('An agent with that name already exists.');
             }
 
-            db.collection(AGENT_COLLECTION).doc(newName).set({ name: newName, tl, location })
+            db.collection(AGENT_COLLECTION).doc(newName).set({ name: newName, tl, location, email })
                 .then(() => db.collection(AGENT_COLLECTION).doc(oldName).delete())
                 .then(() => backfillFeedbackField('agentUser', oldName, newName))
                 .then(() => closeEditAgentModal())
@@ -1629,10 +1579,12 @@
             const nameInput = document.getElementById('newAgentName');
             const tlSelect = document.getElementById('newAgentSupervisorSelect');
             const locSelect = document.getElementById('newAgentLocation');
+            const emailInput = document.getElementById('newAgentEmail');
 
             const name = nameInput.value.trim();
             const tl = tlSelect.value;
             const location = locSelect.value;
+            const email = emailInput.value.trim();
 
             if (!name) return alert('Please enter an agent name.');
 
@@ -1640,8 +1592,8 @@
                 return alert('Agent already exists.');
             }
 
-            db.collection(AGENT_COLLECTION).doc(name).set({ name, tl, location })
-                .then(() => { nameInput.value = ''; })
+            db.collection(AGENT_COLLECTION).doc(name).set({ name, tl, location, email })
+                .then(() => { nameInput.value = ''; emailInput.value = ''; })
                 .catch(err => alert('Could not save agent: ' + err.message));
         }
 
@@ -1649,6 +1601,367 @@
             if (!confirm('Remove agent from active roster?')) return;
             db.collection(AGENT_COLLECTION).doc(name).delete()
                 .catch(err => alert('Could not remove agent: ' + err.message));
+        }
+
+        // --- EMAIL MANAGEMENT (shared by Support + Agent rosters) ---
+        // The "Emails" tab is a unified view over both rosters so a
+        // supervisor can see/edit everyone's email in one place instead of
+        // hunting through the Support and Agent tabs separately. It writes
+        // straight back to whichever collection (supportRoster or
+        // agentRoster) the person's record actually lives in.
+        function renderEmailsManagement() {
+            const search = (document.getElementById('searchEmailsRoster').value || '').toLowerCase();
+            const missingFilter = document.getElementById('emailsMissingFilter').value;
+            const listContainer = document.getElementById('emailsList');
+
+            const people = [
+                ...supportCache.map(r => ({ ...r, roster: 'support', label: `${r.team} Support` })),
+                ...agentsCache.map(a => ({ ...a, roster: 'agent', label: `Agent${a.tl ? ' • TL: ' + a.tl : ''}` }))
+            ].sort((a, b) => a.name.localeCompare(b.name));
+
+            let filtered = people.filter(p => p.name.toLowerCase().includes(search));
+            if (missingFilter === 'MISSING') filtered = filtered.filter(p => !p.email);
+            if (missingFilter === 'SET') filtered = filtered.filter(p => !!p.email);
+
+            document.getElementById('emailsCount').textContent = filtered.length;
+            listContainer.innerHTML = '';
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<p style="font-size: 12px; color: var(--text-muted); padding: 8px 2px;">${people.length === 0 ? 'No Support or Agent records yet.' : 'No matches for that search/filter.'}</p>`;
+                return;
+            }
+
+            filtered.forEach((person) => {
+                const row = document.createElement('div');
+                row.className = 'roster-item';
+                row.style.flexDirection = 'column';
+                row.style.alignItems = 'stretch';
+                row.style.gap = '6px';
+                const safeName = person.name.replace(/'/g, "\\'");
+                row.innerHTML = `
+                    <div style="display:flex; justify-content: space-between; align-items: baseline;">
+                        <strong>${person.name}</strong>
+                        <span style="font-size: 10px; color: var(--text-muted);">${person.label}</span>
+                    </div>
+                    <div style="display:flex; gap: 6px;">
+                        <input type="email" class="person-email-input" data-roster="${person.roster}" data-name="${safeName}" value="${person.email || ''}" placeholder="name@verifone.com" style="flex:1;">
+                        <button class="btn-edit" onclick='savePersonEmail("${person.roster}", "${safeName}")'>Save</button>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function savePersonEmail(roster, name) {
+            const input = document.querySelector(`.person-email-input[data-roster="${roster}"][data-name="${name.replace(/"/g, '&quot;')}"]`);
+            if (!input) return;
+            const email = input.value.trim();
+            const collection = roster === 'agent' ? AGENT_COLLECTION : SUPPORT_COLLECTION;
+
+            db.collection(collection).doc(name).set({ email }, { merge: true })
+                .then(() => { input.style.borderColor = 'var(--accent-teal)'; setTimeout(() => { input.style.borderColor = ''; }, 800); })
+                .catch(err => alert('Could not save email: ' + err.message));
+        }
+
+        // One-click helper: matches a short list of name -> email pairs
+        // (the ones a supervisor has already provided) against whichever
+        // roster currently has that name - Support first, then Agent - and
+        // writes the email in. Names that don't match either roster are
+        // reported back so they can be added first. Safe to re-run; it
+        // only ever sets the email field and never touches anything else.
+        const KNOWN_EMAIL_LIST = [
+            { name: "Zachary Jeremy Payabyab", email: "ZacharyJeremy.S.Payabyab@VERIFONE.com" },
+            { name: "Melvin Lagrosa", email: "T_MelvinL3@verifone.com" },
+            { name: "Kristian Ong", email: "T_MelvinL3@verifone.com" },
+            { name: "Judy Tolentino", email: "T_Judy_T2@VERIFONE.com" },
+            { name: "Christian Mark Patdu", email: "ChristianMark.Patdu@VERIFONE.com" },
+            { name: "Raven Guasis", email: "Raven.Guasis@VERIFONE.com" },
+            { name: "Glory Barbacena", email: "Glory.Barbacena@VERIFONE.com" },
+            { name: "Gemmalyn Silvestre", email: "T_GemmalynS1@VERIFONE.com" },
+            { name: "Donald Sayers", email: "Donald.Sayers@VERIFONE.com" },
+            { name: "Gerardo Morales", email: "Gerardo.Morales@VERIFONE.com" },
+            { name: "James Warder", email: "James.Warder@VERIFONE.com" },
+            { name: "Jesse McQueary", email: "Jesse.McQueary@VERIFONE.com" },
+            { name: "Justine Santa Cruz", email: "Justine.SantaCruz@VERIFONE.com" },
+            { name: "Kimber Dawson", email: "Kimber.Dawson@VERIFONE.com" },
+            { name: "Robert Hasson", email: "Robert.Hasson@VERIFONE.com" },
+            { name: "Wendy Franco", email: "Wendy.Franco@VERIFONE.com" },
+            { name: "Ryan Chavez Higel", email: "Ryan.ChavezHigel@VERIFONE.com" },
+            { name: "Ashley Busch Maynard", email: "Ashley.BuschMaynard@VERIFONE.com" }
+        ];
+
+        async function applyKnownEmailList() {
+            const matched = [];
+            const unmatched = [];
+
+            KNOWN_EMAIL_LIST.forEach(entry => {
+                const supportHit = supportCache.find(r => r.name.toLowerCase() === entry.name.toLowerCase());
+                const agentHit = agentsCache.find(a => a.name.toLowerCase() === entry.name.toLowerCase());
+                if (supportHit) {
+                    matched.push({ roster: 'support', name: supportHit.name, email: entry.email });
+                } else if (agentHit) {
+                    matched.push({ roster: 'agent', name: agentHit.name, email: entry.email });
+                } else {
+                    unmatched.push(entry.name);
+                }
+            });
+
+            if (!matched.length) {
+                alert(unmatched.length
+                    ? `None of these names were found in either roster yet:\n\n${unmatched.join('\n')}\n\nAdd them to the Support or Agent roster first, then try again.`
+                    : 'Nothing to apply.');
+                return;
+            }
+
+            try {
+                let batch = db.batch();
+                matched.forEach(m => {
+                    const collection = m.roster === 'agent' ? AGENT_COLLECTION : SUPPORT_COLLECTION;
+                    batch.set(db.collection(collection).doc(m.name), { email: m.email }, { merge: true });
+                });
+                await batch.commit();
+
+                let msg = `Updated ${matched.length} email address(es).`;
+                if (unmatched.length) {
+                    msg += `\n\nCould not find these names in either roster:\n${unmatched.join('\n')}`;
+                }
+                alert(msg);
+                renderEmailsManagement();
+            } catch (err) {
+                alert('Could not apply email list: ' + err.message);
+            }
+        }
+
+        // --- AGENT IMPORT FROM EXCEL ---
+        // Lets a supervisor upload a spreadsheet of Agent Name + Supervisor
+        // (the "Team Lead / TL" field) and bulk-update the agent roster,
+        // instead of adding agents one at a time. Nothing is written to
+        // Firestore until the supervisor reviews the preview and clicks
+        // "Confirm Import". Any Supervisor name in the sheet that doesn't
+        // already exist in the Team Leads roster is created automatically.
+        let pendingImportRows = [];
+
+        // Finds a column in a parsed spreadsheet row (an object keyed by
+        // header text) by trying several possible header names, so the
+        // sheet doesn't have to use the exact phrase "Agent Name".
+        function findColumnKey(rowObj, candidates) {
+            const keys = Object.keys(rowObj || {});
+            for (const c of candidates) {
+                const exact = keys.find(k => k.toLowerCase().trim() === c);
+                if (exact) return exact;
+            }
+            for (const c of candidates) {
+                const partial = keys.find(k => k.toLowerCase().includes(c));
+                if (partial) return partial;
+            }
+            return null;
+        }
+
+        // Normalizes free-text location/site values (e.g. "Manila",
+        // "manila office") to one of the four standard location strings
+        // used elsewhere in this app. Returns null if it can't tell.
+        function normalizeLocationText(text) {
+            if (!text) return null;
+            const t = String(text).toLowerCase();
+            if (t.includes('mnl') || t.includes('manila')) return 'MNL - Manila';
+            if (t.includes('tus') || t.includes('tucson')) return 'TUS - Tucson';
+            if (t.includes('blr') || t.includes('bangalore')) return 'BLR - Bangalore';
+            if (t.includes('mis') || t.includes('canada')) return 'MIS - Canada';
+            return null;
+        }
+
+        // Best-guess location for one import row: keep an existing agent's
+        // current location, otherwise try the sheet's own location column
+        // (if any), otherwise fall back to the matching Team Lead's site.
+        // Returns null when nothing can be inferred, so the preview table
+        // can ask the supervisor to pick one.
+        function inferImportRowLocation(row) {
+            const existingAgent = agentsCache.find(a => a.name.toLowerCase() === row.name.toLowerCase());
+            if (existingAgent && existingAgent.location) return existingAgent.location;
+
+            const fromSheet = normalizeLocationText(row.location);
+            if (fromSheet) return fromSheet;
+
+            const tl = teamLeadsCache.find(t => t.name.toLowerCase() === row.supervisor.toLowerCase());
+            if (tl && tl.site) return tl.site;
+
+            return null;
+        }
+
+        function handleAgentImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const wb = XLSX.read(data, { type: 'array' });
+                    const sheet = wb.Sheets[wb.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+                    if (!json.length) {
+                        alert('That spreadsheet appears to be empty.');
+                        return;
+                    }
+
+                    const nameKey = findColumnKey(json[0], ['agent name', 'name']);
+                    const supKey = findColumnKey(json[0], ['supervisor', 'team lead', 'tl']);
+                    const locKey = findColumnKey(json[0], ['location', 'site']);
+
+                    if (!nameKey) {
+                        alert('Could not find an "Agent Name" column in that spreadsheet. Please check the column headers.');
+                        return;
+                    }
+
+                    pendingImportRows = json
+                        .map(r => ({
+                            name: String(r[nameKey] || '').trim(),
+                            supervisor: supKey ? String(r[supKey] || '').trim() : '',
+                            location: locKey ? String(r[locKey] || '').trim() : ''
+                        }))
+                        .filter(r => r.name);
+
+                    if (!pendingImportRows.length) {
+                        alert('No agent rows were found in that spreadsheet.');
+                        return;
+                    }
+
+                    renderImportPreview();
+                } catch (err) {
+                    console.error('Import parse error:', err);
+                    alert('Could not read that file. Please make sure it is a valid Excel (.xlsx) file.');
+                } finally {
+                    // Allow re-selecting the same file again later.
+                    event.target.value = '';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function renderImportPreview() {
+            const body = document.getElementById('importPreviewBody');
+            const summary = document.getElementById('importSummaryLine');
+            body.innerHTML = '';
+
+            let newCount = 0;
+            let updateCount = 0;
+            let unchangedCount = 0;
+
+            pendingImportRows.forEach((row, idx) => {
+                const existingAgent = agentsCache.find(a => a.name.toLowerCase() === row.name.toLowerCase());
+                const inferredLocation = inferImportRowLocation(row);
+                let status, statusBadge;
+
+                if (!existingAgent) {
+                    status = 'new';
+                    newCount++;
+                    statusBadge = `<span class="badge badge-success">New</span>`;
+                } else if ((existingAgent.tl || '') !== row.supervisor) {
+                    status = 'update';
+                    updateCount++;
+                    statusBadge = `<span class="badge badge-success">Update Supervisor</span>`;
+                } else {
+                    status = 'unchanged';
+                    unchangedCount++;
+                    statusBadge = `<span class="badge" style="background: var(--input-border); color: var(--text-muted);">No Change</span>`;
+                }
+
+                const supervisorIsNewTL = row.supervisor &&
+                    !teamLeadsCache.some(t => t.name.toLowerCase() === row.supervisor.toLowerCase());
+
+                const tr = document.createElement('tr');
+                const locationCell = inferredLocation
+                    ? `${inferredLocation}`
+                    : `<select class="import-location-select" data-idx="${idx}" style="width: auto; font-size: 12px; padding: 4px 6px;">
+                            <option value="MNL - Manila">MNL - Manila</option>
+                            <option value="TUS - Tucson">TUS - Tucson</option>
+                            <option value="BLR - Bangalore">BLR - Bangalore</option>
+                            <option value="MIS - Canada">MIS - Canada</option>
+                       </select>`;
+
+                tr.innerHTML = `
+                    <td class="nowrap">${row.name}</td>
+                    <td class="nowrap">${row.supervisor || '<i style="color: var(--text-muted);">none</i>'}${supervisorIsNewTL ? ' <span class="badge badge-success" style="margin-left:4px;">New TL</span>' : ''}</td>
+                    <td class="nowrap">${locationCell}</td>
+                    <td class="nowrap">${statusBadge}</td>
+                `;
+                body.appendChild(tr);
+            });
+
+            const newTLNames = new Set(
+                pendingImportRows
+                    .filter(r => r.supervisor && !teamLeadsCache.some(t => t.name.toLowerCase() === r.supervisor.toLowerCase()))
+                    .map(r => r.supervisor.toLowerCase())
+            );
+
+            summary.textContent = `${pendingImportRows.length} row(s) found — ${newCount} new agent(s), ${updateCount} supervisor update(s), ${unchangedCount} unchanged${newTLNames.size ? `, ${newTLNames.size} new Team Lead(s) will be created` : ''}.`;
+
+            document.getElementById('importPreviewModal').classList.remove('hidden');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importPreviewModal').classList.add('hidden');
+            pendingImportRows = [];
+        }
+
+        async function confirmAgentImport() {
+            if (!pendingImportRows.length) return;
+
+            const rowsWithLocation = pendingImportRows.map((row, idx) => {
+                const inferred = inferImportRowLocation(row);
+                if (inferred) return { ...row, location: inferred };
+                const select = document.querySelector(`.import-location-select[data-idx="${idx}"]`);
+                return { ...row, location: select ? select.value : 'MNL - Manila' };
+            });
+
+            // Collect any supervisor names that don't exist as Team Leads
+            // yet, so they get created alongside the agents in one batch.
+            const newTLs = {};
+            rowsWithLocation.forEach(r => {
+                if (!r.supervisor) return;
+                const key = r.supervisor.toLowerCase();
+                if (!teamLeadsCache.some(t => t.name.toLowerCase() === key) && !newTLs[key]) {
+                    newTLs[key] = { name: r.supervisor, site: r.location };
+                }
+            });
+
+            try {
+                let batch = db.batch();
+                let opCount = 0;
+                const commits = [];
+
+                function addSet(ref, data) {
+                    batch.set(ref, data, { merge: true });
+                    opCount++;
+                    if (opCount === 450) {
+                        commits.push(batch.commit());
+                        batch = db.batch();
+                        opCount = 0;
+                    }
+                }
+
+                Object.values(newTLs).forEach(tl => {
+                    addSet(db.collection(TL_COLLECTION).doc(tl.name), tl);
+                });
+
+                rowsWithLocation.forEach(r => {
+                    addSet(db.collection(AGENT_COLLECTION).doc(r.name), {
+                        name: r.name,
+                        tl: r.supervisor,
+                        location: r.location
+                    });
+                });
+
+                commits.push(batch.commit());
+                await Promise.all(commits);
+
+                alert(`Import complete: ${rowsWithLocation.length} agent(s) processed${Object.keys(newTLs).length ? `, ${Object.keys(newTLs).length} new Team Lead(s) added` : ''}.`);
+                closeImportModal();
+            } catch (err) {
+                console.error('Import failed:', err);
+                alert('Import failed: ' + err.message);
+            }
         }
 
         // --- FEEDBACK DATA (SHARED WITH index.html) ---
@@ -1721,6 +2034,38 @@
         }
 
         // --- DASHBOARD RENDER & FILTERING ---
+        // Month names used when building a human-readable label for
+        // whatever period is currently selected (e.g. "October 2026",
+        // "All of 2026", "All Time"). Shared by the comments/history
+        // modals and the emailed summaries so what you see on screen
+        // always matches what gets sent.
+        const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        function describePeriod(yearFilter, monthFilter, startDate, endDate) {
+            if (startDate || endDate) {
+                const fmt = d => d ? new Date(d + 'T00:00:00').toLocaleDateString() : '…';
+                return `${fmt(startDate)} – ${fmt(endDate)}`;
+            }
+            if (yearFilter !== 'ALL' && monthFilter !== 'ALL') {
+                return `${MONTH_NAMES[parseInt(monthFilter, 10) - 1]} ${yearFilter}`;
+            }
+            if (monthFilter !== 'ALL') {
+                return `${MONTH_NAMES[parseInt(monthFilter, 10) - 1]} (All Years)`;
+            }
+            if (yearFilter !== 'ALL') {
+                return `All of ${yearFilter}`;
+            }
+            return 'All Time';
+        }
+
+        // The feedback list currently shown on the Support Performance tab,
+        // after the Team/Year/Month/Date filters above it are applied. The
+        // Support comments modal reads from this (instead of re-fetching
+        // every submission ever made) so "Click name for comments" and its
+        // Email Summary only ever cover the period you're looking at.
+        let currentSupportFilteredFeedback = [];
+        let currentSupportPeriodLabel = 'All Time';
+
         function renderDashboard() {
             const feedback = loadFeedbackData();
             const teamFilter = document.getElementById('teamFilter').value;
@@ -1739,6 +2084,9 @@
                 if (endDate && itemDate > new Date(endDate + 'T23:59:59')) return false;
                 return true;
             });
+
+            currentSupportFilteredFeedback = filteredFeedback;
+            currentSupportPeriodLabel = describePeriod(yearFilter, monthFilter, startDate, endDate);
 
             renderTeamSummaryStats(filteredFeedback);
             renderSupportSummary(filteredFeedback);
@@ -1850,6 +2198,13 @@
             });
         }
 
+        // Same idea as currentSupportFilteredFeedback/currentSupportPeriodLabel
+        // above, but for the Agent Survey Credits tab's own Year/Month/Date
+        // filters, keyed by agent name so the Agent History modal can pull
+        // exactly what's on screen for whichever agent was clicked.
+        let currentAgentFilteredFeedbackByName = {};
+        let currentAgentPeriodLabel = 'All Time';
+
         function renderAgentCredits() {
             const agents = agentsCache;
             const feedback = loadFeedbackData();
@@ -1861,6 +2216,9 @@
             const monthFilter = document.getElementById('creditMonthFilter').value;
             const startDate = document.getElementById('creditStartDate').value;
             const endDate = document.getElementById('creditEndDate').value;
+
+            currentAgentPeriodLabel = describePeriod(yearFilter, monthFilter, startDate, endDate);
+            currentAgentFilteredFeedbackByName = {};
 
             const tbody = document.getElementById('agentCreditBody');
             tbody.innerHTML = '';
@@ -1883,6 +2241,8 @@
                     if (endDate && fDate > new Date(endDate + 'T23:59:59')) return false;
                     return true;
                 });
+
+                currentAgentFilteredFeedbackByName[agent.name.toLowerCase()] = agentSubmissions;
 
                 const used = agentSubmissions.length;
                 const remaining = Math.max(0, BASE_MONTHLY_CREDITS - used);
@@ -1912,25 +2272,40 @@
         // Tracks what the "Email Summary" button in the modal should export.
         let currentModalExport = null;
 
+        // Reads the email on file for a Support person or Agent from
+        // whichever roster has them, so the "Email Summary" button can
+        // pre-fill the "To" field instead of leaving it blank.
+        function lookupPersonEmail(type, name) {
+            if (type === 'support') {
+                const hit = supportCache.find(r => r.name.toLowerCase() === name.toLowerCase());
+                return hit && hit.email ? hit.email : '';
+            }
+            const hit = agentsCache.find(a => a.name.toLowerCase() === name.toLowerCase());
+            return hit && hit.email ? hit.email : '';
+        }
+
+        // Scoped to whatever period is currently selected on the Support
+        // Performance tab's filters (Team/Year/Month/Date) - uses the same
+        // list already shown in the on-screen summary table, so the modal
+        // and its Email Summary only ever cover that period, not all time.
         function openCommentsModal(supportName) {
-            const feedback = loadFeedbackData();
             const modal = document.getElementById('commentsModal');
             const title = document.getElementById('modalTitle');
             const subtitle = document.getElementById('modalSubtitle');
             const list = document.getElementById('modalCommentsList');
 
-            const allForSupport = feedback.filter(f => f.supportName === supportName);
+            const allForSupport = currentSupportFilteredFeedback.filter(f => f.supportName === supportName);
             const withComments = allForSupport.filter(f => f.comments);
             const avgRating = allForSupport.length
                 ? (allForSupport.reduce((sum, f) => sum + parseFloat(f.rating || 0), 0) / allForSupport.length)
                 : NaN;
 
             title.textContent = `Feedback for ${supportName}`;
-            subtitle.innerHTML = `Total Comments: ${withComments.length} &nbsp;•&nbsp; Overall Rating: ${getRatingBadge(avgRating)}`;
+            subtitle.innerHTML = `${currentSupportPeriodLabel} &nbsp;•&nbsp; Total Comments: ${withComments.length} &nbsp;•&nbsp; Overall Rating: ${getRatingBadge(avgRating)}`;
             list.innerHTML = '';
 
             if (withComments.length === 0) {
-                list.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">No comments provided for this support member.</p>`;
+                list.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">No comments provided for this support member in this period.</p>`;
             } else {
                 withComments.forEach(item => {
                     const div = document.createElement('div');
@@ -1948,33 +2323,38 @@
                 type: 'support',
                 name: supportName,
                 team: allForSupport.length ? allForSupport[0].team : 'N/A',
+                periodLabel: currentSupportPeriodLabel,
+                email: lookupPersonEmail('support', supportName),
                 avgRating: avgRating,
                 totalSubmissions: allForSupport.length,
                 allSubmissions: allForSupport,
                 comments: withComments
             };
 
+            document.getElementById('modalEmailToInput').value = currentModalExport.email;
             modal.classList.remove('hidden');
         }
 
+        // Scoped to whatever period is currently selected on the Agent
+        // Survey Credits tab's filters - uses the same per-agent list
+        // already computed for the on-screen credits table.
         function openAgentHistoryModal(agentName) {
-            const feedback = loadFeedbackData();
             const modal = document.getElementById('commentsModal');
             const title = document.getElementById('modalTitle');
             const subtitle = document.getElementById('modalSubtitle');
             const list = document.getElementById('modalCommentsList');
 
-            const filtered = feedback.filter(f => (f.agentName || '').toLowerCase() === agentName.toLowerCase());
+            const filtered = currentAgentFilteredFeedbackByName[agentName.toLowerCase()] || [];
             const avgRating = filtered.length
                 ? (filtered.reduce((sum, f) => sum + parseFloat(f.rating || 0), 0) / filtered.length)
                 : NaN;
 
             title.textContent = `Submission History for ${agentName}`;
-            subtitle.innerHTML = `Total Submissions: ${filtered.length} &nbsp;•&nbsp; Average Given: ${getRatingBadge(avgRating)}`;
+            subtitle.innerHTML = `${currentAgentPeriodLabel} &nbsp;•&nbsp; Total Submissions: ${filtered.length} &nbsp;•&nbsp; Average Given: ${getRatingBadge(avgRating)}`;
             list.innerHTML = '';
 
             if (filtered.length === 0) {
-                list.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">No submission activity logged for this agent.</p>`;
+                list.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">No submission activity logged for this agent in this period.</p>`;
             } else {
                 filtered.forEach(item => {
                     const div = document.createElement('div');
@@ -1991,16 +2371,20 @@
             currentModalExport = {
                 type: 'agent',
                 name: agentName,
+                periodLabel: currentAgentPeriodLabel,
+                email: lookupPersonEmail('agent', agentName),
                 avgRating: avgRating,
                 totalSubmissions: filtered.length,
                 entries: filtered
             };
 
+            document.getElementById('modalEmailToInput').value = currentModalExport.email;
             modal.classList.remove('hidden');
         }
 
         function closeModal() {
             document.getElementById('commentsModal').classList.add('hidden');
+            document.getElementById('modalEmailToInput').value = '';
             currentModalExport = null;
         }
 
@@ -2039,25 +2423,34 @@
 
         // Builds a mailto: link summarizing the currently open modal
         // (support feedback or agent submission history) and opens the
-        // person's default email client with it pre-filled.
+        // person's default email client with it pre-filled - addressed to
+        // whatever is in the "To" field (pre-filled from the roster email,
+        // if one is on file, and editable before sending). The subject and
+        // body always describe the period actually shown in the modal
+        // (e.g. "October 2026"), matching whatever Month/Year filter is
+        // currently selected on the dashboard, not necessarily this month.
         function emailModalFeedback() {
             if (!currentModalExport) return;
             const data = currentModalExport;
             let subject, body;
 
-            const now = new Date();
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const monthYear = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+            const toAddress = (document.getElementById('modalEmailToInput').value || '').trim();
+            const periodLabel = data.periodLabel || 'All Time';
+
+            if (!toAddress) {
+                const proceed = confirm('No email address is set for this send. Open the mail client anyway with the "To" field blank?\n\nTip: add an email in the Emails tab so this fills in automatically next time.');
+                if (!proceed) return;
+            }
 
             if (data.type === 'support') {
                 const avgText = isNaN(data.avgRating) ? 'N/A' : `${data.avgRating.toFixed(2)} / 5.0`;
                 const breakdown = getRatingBreakdown(data.allSubmissions);
                 const opportunity = generateOpportunitySummary(data.avgRating, data.totalSubmissions);
 
-                subject = `Support Performance Feedback Summary - ${data.name} (${monthYear})`;
+                subject = `Support Performance Feedback Summary - ${data.name} (${periodLabel})`;
 
-                body = `Hi Team,\n\n`;
-                body += `Please find below the performance feedback summary for ${data.name} (${data.team} Support), covering ${data.totalSubmissions} submission(s) from agents.\n\n`;
+                body = `Hi ${data.name},\n\n`;
+                body += `Please find below the performance feedback summary for ${data.name} (${data.team} Support), covering ${periodLabel} - ${data.totalSubmissions} submission(s) from agents in this period.\n\n`;
 
                 body += `OVERALL SNAPSHOT\n`;
                 body += `----------------------------------------\n`;
@@ -2084,10 +2477,10 @@
                 const avgText = isNaN(data.avgRating) ? 'N/A' : `${data.avgRating.toFixed(2)} / 5.0`;
                 const breakdown = getRatingBreakdown(data.entries);
 
-                subject = `Agent Submission History - ${data.name} (${monthYear})`;
+                subject = `Agent Submission History - ${data.name} (${periodLabel})`;
 
-                body = `Hi Team,\n\n`;
-                body += `Please find below the survey submission history for ${data.name}, covering ${data.totalSubmissions} submission(s).\n\n`;
+                body = `Hi ${data.name},\n\n`;
+                body += `Please find below your survey submission history, covering ${periodLabel} - ${data.totalSubmissions} submission(s) in this period.\n\n`;
 
                 body += `OVERALL SNAPSHOT\n`;
                 body += `----------------------------------------\n`;
@@ -2103,7 +2496,11 @@
                 });
             }
 
-            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            // Note: the "to" address itself is left un-encoded (only the
+            // subject/body query params are) - encoding it would turn the
+            // "@" into "%40", which not every mail client resolves back
+            // correctly.
+            const mailtoLink = `mailto:${toAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.location.href = mailtoLink;
         }
 
