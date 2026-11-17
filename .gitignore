@@ -1,0 +1,8 @@
+# Never commit the real Firebase config / supervisor password.
+# Use firebase-config.example.js as the template instead.
+firebase-config.js
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log
