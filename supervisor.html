@@ -1086,6 +1086,11 @@
         let feedbackCache = [];
         let listenersAttached = false;
 
+        // Tracks whether the Agent Survey Credits tab's Year/Month filters
+        // have been given their one-time default of "the current month" -
+        // see populateFilterOptions() below for why that default matters.
+        let creditFiltersInitialized = false;
+
         function authenticate() {
             const input = document.getElementById('passwordInput').value;
             if (input === AUTH_PASS) {
@@ -1323,6 +1328,18 @@
             const filterSelect = document.getElementById('tlFilter');
             const rosterTLFilter = document.getElementById('rosterTLFilter');
 
+            // Rebuilding these dropdowns' innerHTML is unavoidable whenever
+            // the Team Lead list changes, but it also resets whatever the
+            // supervisor currently has selected back to the first option -
+            // and this function re-runs on every live Firestore update, not
+            // just when a TL is actually added/removed. Remember the
+            // current selections first and restore them after rebuilding,
+            // so a filter you've chosen doesn't silently snap back to "All"
+            // while you're using the page.
+            const prevAgentSelect = agentSelect.value;
+            const prevFilterSelect = filterSelect.value;
+            const prevRosterTLFilter = rosterTLFilter.value;
+
             agentSelect.innerHTML = '<option value="">Select Team Lead / TL</option>';
             filterSelect.innerHTML = '<option value="ALL">All Team Leads</option>';
             rosterTLFilter.innerHTML = '<option value="ALL">Filter by Team Lead (All)</option>';
@@ -1333,6 +1350,10 @@
                 rosterTLFilter.innerHTML += `<option value="${tl.name}">${tl.name}</option>`;
             });
 
+            agentSelect.value = tls.some(t => t.name === prevAgentSelect) ? prevAgentSelect : '';
+            filterSelect.value = prevFilterSelect;
+            rosterTLFilter.value = prevRosterTLFilter;
+
             // Populate Years in Filters
             const feedback = loadFeedbackData();
             const years = new Set(feedback.map(f => f.dateObj.getFullYear()).filter(y => !isNaN(y)));
@@ -1341,6 +1362,10 @@
 
             const yearFilter = document.getElementById('yearFilter');
             const creditYearFilter = document.getElementById('creditYearFilter');
+            const creditMonthFilter = document.getElementById('creditMonthFilter');
+
+            const prevYearFilter = yearFilter.value;
+            const prevCreditYearFilter = creditYearFilter.value;
 
             yearFilter.innerHTML = '<option value="ALL">All Years</option>';
             creditYearFilter.innerHTML = '<option value="ALL">All Years</option>';
@@ -1349,6 +1374,30 @@
                 yearFilter.innerHTML += `<option value="${y}">${y}</option>`;
                 creditYearFilter.innerHTML += `<option value="${y}">${y}</option>`;
             });
+
+            // Same reset-on-every-update problem as above - restore the
+            // Support Performance tab's Year filter to whatever it already
+            // was, every time.
+            yearFilter.value = prevYearFilter;
+
+            // The Agent Survey Credits tab is different: it needs to match
+            // the TRUE monthly-reset cap that index.html actually enforces
+            // (4 fresh credits every calendar month). If it defaulted to
+            // "All Years / All Months" like the Support tab does, it would
+            // show each agent's lifetime submission total instead of this
+            // month's - which looks like a different, wrong number next to
+            // the real limit. So the very first time this runs, default it
+            // to the current month/year. After that, behave like the other
+            // filters above and just preserve whatever the supervisor has
+            // chosen (including deliberately switching to "All" to see
+            // historical totals).
+            if (!creditFiltersInitialized) {
+                creditFiltersInitialized = true;
+                creditYearFilter.value = currentYear.toString();
+                creditMonthFilter.value = (new Date().getMonth() + 1).toString().padStart(2, '0');
+            } else {
+                creditYearFilter.value = prevCreditYearFilter;
+            }
         }
 
         // --- SUPPORT ROSTER MANAGEMENT ---
@@ -2218,6 +2267,7 @@
             const endDate = document.getElementById('creditEndDate').value;
 
             currentAgentPeriodLabel = describePeriod(yearFilter, monthFilter, startDate, endDate);
+            document.getElementById('creditSectionHeader').textContent = `Agent Survey Credit Allowance (4 Max / Month) — ${currentAgentPeriodLabel}`;
             currentAgentFilteredFeedbackByName = {};
 
             const tbody = document.getElementById('agentCreditBody');
