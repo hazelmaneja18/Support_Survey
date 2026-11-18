@@ -528,10 +528,26 @@
             checkSupportLimit();
         }
 
+        // Credits reset every calendar month: only submissions made in the
+        // current month/year count against the limit, so an agent who used
+        // all 4 in October automatically has 4 fresh ones again in November.
+        function getAgentSubmissionsThisMonth(agentName) {
+            if (!agentName) return [];
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1; // 1-12
+
+            return feedbackCache.filter(s => {
+                if ((s.agentUser || '').toLowerCase() !== agentName.toLowerCase()) return false;
+                const d = s.dateISO ? new Date(s.dateISO + 'T00:00:00') : new Date(s.timestamp);
+                if (isNaN(d.getTime())) return false;
+                return d.getFullYear() === currentYear && (d.getMonth() + 1) === currentMonth;
+            });
+        }
+
         function getAgentRemainingCredits(agentName) {
             if (!agentName) return INITIAL_CREDITS;
-            const agentSubmissions = feedbackCache.filter(s => (s.agentUser || '').toLowerCase() === agentName.toLowerCase());
-            return Math.max(0, INITIAL_CREDITS - agentSubmissions.length);
+            return Math.max(0, INITIAL_CREDITS - getAgentSubmissionsThisMonth(agentName).length);
         }
 
         // Prevents the same agent from rating the same support person more
@@ -647,7 +663,7 @@
 
             const remaining = getAgentRemainingCredits(agentName);
             badge.classList.remove('hidden', 'badge-success', 'badge-warning', 'badge-danger');
-            badge.textContent = `${remaining} / ${INITIAL_CREDITS} Credits Left`;
+            badge.textContent = `${remaining} / ${INITIAL_CREDITS} Credits Left This Month`;
 
             if (remaining > 2) {
                 badge.classList.add('badge-success');
@@ -657,7 +673,7 @@
                 creditsExhausted = false;
             } else {
                 badge.classList.add('badge-danger');
-                badge.textContent = "0 Credits Left (Limit Reached)";
+                badge.textContent = "0 Credits Left This Month (resets next month)";
                 creditsExhausted = true;
             }
 
@@ -702,7 +718,7 @@
             const creditsLeft = getAgentRemainingCredits(selectedAgent);
 
             if (creditsLeft <= 0) {
-                alert('You have used all 4 feedback submission credits.');
+                alert('You have used all 4 feedback submission credits for this month. New credits will be available next month.');
                 return;
             }
 
@@ -760,7 +776,7 @@
 
             db.collection(FEEDBACK_COLLECTION).doc(String(newEntry.id)).set(newEntry)
                 .then(() => {
-                    alert(`Thank you! Your feedback has been recorded. You have ${creditsLeft - 1} credit(s) remaining.`);
+                    alert(`Thank you! Your feedback has been recorded. You have ${creditsLeft - 1} credit(s) remaining this month.`);
                     this.reset();
                     document.getElementById('customAgentContainer').classList.add('hidden');
                     document.getElementById('customSupportContainer').classList.add('hidden');
