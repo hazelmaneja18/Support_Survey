@@ -551,7 +551,8 @@
         }
 
         // Prevents the same agent from rating the same support person more
-        // than MAX_SUBMISSIONS_PER_SUPPORT times.
+        // than MAX_SUBMISSIONS_PER_SUPPORT times per calendar month (resets
+        // every month, same as the credit allowance above).
         const MAX_SUBMISSIONS_PER_SUPPORT = 2;
         let creditsExhausted = false;
         let supportLimitReached = false;
@@ -608,12 +609,23 @@
             return val;
         }
 
+        // Resets every calendar month, same as the agent credit limit above:
+        // only counts this agent+support pair's submissions made in the
+        // current month/year, so an agent who rated someone twice in
+        // October can rate that same person again starting in November.
         function getPairSubmissionCount(agentName, supportName) {
             if (!agentName || !supportName) return 0;
-            return feedbackCache.filter(s =>
-                (s.agentUser || '').toLowerCase() === agentName.toLowerCase() &&
-                (s.supportName || '').toLowerCase() === supportName.toLowerCase()
-            ).length;
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1; // 1-12
+
+            return feedbackCache.filter(s => {
+                if ((s.agentUser || '').toLowerCase() !== agentName.toLowerCase()) return false;
+                if ((s.supportName || '').toLowerCase() !== supportName.toLowerCase()) return false;
+                const d = s.dateISO ? new Date(s.dateISO + 'T00:00:00') : new Date(s.timestamp);
+                if (isNaN(d.getTime())) return false;
+                return d.getFullYear() === currentYear && (d.getMonth() + 1) === currentMonth;
+            }).length;
         }
 
         function checkSupportLimit() {
@@ -631,7 +643,7 @@
             const count = getPairSubmissionCount(agentName, supportName);
 
             if (count >= MAX_SUBMISSIONS_PER_SUPPORT) {
-                notice.textContent = `Looks like you've already shared feedback for ${supportName} ${MAX_SUBMISSIONS_PER_SUPPORT} times. To keep things fair for everyone, please pick a different support person for this submission.`;
+                notice.textContent = `Looks like you've already shared feedback for ${supportName} ${MAX_SUBMISSIONS_PER_SUPPORT} times this month. To keep things fair for everyone, please pick a different support person, or try again next month.`;
                 notice.classList.remove('hidden');
                 notice.classList.add('limit-notice-warning');
                 supportLimitReached = true;
@@ -735,7 +747,7 @@
 
             const pairCount = getPairSubmissionCount(selectedAgent, selectedSupport);
             if (pairCount >= MAX_SUBMISSIONS_PER_SUPPORT) {
-                alert(`You've already shared feedback for ${selectedSupport} ${MAX_SUBMISSIONS_PER_SUPPORT} times. Please choose a different support person to submit new feedback.`);
+                alert(`You've already shared feedback for ${selectedSupport} ${MAX_SUBMISSIONS_PER_SUPPORT} times this month. Please choose a different support person, or try again next month.`);
                 return;
             }
 
